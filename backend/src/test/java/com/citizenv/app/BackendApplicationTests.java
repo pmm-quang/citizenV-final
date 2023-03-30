@@ -1,4 +1,4 @@
-package com.citizenv.backend;
+package com.citizenv.app;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
