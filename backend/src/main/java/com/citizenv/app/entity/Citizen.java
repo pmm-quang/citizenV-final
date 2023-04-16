@@ -28,52 +28,30 @@ public class Citizen {
 
     private String maritalStatus;
 
-    private String ethnic;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ethnicity_id")
+    private Ethnicity ethnicity;
 
     private String otherNationality;
 
-    private String religion;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "father_id")
-    private Citizen father;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mother_id")
-    private Citizen mother;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "marriage_partner_id")
-    private Citizen marriagePartner;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "legal_representative_id")
-    private Citizen legalRepresentative;
-
-    @OneToMany(mappedBy = "father", fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private List<Citizen> fatherOf;
-
-    @OneToMany(mappedBy = "mother", fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private List<Citizen> motherOf;
-
-    @OneToMany(mappedBy = "marriagePartner", fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private List<Citizen> marriagePartnerOf;
-
-    @OneToMany(mappedBy = "legalRepresentative", fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private List<Citizen> legalRepresentativeOf;
+    @JoinColumn(name = "religion_id")
+    private Religion religion;
 
     @OneToMany(mappedBy = "citizen", fetch = FetchType.LAZY)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<Address> addresses;
+
+    @OneToMany(mappedBy = "citizen", fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<Association> associations;
+
+    @OneToMany(mappedBy = "associatedCitizen", fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<Association> associationOf;
 
     @Override
     public boolean equals(Object o) {

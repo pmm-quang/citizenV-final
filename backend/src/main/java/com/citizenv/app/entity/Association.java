@@ -5,9 +5,9 @@ import lombok.Data;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "addresses")
+@Table(name = "associations")
 @Data
-public class Address {
+public class Association {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -18,10 +18,11 @@ public class Address {
     private Citizen citizen;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hamlet_code")
-    private Hamlet hamlet;
+    @JoinColumn(name = "associated_citizen_id")
+    private Citizen associatedCitizen;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_type")
-    private AddressType addressType;
+    @JoinColumn(name = "association_type")
+    private AssociationType associationType;
+
 }
