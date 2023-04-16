@@ -8,5 +8,6 @@ public class ProvinceDto {
     private String name;
     private AdministrativeUnitDto administrativeUnit;
     private AdministrativeRegionDto administrativeRegion;
+    private String administrativeCode;
 }
 

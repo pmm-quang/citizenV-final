@@ -29,10 +29,5 @@ public class District {
     @OneToMany(mappedBy = "district", fetch = FetchType.LAZY)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private List<Address> addresses;
-
-    @OneToMany(mappedBy = "district", fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private List<User> users;
 }

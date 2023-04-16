@@ -34,14 +34,11 @@ public class Province {
     @OneToMany(mappedBy = "province", fetch = FetchType.LAZY)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private List<Address> addresses;
-
-    @OneToMany(mappedBy = "province", fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private List<User> users;
 
     public void setAdministrativeUnit(AdministrativeUnit administrativeUnit) {
         this.administrativeUnit = administrativeUnit;
     }
+
+    private String administrativeCode;
 }
