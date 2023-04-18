@@ -16,14 +16,26 @@ public class AdministrativeUnit {
     private Integer id;
 
     private String fullName;
-    private String fullNameEn;
     private String shortName;
-    private String shortNameEn;
     private String codeName;
-    private String codeNameEn;
 
     @OneToMany(mappedBy = "administrativeUnit", fetch = FetchType.LAZY)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<Province> provinceList;
+
+    @OneToMany(mappedBy = "administrativeUnit", fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<District> districtList;
+
+    @OneToMany(mappedBy = "administrativeUnit", fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<Ward> wardList;
+
+    @OneToMany(mappedBy = "administrativeUnit", fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<Hamlet> hamletList;
 }

@@ -20,6 +20,10 @@ public class Hamlet {
     @JoinColumn(name = "ward_code")
     private Ward ward;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "administrative_unit_id")
+    private AdministrativeUnit administrativeUnit;
+
     @OneToMany(mappedBy = "hamlet", fetch = FetchType.LAZY)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude

@@ -1,4 +1,4 @@
-package com.citizenv.app.service;
+package com.citizenv.app.service.impl;
 
 import com.citizenv.app.entity.Declaration;
 import com.citizenv.app.payload.DeclarationDto;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class DeclarationService {
+public class DeclarationServiceImpl {
     @Autowired
     private ModelMapper mapper;
 

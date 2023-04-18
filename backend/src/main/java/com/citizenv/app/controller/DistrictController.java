@@ -16,13 +16,13 @@ public class DistrictController {
     @Autowired
     DistrictService districtService;
 
-    @GetMapping("/")
+    @GetMapping("/")//OK
     public ResponseEntity<List<DistrictDto>> getAll() {
         List<DistrictDto> districtDtoList = districtService.getAll();
         return new ResponseEntity<List<DistrictDto>>(districtDtoList, HttpStatus.OK);
     }
 
-    @GetMapping("/{districtId}")
+    @GetMapping("/{districtId}")//OK
     public ResponseEntity<DistrictDto> getById(@PathVariable String districtId) {
         DistrictDto districtDto = districtService.getById(districtId);
         return new ResponseEntity<>(districtDto, HttpStatus.OK);

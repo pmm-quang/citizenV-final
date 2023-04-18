@@ -1,4 +1,4 @@
-package com.citizenv.app.service;
+package com.citizenv.app.service.impl;
 
 
 import com.citizenv.app.component.Utils;
@@ -22,7 +22,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class CitizenService {
+public class CitizenServiceImpl {
     @Autowired
     private ModelMapper mapper;
 
@@ -45,7 +45,7 @@ public class CitizenService {
 
     public CitizenDto getById(String citizenId) {
         Citizen citizen = repository.findById(citizenId).orElseThrow(
-                () -> new ResourceNotFoundException("Customer", "CustomerID", Long.parseLong(citizenId)));
+                () -> new ResourceNotFoundException("Customer", "CustomerID", citizenId));
         return mapper.map(citizen, CitizenDto.class);
     }
 
@@ -148,7 +148,8 @@ public class CitizenService {
 
     public String deleteById(String citizenId) {
 
-        repository.delete(repository.findById(citizenId).orElseThrow(() -> new ResourceNotFoundException("Citizen", "citizenId", Long.parseLong(citizenId))));
+        repository.delete(repository.findById(citizenId)
+                .orElseThrow(() -> new ResourceNotFoundException("Citizen", "citizenId", citizenId)));
         return "Deleted";
     }
 

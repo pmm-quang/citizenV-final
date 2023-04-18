@@ -1,4 +1,4 @@
-package com.citizenv.app.service;
+package com.citizenv.app.service.impl;
 
 
 import com.citizenv.app.entity.AdministrativeUnit;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class AdministrativeUnitService {
+public class AdministrativeUnitServiceImpl {
     @Autowired
     private ModelMapper mapper;
 
@@ -27,7 +27,7 @@ public class AdministrativeUnitService {
 
     public AdministrativeUnitDto getById(String admUnitId) {
         AdministrativeUnit au = repository.findById(Integer.parseInt(admUnitId)).orElseThrow(
-                () -> new ResourceNotFoundException("AdmUnit", "admUnitId", Long.parseLong(admUnitId)));
+                () -> new ResourceNotFoundException("AdmUnit", "admUnitId", admUnitId));
         return mapper.map(au, AdministrativeUnitDto.class);
     }
 }

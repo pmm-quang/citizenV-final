@@ -1,4 +1,4 @@
-package com.citizenv.app.service;
+package com.citizenv.app.service.impl;
 
 
 import com.citizenv.app.entity.AdministrativeRegion;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class AdministrativeRegionService {
+public class AdministrativeRegionServiceImpl {
     @Autowired
     private ModelMapper mapper;
 
@@ -27,7 +27,7 @@ public class AdministrativeRegionService {
 
     public AdministrativeRegionDto getById(String admRegionId) {
         AdministrativeRegion ad = repository.findById(Integer.parseInt(admRegionId)).orElseThrow(
-                () -> new ResourceNotFoundException("AdmRegion", "admRegionId", Long.parseLong(admRegionId)));
+                () -> new ResourceNotFoundException("AdmRegion", "admRegionId", admRegionId));
         return mapper.map(ad, AdministrativeRegionDto.class);
     }
 }

@@ -1,4 +1,4 @@
-package com.citizenv.app.service;
+package com.citizenv.app.service.impl;
 
 import com.citizenv.app.entity.User;
 import com.citizenv.app.exception.ResourceNotFoundException;
@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class UserService {
+public class UserServiceImpl {
     @Autowired
     private ModelMapper mapper;
 
@@ -31,7 +31,7 @@ public class UserService {
 
     public UserDto getById(String userId) {
         User province = repository.findById(userId).orElseThrow(
-                () -> new ResourceNotFoundException("User", "userId", Long.parseLong(userId)));
+                () -> new ResourceNotFoundException("User", "userId", userId));
         return mapper.map(province, UserDto.class);
     }
 

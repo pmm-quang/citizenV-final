@@ -1,6 +1,6 @@
 package com.citizenv.app.controller;
 import com.citizenv.app.payload.UserDto;
-import com.citizenv.app.service.UserService;
+import com.citizenv.app.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +13,7 @@ import java.util.Map;
 @RequestMapping("api/v1/user")
 public class UserController {
     @Autowired
-    UserService userService;
+    UserServiceImpl userService;
 
     @GetMapping("/")
     public ResponseEntity<List<UserDto>> getAll() {

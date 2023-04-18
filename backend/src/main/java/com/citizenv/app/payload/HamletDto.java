@@ -6,4 +6,5 @@ public class HamletDto {
     private String code;
     private String name;
     private WardDto ward;
+    private AdministrativeUnitDto administrativeUnit;
 }

@@ -1,7 +1,7 @@
 package com.citizenv.app.controller;
 
 import com.citizenv.app.payload.DeclarationDto;
-import com.citizenv.app.service.DeclarationService;
+import com.citizenv.app.service.impl.DeclarationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +17,7 @@ import java.util.List;
 @RequestMapping("api/v1/declaration")
 public class DeclarationController {
     @Autowired
-    DeclarationService declarationService;
+    DeclarationServiceImpl declarationService;
 
     @GetMapping("/")
     public ResponseEntity<List<DeclarationDto>> getAll() {

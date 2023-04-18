@@ -2,7 +2,7 @@ package com.citizenv.app.controller;
 
 import com.citizenv.app.entity.custom.Population;
 import com.citizenv.app.payload.CitizenDto;
-import com.citizenv.app.service.CitizenService;
+import com.citizenv.app.service.impl.CitizenServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +17,7 @@ import java.util.Map;
 @RequestMapping("api/v1/citizen")
 public class CitizenController {
     @Autowired
-    CitizenService citizenService;
+    CitizenServiceImpl citizenService;
 
     @GetMapping("/")
     public ResponseEntity<List<CitizenDto>> getAll() {

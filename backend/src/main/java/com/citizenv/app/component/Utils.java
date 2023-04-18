@@ -5,6 +5,41 @@ import java.util.regex.Pattern;
 
 public class Utils {
 
+    public enum AdministrativeUnitsLv1 {
+        MUNICIPALITY(1), PROVINCE(2);
+        private final int id;
+        AdministrativeUnitsLv1(int id) {
+            this.id = id;
+        }
+        public int getId() {return this.id;}
+    }
+
+    public enum AdministrativeUnitsLv2 {
+        MUNICIPALITY_CITY(3), PROVINCE_CITY(4), URBAN_DISTRICT(5), DISTRICT_LEVEL_TOWN(6), DISTRICT(7);
+        private final int id;
+        AdministrativeUnitsLv2(int id) {
+            this.id = id;
+        }
+        public int getId() {return this.id;}
+    }
+
+    public enum AdministrativeUnitsLv3 {
+        WARD(8), COMMUNE_LEVEL_TOWN(9), COMMUNE(10);
+        private final int id;AdministrativeUnitsLv3(int id) {
+            this.id = id;
+        }
+
+        public int getId() {return this.id;}
+    }
+
+    public enum AdministrativeUnitsLv4  {
+        HAMLET(11), VILLAGE(12), TRIBAL_VILLAGE(12), URBAN_NEIGHBORHOOD(13);
+        private final int id;AdministrativeUnitsLv4(int id) {
+            this.id = id;
+        }
+
+        public int getId() {return this.id;}
+    }
     /**
      * Lop tien ich xu ly ky tu tieng Viet
      *
