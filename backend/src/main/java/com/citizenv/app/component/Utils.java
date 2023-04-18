@@ -103,9 +103,40 @@ public class Utils {
         }
     }
 
+    /**
+     * Hàm kiểm tra chuỗi có phải là tên tiếng Việt hợp lệ không.
+     * Các ví dụ hợp lệ:
+     * <ul>
+     *     <li>Tên thường như Đinh Tùng Duy;</li>
+     *     <li>Tên dân tộc như K'Sante, Ch'ơm, K' Dang, Tr'Hy</li>
+     *     <li>Tên gộp bằng dấu gạch ngang như Bà Rịa - Vũng Tàu, Phan Rang - Tháp Chàm</li>
+     * </ul>
+     */
     public static boolean validateName(String name) {
-        String nameRegEx = "^[A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ][a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]{1,6}(?:[ ][A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ][a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]{1,6})*$";
+        String nameRegEx = "^[A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ][a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ']{1,6}(-*)(?:[ ][A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ][a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]{1,6})*[ -]*(?:[ -']*[A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ][a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]{1,6})*$";
         return Pattern.compile(nameRegEx).matcher(name).matches();
+    }
+
+    public static String removeNonAlphanumeric(String str)
+    {
+        str = str.replaceAll(
+                "[^a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđA-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ0-9-']", "");
+        return str;
+    }
+
+    public static String standardizeName(String name) {
+        StringBuilder sb = new StringBuilder();
+        for (String s : name.split(" ")) {
+            s = removeNonAlphanumeric(s);
+            if (s.length() > 0) {
+                sb.append(Character.toUpperCase(s.charAt(0)));
+                if (s.length() > 1) {
+                    sb.append(s.substring(1).toLowerCase());
+                }
+                sb.append(" ");
+            }
+        }
+        return sb.toString().trim();
     }
 
     public static boolean validateSex(String sex) {
