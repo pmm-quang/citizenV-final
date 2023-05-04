@@ -8,7 +8,11 @@ public interface WardService {
     List<WardDto> getAll();
     WardDto getById(String wardId);
 
-    List<WardDto> getByWardCode(String wardCode);
+    List<WardDto> getByDistrictCode(String wardCode);
+
+    List<WardDto> getByAdministrativeUnitId(int admId);
     WardDto createWard(String wardCode,String districtCode,WardDto ward);
+
+    WardDto createWard(WardDto ward);
     WardDto updateWard(String wardNeedUpdateID, WardDto ward);
 }

@@ -12,4 +12,5 @@ import java.util.List;
 public interface HamletRepository extends JpaRepository<Hamlet, String> {
     List<Hamlet> findAllByWard(Ward ward);
     List<Hamlet> findAllByAdministrativeUnit(AdministrativeUnit administrativeUnit);
+
 }

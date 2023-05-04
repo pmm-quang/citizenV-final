@@ -2,11 +2,15 @@ package com.citizenv.app.service.impl;
 
 
 import com.citizenv.app.component.Utils;
-import com.citizenv.app.entity.Citizen;
+import com.citizenv.app.entity.*;
 import com.citizenv.app.entity.custom.Population;
+import com.citizenv.app.exception.ResourceFoundException;
 import com.citizenv.app.exception.ResourceNotFoundException;
+import com.citizenv.app.payload.AddressDto;
 import com.citizenv.app.payload.CitizenDto;
 import com.citizenv.app.repository.*;
+import com.citizenv.app.service.CitizenService;
+import com.mysql.cj.protocol.WriterWatcher;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
@@ -22,31 +26,87 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class CitizenServiceImpl {
+public class CitizenServiceImpl implements CitizenService {
     @Autowired
     private ModelMapper mapper;
 
     Logger logger = LogManager.getRootLogger();
 
     @Autowired
-    private CitizenRepository repository;
+    private CitizenRepository repo;
     @Autowired
-    private DistrictRepository districtRepository;
+    private DistrictRepository districtRepo;
     @Autowired
-    private ProvinceRepository provinceRepository;
+    private ProvinceRepository provinceRepo;
     @Autowired
-    private WardRepository wardRepository;
+    private WardRepository wardRepo;
+    @Autowired
+    private HamletRepository hamletRepo;
+    @Autowired
+    private AddressRepository addressRepo;
 
 
     public List<CitizenDto> getAll() {
-        List<Citizen> entities = repository.findAll();
+        List<Citizen> entities = repo.findAll();
         return entities.stream().map(l-> mapper.map(l, CitizenDto.class)).collect(Collectors.toList());
     }
 
     public CitizenDto getById(String citizenId) {
-        Citizen citizen = repository.findById(citizenId).orElseThrow(
+        Citizen citizen = repo.findById(citizenId).orElseThrow(
                 () -> new ResourceNotFoundException("Customer", "CustomerID", citizenId));
         return mapper.map(citizen, CitizenDto.class);
+    }
+
+    @Override
+    public List<CitizenDto> getAllByHamletCode(String hamletCode) {
+        Hamlet foundHamlet = hamletRepo.findById(hamletCode).orElseThrow(
+                ()-> new ResourceNotFoundException("Hamlet", "HamletCode", hamletCode)
+        );
+//        List<Citizen> entities = repo.findAllByHamletCode(hamletCode, "1");
+        List<Citizen> entities = repo.findByAddresses_Hamlet_code(hamletCode);
+        return entities.stream().map(l-> mapper.map(l, CitizenDto.class)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CitizenDto> getAllByWardCode(String wardCode) {
+        Ward foundWard = wardRepo.findById(wardCode).orElseThrow(
+                () -> new ResourceNotFoundException("Ward", "WardCode", wardCode)
+        );
+        List<Citizen> entities = repo.findAllByWardCode(wardCode, "1");
+        return entities.stream().map(l-> mapper.map(l, CitizenDto.class)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CitizenDto> getAllByDistrictCode(String districtCode) {
+        District foundDistrict = districtRepo.findById(districtCode).orElseThrow(
+                () -> new ResourceNotFoundException("District", "DistrictCode", districtCode)
+        );
+        List<Citizen> entities = repo.findAllByDistrictCode(districtCode, "1");
+        return entities.stream().map(l-> mapper.map(l, CitizenDto.class)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CitizenDto> getAllByProvinceCode(String provinceCode) {
+        Province foundProvince = provinceRepo.findById(provinceCode).orElseThrow(
+                () -> new ResourceNotFoundException("Province", "ProvinceCode", provinceCode)
+        );
+        List<Citizen> entities = repo.findAllByProvinceCode(provinceCode, "1");
+        return entities.stream().map(l-> mapper.map(l, CitizenDto.class)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CitizenDto> getAllByAddressId(String addressId) {
+        return null;
+    }
+
+    @Override
+    public CitizenDto createCitizen(CitizenDto citizen) {
+        String citizenId = citizen.getId();
+        repo.findById(citizenId).ifPresent(
+                citizen1 -> {throw new ResourceFoundException("Citizen", "CititzenId", citizenId);
+        });
+
+        return null;
     }
 
     public CitizenDto createCitizen(Map<String, Object> JSONInfoAsMap) {
@@ -101,7 +161,7 @@ public class CitizenServiceImpl {
     }
 
     public CitizenDto updateCitizen(String citizenIdNeedUpdate, Map<String, Object> JSONInfoAsMap) throws ParseException {
-        Optional<Citizen> foundCitizen = repository.findById(citizenIdNeedUpdate);
+        Optional<Citizen> foundCitizen = repo.findById(citizenIdNeedUpdate);
         if (foundCitizen.isPresent()) {
             Citizen citizenNeedChange = foundCitizen.get();
             logger.trace("Found the thing. Updating...");
@@ -139,7 +199,7 @@ public class CitizenServiceImpl {
                 }
 
             }
-            repository.save(citizenNeedChange);
+            repo.save(citizenNeedChange);
             logger.trace("citizenUpdated");
             return mapper.map(citizenNeedChange, CitizenDto.class);
         }
@@ -148,13 +208,13 @@ public class CitizenServiceImpl {
 
     public String deleteById(String citizenId) {
 
-        repository.delete(repository.findById(citizenId)
+        repo.delete(repo.findById(citizenId)
                 .orElseThrow(() -> new ResourceNotFoundException("Citizen", "citizenId", citizenId)));
         return "Deleted";
     }
 
     public Long getCountryPopulation() {
-        return repository.count();
+        return repo.count();
     }
 
     public List<Population> getPopulationListGroupByProvince() {

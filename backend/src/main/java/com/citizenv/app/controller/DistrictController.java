@@ -1,6 +1,7 @@
 package com.citizenv.app.controller;
 
 import com.citizenv.app.payload.DistrictDto;
+
 import com.citizenv.app.service.DistrictService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,7 +15,7 @@ import java.util.List;
 @RequestMapping("api/v1/district")
 public class DistrictController {
     @Autowired
-    DistrictService districtService;
+    private DistrictService districtService;
 
     @GetMapping("/")//OK
     public ResponseEntity<List<DistrictDto>> getAll() {
@@ -26,5 +27,15 @@ public class DistrictController {
     public ResponseEntity<DistrictDto> getById(@PathVariable String districtId) {
         DistrictDto districtDto = districtService.getById(districtId);
         return new ResponseEntity<>(districtDto, HttpStatus.OK);
+    }
+
+    @GetMapping("/provinceCode/{provinceCode}")
+    public ResponseEntity<Object> getAllByProvinceCode(@PathVariable String provinceCode) {
+        try {
+            List<DistrictDto> list = districtService.getAllByProvinceCode(provinceCode);
+            return new ResponseEntity<>(list, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

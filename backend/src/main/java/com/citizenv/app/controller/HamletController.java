@@ -61,10 +61,6 @@ public class HamletController {
         try {
             HamletDto hamletDto = service.updateHamlet(hamletCode, hamlet);
             return hamletDto != null ? new ResponseEntity<>(hamletDto, HttpStatus.OK) : new ResponseEntity<>("Mã đơn vị không trùng khớp hoặc cấp bậc hành chính không chính xác", HttpStatus.OK);
-//            if (hamletDto != null) {
-//                return new ResponseEntity<>(hamletDto, HttpStatus.OK);
-//            }
-//            return new ResponseEntity<>("Mã đơn vị không trùng khớp hoặc cấp bậc hành chính không chính xác", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

@@ -31,6 +31,14 @@ public class CitizenController {
         return new ResponseEntity<>(citizenDto, HttpStatus.OK);
     }
 
+    @GetMapping("/hamlet/{hamletCode}")
+    public ResponseEntity<List<CitizenDto>> getAllByHamletCode(@PathVariable String hamletCode) {
+        List<CitizenDto> list = citizenService.getAllByHamletCode(hamletCode);
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+
+/**
     @PostMapping("/")
     public ResponseEntity<CitizenDto> create(@RequestBody Map<String, Object> citizenJSONInfo) {
         CitizenDto newCitizen = citizenService.createCitizen(citizenJSONInfo);
@@ -71,4 +79,5 @@ public class CitizenController {
         List<Population> population = citizenService.getPopulationListGroupByWard();
         return new ResponseEntity<List<Population>>(population, HttpStatus.OK);
     }
+    **/
 }

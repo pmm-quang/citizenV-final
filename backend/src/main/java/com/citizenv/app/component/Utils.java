@@ -1,11 +1,15 @@
 package com.citizenv.app.component;
 
+import java.lang.reflect.Parameter;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class Utils {
 
-    public enum AdministrativeUnitsLv1 {
+
+    public enum AdministrativeUnitsLv1{
         MUNICIPALITY(1), PROVINCE(2);
         private final int id;
         AdministrativeUnitsLv1(int id) {
@@ -40,6 +44,7 @@ public class Utils {
 
         public int getId() {return this.id;}
     }
+
     /**
      * Lop tien ich xu ly ky tu tieng Viet
      *

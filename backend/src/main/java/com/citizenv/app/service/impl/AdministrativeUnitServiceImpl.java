@@ -5,6 +5,7 @@ import com.citizenv.app.entity.AdministrativeUnit;
 import com.citizenv.app.exception.ResourceNotFoundException;
 import com.citizenv.app.payload.AdministrativeUnitDto;
 import com.citizenv.app.repository.AdministrativeUnitRepository;
+import com.citizenv.app.service.AdministrativeUnitService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class AdministrativeUnitServiceImpl {
+public class AdministrativeUnitServiceImpl implements AdministrativeUnitService {
     @Autowired
     private ModelMapper mapper;
 
@@ -25,9 +26,9 @@ public class AdministrativeUnitServiceImpl {
         return entities.stream().map(l-> mapper.map(l, AdministrativeUnitDto.class)).collect(Collectors.toList());
     }
 
-    public AdministrativeUnitDto getById(String admUnitId) {
-        AdministrativeUnit au = repository.findById(Integer.parseInt(admUnitId)).orElseThrow(
-                () -> new ResourceNotFoundException("AdmUnit", "admUnitId", admUnitId));
+    public AdministrativeUnitDto getById(int admUnitId) {
+        AdministrativeUnit au = repository.findById(admUnitId).orElseThrow(
+                () -> new ResourceNotFoundException("AdmUnit", "admUnitId", String.valueOf(admUnitId)));
         return mapper.map(au, AdministrativeUnitDto.class);
     }
 }

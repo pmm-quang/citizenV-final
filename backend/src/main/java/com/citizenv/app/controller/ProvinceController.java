@@ -34,6 +34,26 @@ public class ProvinceController {
         }
     }
 
+    @GetMapping("/administrativeUnitId/{admUnitId}")
+    public ResponseEntity<Object> getAllByAdministrativeUnitId(@PathVariable int admUnitId) {
+        try {
+            List<ProvinceDto> list = provinceService.getAllByAdministrativeUnitId(admUnitId);
+            return new ResponseEntity<>(list, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/administrativeRegionId/{admRegionId}")
+    public ResponseEntity<Object> getAllByAdministrativeRegionId(@PathVariable int admRegionId) {
+        try {
+            List<ProvinceDto> list = provinceService.getAllByAdministrativeRegionId(admRegionId);
+            return new ResponseEntity<>(list, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @PostMapping("/")
     public ResponseEntity<Object> create(@RequestBody Map<String, Object> provinceJSONInfo) {
          ProvinceDto newProvince = provinceService.createProvince(provinceJSONInfo);
