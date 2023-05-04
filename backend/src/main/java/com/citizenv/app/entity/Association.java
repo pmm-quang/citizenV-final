@@ -17,9 +17,7 @@ public class Association {
     @JoinColumn(name = "citizen_id")
     private Citizen citizen;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "associated_citizen_id")
-    private Citizen associatedCitizen;
+    private String associatedCitizenName;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "association_type")

@@ -16,8 +16,4 @@ public class CitizenDto {
     private String ethnic;
     private String otherNationality;
     private String religion;
-    private CitizenDto father;
-    private CitizenDto mother;
-    private CitizenDto marriagePartner;
-    private CitizenDto legalRepresentative;
 }

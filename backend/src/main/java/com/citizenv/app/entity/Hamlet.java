@@ -9,28 +9,15 @@ import java.util.List;
 @Entity
 @Table(name = "hamlets")
 @Data
-public class Hamlet {
-    @Id
-    @Column(name = "code", nullable = false)
-    private String code;
-
-    private String name;
-
+public class Hamlet extends AdministrativeDivision {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ward_code")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Ward ward;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "administrative_unit_id")
-    private AdministrativeUnit administrativeUnit;
 
     @OneToMany(mappedBy = "hamlet", fetch = FetchType.LAZY)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<Address> addresses;
-
-    @OneToMany(mappedBy = "hamlet", fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private List<User> users;
 }

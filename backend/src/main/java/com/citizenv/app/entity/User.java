@@ -19,20 +19,8 @@ public class User {
     private Boolean isActive;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "province_code")
-    private Province province;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "district_code")
-    private District district;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ward_code")
-    private Ward ward;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hamlet_code")
-    private Hamlet hamlet;
+    @JoinColumn(name = "code")
+    private AdministrativeDivision code;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")

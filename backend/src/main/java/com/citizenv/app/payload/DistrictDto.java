@@ -4,8 +4,6 @@ import lombok.Data;
 
 @Data
 public class DistrictDto {
-    private String code;
-    private String name;
+    private AdministrativeDivisionDto administrativeDivision;
     private ProvinceDto province;
-    private AdministrativeUnitDto administrativeUnit;
 }

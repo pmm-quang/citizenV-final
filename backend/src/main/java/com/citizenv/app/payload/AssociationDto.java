@@ -13,6 +13,6 @@ import java.io.Serializable;
 @Data
 public class AssociationDto implements Serializable {
     private CitizenDto citizen;
-    private CitizenDto associatedCitizen;
+    private String associatedCitizenName;
     private AssociationType associationType;
 }

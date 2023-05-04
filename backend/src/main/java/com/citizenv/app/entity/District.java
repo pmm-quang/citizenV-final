@@ -10,24 +10,15 @@ import java.util.List;
 @Entity
 @Table(name = "districts")
 @Data
-public class District {
-    @Id
-    @Column(name = "code", nullable = false)
-    private String code;
-    private String name;
-
+public class District extends AdministrativeDivision {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "province_code")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Province province;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "administrative_unit_id")
-    private AdministrativeUnit administrativeUnit;
-
     @OneToMany(mappedBy = "district", fetch = FetchType.LAZY)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private List<User> users;
+    private List<Ward> wards;
 }

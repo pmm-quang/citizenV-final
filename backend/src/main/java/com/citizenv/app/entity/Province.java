@@ -11,17 +11,7 @@ import java.util.List;
 @Setter
 @ToString
 @RequiredArgsConstructor
-public class Province {
-    @Id
-    @Column(name = "code", nullable = false)
-    private String code;
-
-    private String name;
-
-    @ManyToOne()
-    @JoinColumn(name = "administrative_unit_id")
-    private AdministrativeUnit administrativeUnit;
-
+public class Province extends AdministrativeDivision {
     @ManyToOne()
     @JoinColumn(name = "administrative_region_id")
     private AdministrativeRegion administrativeRegion;
@@ -30,15 +20,6 @@ public class Province {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<District> districts;
-
-    @OneToMany(mappedBy = "province", fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private List<User> users;
-
-    public void setAdministrativeUnit(AdministrativeUnit administrativeUnit) {
-        this.administrativeUnit = administrativeUnit;
-    }
 
     private String administrativeCode;
 }

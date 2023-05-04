@@ -5,7 +5,5 @@ import lombok.Data;
 public class UserDto {
     private String username;
     private Boolean isActive;
-    private ProvinceDto province;
-    private DistrictDto district;
-    private WardDto ward;
+    private AdministrativeDivisionDto administrativeDivision;
 }
