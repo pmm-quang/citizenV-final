@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 public class Utils {
 
@@ -43,6 +44,50 @@ public class Utils {
         }
 
         public int getId() {return this.id;}
+    }
+
+    public enum BloodType {
+        A, B, O, AB
+    }
+
+    public enum Sex {
+        MALE("Nam"),
+        FEMALE("Nữ"),
+        OTHER("Khác");
+
+        private final String value;
+        Sex(String s) {
+            this.value = s;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public static Sex of(String sex) {
+            return Stream.of(Sex.values())
+                    .filter(p -> p.getValue().equals(sex))
+                    .findFirst()
+                    .orElseThrow(IllegalArgumentException::new);
+        }
+    }
+
+    public enum MaritalStatus {
+        SINGLE("Chưa kết hôn"),
+        MARRIED("Đã kết hôn"),
+        DIVORCED("Ly hôn");
+
+        private final String value;
+        MaritalStatus(String s) {
+            this.value = s;
+        }
+
+        public String getValue() {
+            return value;
+        }
+        public static MaritalStatus of(String status) {
+            return Stream.of(MaritalStatus.values()).filter(targetEnum -> targetEnum.value.equals(status)).findFirst().orElseThrow(IllegalArgumentException::new);
+        }
     }
 
     /**
