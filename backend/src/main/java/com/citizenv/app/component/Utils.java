@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 public class Utils {
 
 
-    public enum AdministrativeUnitsLv1{
+    public enum AdministrativeUnitsLv1 {
         MUNICIPALITY(1), PROVINCE(2);
         private final int id;
         AdministrativeUnitsLv1(int id) {
@@ -36,7 +36,7 @@ public class Utils {
         public int getId() {return this.id;}
     }
 
-    public enum AdministrativeUnitsLv4  {
+    public enum AdministrativeUnitsLv4 {
         HAMLET(11), VILLAGE(12), TRIBAL_VILLAGE(12), URBAN_NEIGHBORHOOD(13);
         private final int id;AdministrativeUnitsLv4(int id) {
             this.id = id;

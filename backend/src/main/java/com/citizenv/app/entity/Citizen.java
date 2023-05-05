@@ -1,8 +1,5 @@
 package com.citizenv.app.entity;
 
-import com.citizenv.app.entity.enumerate.BloodType;
-import com.citizenv.app.entity.enumerate.MaritalStatus;
-import com.citizenv.app.entity.enumerate.Sex;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -27,17 +24,11 @@ public class Citizen {
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "blood_type", columnDefinition = "ENUM('A', 'B', 'O', 'AB')", nullable = false)
-    private BloodType bloodType;
+    private String bloodType;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "sex", columnDefinition = "ENUM('Nam', 'Nữ', 'Khác')", nullable = false)
-    private Sex sex;
+    private String sex;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "marital_status", columnDefinition = "ENUM('Chưa kết hôn', 'Đã kết hôn', 'Ly hôn')", nullable = false)
-    private MaritalStatus maritalStatus;
+    private String maritalStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ethnicity_id", nullable = false)
