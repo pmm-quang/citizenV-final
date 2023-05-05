@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ResourceNotFoundException extends ResourceException{
+public class ResourceNotFoundException extends ResourceException {
 
     public ResourceNotFoundException(String resourceName, String fieldName, String fieldValue) {
         super(String.format("%s not found with %s : %s\n", resourceName, fieldName, fieldValue));

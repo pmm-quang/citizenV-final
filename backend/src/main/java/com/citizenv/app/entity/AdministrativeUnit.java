@@ -22,20 +22,5 @@ public class AdministrativeUnit {
     @OneToMany(mappedBy = "administrativeUnit", fetch = FetchType.LAZY)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private List<Province> provinceList;
-
-    @OneToMany(mappedBy = "administrativeUnit", fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private List<District> districtList;
-
-    @OneToMany(mappedBy = "administrativeUnit", fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private List<Ward> wardList;
-
-    @OneToMany(mappedBy = "administrativeUnit", fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private List<Hamlet> hamletList;
+    private List<AdministrativeDivision> administrativeDivisions;
 }

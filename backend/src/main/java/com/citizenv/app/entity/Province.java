@@ -7,11 +7,13 @@ import java.util.List;
 
 @Entity
 @Table(name = "provinces")
+@PrimaryKeyJoinColumn(name = "code")
 @Getter
 @Setter
 @ToString
 @RequiredArgsConstructor
 public class Province extends AdministrativeDivision {
+
     @ManyToOne()
     @JoinColumn(name = "administrative_region_id")
     private AdministrativeRegion administrativeRegion;

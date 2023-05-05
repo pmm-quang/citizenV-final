@@ -8,6 +8,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "wards")
+@PrimaryKeyJoinColumn(name = "code")
 @Data
 public class Ward extends AdministrativeDivision {
     @ManyToOne(fetch = FetchType.LAZY)

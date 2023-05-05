@@ -11,7 +11,7 @@ import java.time.LocalTime;
 public class Declaration {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "grant_code")
@@ -21,8 +21,10 @@ public class Declaration {
     @JoinColumn(name = "proceed_code")
     private User proceedUser;
 
+    @Column(name = "start_time", columnDefinition = "DATETIME")
     private LocalTime startTime;
 
+    @Column(name = "end_time", columnDefinition = "DATETIME")
     private LocalTime endTime;
 
     private String status;

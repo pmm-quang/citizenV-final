@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface AddressTypeRepository extends JpaRepository<AddressType, String> {
+public interface AddressTypeRepository extends JpaRepository<AddressType, Integer> {
 }

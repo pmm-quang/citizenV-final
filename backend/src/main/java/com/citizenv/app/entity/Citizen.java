@@ -1,5 +1,8 @@
 package com.citizenv.app.entity;
 
+import com.citizenv.app.entity.enumerate.BloodType;
+import com.citizenv.app.entity.enumerate.MaritalStatus;
+import com.citizenv.app.entity.enumerate.Sex;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -24,12 +27,20 @@ public class Citizen {
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
-    private String sex;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "blood_type", columnDefinition = "ENUM('A', 'B', 'O', 'AB')", nullable = false)
+    private BloodType bloodType;
 
-    private String maritalStatus;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "sex", columnDefinition = "ENUM('Nam', 'Nữ', 'Khác')", nullable = false)
+    private Sex sex;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "marital_status", columnDefinition = "ENUM('Chưa kết hôn', 'Đã kết hôn', 'Ly hôn')", nullable = false)
+    private MaritalStatus maritalStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ethnicity_id")
+    @JoinColumn(name = "ethnicity_id", nullable = false)
     private Ethnicity ethnicity;
 
     private String otherNationality;
@@ -47,11 +58,6 @@ public class Citizen {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<Association> associations;
-
-    @OneToMany(mappedBy = "associatedCitizen", fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private List<Association> associationOf;
 
     @Override
     public boolean equals(Object o) {

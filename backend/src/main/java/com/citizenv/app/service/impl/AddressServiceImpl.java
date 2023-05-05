@@ -60,13 +60,13 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public List<AddressDto> getByHamletCodeAndAddressType(String hamletCode, String addressTypeId) {
+    public List<AddressDto> getByHamletCodeAndAddressType(String hamletCode, Integer addressTypeId) {
         Hamlet foundHamlet = hamletRepository.findById(hamletCode).orElseThrow(
                 ()-> new ResourceNotFoundException("Hamlet", "HamletCode", hamletCode)
         );
 
         AddressType foundAddressType = addressTypeRepository.findById(addressTypeId).orElseThrow(
-                ()-> new ResourceNotFoundException("AddressType", "AddressTypeID", addressTypeId)
+                ()-> new ResourceNotFoundException("AddressType", "AddressTypeID", addressTypeId.toString())
         );
         List<Address> list = repository.findAllByHamletAndAddressType(foundHamlet, foundAddressType);
         List<AddressDto> dtoList = list.stream().map(address -> mapper.map(address, AddressDto.class)).collect(Collectors.toList());

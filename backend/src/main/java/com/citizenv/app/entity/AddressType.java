@@ -13,7 +13,7 @@ import java.util.List;
 public class AddressType {
     @Id
     @Column(name = "id", nullable = false)
-    private String id;
+    private Integer id;
 
     private String name;
 

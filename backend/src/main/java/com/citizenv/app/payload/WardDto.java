@@ -4,6 +4,8 @@ import lombok.Data;
 
 @Data
 public class WardDto {
-    private AdministrativeDivisionDto administrativeDivision;
+    private String code;
+    private String name;
+    private AdministrativeUnitDto administrativeUnit;
     private DistrictDto district;
 }

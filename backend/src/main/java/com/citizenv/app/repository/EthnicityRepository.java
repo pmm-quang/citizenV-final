@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface EthnicityRepository extends JpaRepository<Ethnicity, String> {
+public interface EthnicityRepository extends JpaRepository<Ethnicity, Integer> {
     Optional<Ethnicity> findById(String s);
 }

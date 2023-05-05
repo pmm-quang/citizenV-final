@@ -4,6 +4,7 @@ package com.citizenv.app.service.impl;
 import com.citizenv.app.component.Utils;
 import com.citizenv.app.entity.*;
 import com.citizenv.app.entity.custom.Population;
+import com.citizenv.app.entity.enumerate.Sex;
 import com.citizenv.app.exception.ResourceFoundException;
 import com.citizenv.app.exception.ResourceNotFoundException;
 import com.citizenv.app.payload.AddressDto;
@@ -187,7 +188,7 @@ public class CitizenServiceImpl implements CitizenService {
                         if (!Utils.validateSex(property)) {
                             return null;
                         }
-                        citizenNeedChange.setSex((String) JSONInfoAsMap.get(property));
+                        citizenNeedChange.setSex(Sex.valueOf((String) JSONInfoAsMap.get(property)));
                         logger.trace("Sex changed");
                         break;
                     }

@@ -1,6 +1,6 @@
 package com.citizenv.app.exception;
 
-public class ResourceException extends RuntimeException{
+public class ResourceException extends RuntimeException {
     protected String resourceName;
     protected String fieldName;
     protected String fieldValue;

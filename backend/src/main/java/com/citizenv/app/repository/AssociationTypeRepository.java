@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-public interface AssociationTypeRepository extends JpaRepository<AssociationType, String> {
+public interface AssociationTypeRepository extends JpaRepository<AssociationType, Integer> {
 }

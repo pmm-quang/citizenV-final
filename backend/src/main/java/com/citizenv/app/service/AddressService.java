@@ -9,7 +9,7 @@ public interface AddressService {
     List<AddressDto> getAll();
     List<AddressDto> getByCitizenId(String citizenID);
     List<AddressDto> getByHamletCode(String hamletCode);
-    List<AddressDto> getByHamletCodeAndAddressType(String hamletCode, String addressTypeId);
+    List<AddressDto> getByHamletCodeAndAddressType(String hamletCode, Integer addressTypeId);
     List<AddressTypeDto> getAllAddressType();
 
 }

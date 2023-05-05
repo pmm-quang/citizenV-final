@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface AddressRepository extends JpaRepository<Address, String> {
+public interface AddressRepository extends JpaRepository<Address, Integer> {
     List<Address> findAllByCitizen(Citizen citizen);
     List<Address> findAllByHamlet(Hamlet hamlet);
 
