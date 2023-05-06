@@ -213,22 +213,4 @@ public class CitizenServiceImpl implements CitizenService {
         return "Deleted";
     }
 
-    public Long getCountryPopulation() {
-        return repo.count();
-    }
-
-    public List<Population> getPopulationListGroupByProvince() {
-//        return repository.getPopulationGroupByProvince();
-        return null;
-    }
-
-    public List<Population> getPopulationListGroupByDistrict() {
-//        return repository.getPopulationGroupByDistrict();
-        return null;
-    }
-
-    public List<Population> getPopulationListGroupByWard() {
-//        return repository.getPopulationGroupByWard();
-        return null;
-    }
 }

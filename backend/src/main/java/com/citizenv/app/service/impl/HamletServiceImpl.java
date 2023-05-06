@@ -85,7 +85,7 @@ public class HamletServiceImpl implements HamletService {
         );
 
         for (Utils.AdministrativeUnitsLv4 a: Utils.AdministrativeUnitsLv4.values()) {
-            if (administrativeUnitID == a.getId()) {
+            if (administrativeUnitID == a.getValue()) {
                 isAdministrativeUnitsLv4 = true;
             }
         }
@@ -122,7 +122,7 @@ public class HamletServiceImpl implements HamletService {
         }
 
         for (Utils.AdministrativeUnitsLv4 a: Utils.AdministrativeUnitsLv4.values()) {
-            if (administrativeUnitID == a.getId()) {
+            if (administrativeUnitID == a.getValue()) {
                 isAdministrativeUnitsLv4 = true;
             }
         }

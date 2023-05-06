@@ -1,56 +1,124 @@
 package com.citizenv.app.component;
 
-import java.lang.reflect.Parameter;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public class Utils {
 
+    interface EnumInterface<K, V> {
+        V getValue();
+        K findKey(V value);
+    }
 
-    public enum AdministrativeUnitsLv1 {
+    public enum AdministrativeUnitsLv1 implements EnumInterface<AdministrativeUnitsLv1, Integer> {
         MUNICIPALITY(1), PROVINCE(2);
-        private final int id;
+        private final Integer id;
         AdministrativeUnitsLv1(int id) {
             this.id = id;
         }
-        public int getId() {return this.id;}
+
+        @Override
+        public Integer getValue() {
+            return this.id;
+        }
+
+        @Override
+        public AdministrativeUnitsLv1 findKey(Integer value) {
+            return Stream.of(AdministrativeUnitsLv1.values())
+                    .filter(p -> p.getValue().equals(value))
+                    .findFirst()
+                    .orElseThrow(IllegalArgumentException::new);
+        }
+
+        public static boolean containsKey(Integer value) {
+            return Stream.of(AdministrativeUnitsLv1.values())
+                    .anyMatch(p -> p.getValue().equals(value));
+        }
     }
 
-    public enum AdministrativeUnitsLv2 {
+    public enum AdministrativeUnitsLv2 implements EnumInterface<AdministrativeUnitsLv2, Integer> {
         MUNICIPALITY_CITY(3), PROVINCE_CITY(4), URBAN_DISTRICT(5), DISTRICT_LEVEL_TOWN(6), DISTRICT(7);
-        private final int id;
+        private final Integer id;
         AdministrativeUnitsLv2(int id) {
             this.id = id;
         }
-        public int getId() {return this.id;}
+
+        @Override
+        public Integer getValue() {
+            return this.id;
+        }
+
+        @Override
+        public AdministrativeUnitsLv2 findKey(Integer value) {
+            return Stream.of(AdministrativeUnitsLv2.values())
+                    .filter(p -> p.getValue().equals(value))
+                    .findFirst()
+                    .orElseThrow(IllegalArgumentException::new);
+        }
+
+        public static boolean containsKey(Integer value) {
+            return Stream.of(AdministrativeUnitsLv1.values())
+                    .anyMatch(p -> p.getValue().equals(value));
+        }
     }
 
-    public enum AdministrativeUnitsLv3 {
+    public enum AdministrativeUnitsLv3 implements EnumInterface<AdministrativeUnitsLv3, Integer> {
         WARD(8), COMMUNE_LEVEL_TOWN(9), COMMUNE(10);
-        private final int id;AdministrativeUnitsLv3(int id) {
+        private final Integer id;
+        AdministrativeUnitsLv3(int id) {
             this.id = id;
         }
 
-        public int getId() {return this.id;}
+        @Override
+        public Integer getValue() {
+            return this.id;
+        }
+
+        @Override
+        public AdministrativeUnitsLv3 findKey(Integer value) {
+            return Stream.of(AdministrativeUnitsLv3.values())
+                    .filter(p -> p.getValue().equals(value))
+                    .findFirst()
+                    .orElseThrow(IllegalArgumentException::new);
+        }
+
+        public static boolean containsKey(Integer value) {
+            return Stream.of(AdministrativeUnitsLv1.values())
+                    .anyMatch(p -> p.getValue().equals(value));
+        }
     }
 
-    public enum AdministrativeUnitsLv4 {
-        HAMLET(11), VILLAGE(12), TRIBAL_VILLAGE(12), URBAN_NEIGHBORHOOD(13);
-        private final int id;AdministrativeUnitsLv4(int id) {
+    public enum AdministrativeUnitsLv4 implements EnumInterface<AdministrativeUnitsLv4, Integer> {
+        HAMLET(11), VILLAGE(12), TRIBAL_VILLAGE(13), URBAN_NEIGHBORHOOD(14);
+        private final Integer id;
+        AdministrativeUnitsLv4(int id) {
             this.id = id;
         }
+        @Override
+        public Integer getValue() {
+            return this.id;
+        }
 
-        public int getId() {return this.id;}
+        @Override
+        public AdministrativeUnitsLv4 findKey(Integer value) {
+            return Stream.of(AdministrativeUnitsLv4.values())
+                    .filter(p -> p.getValue().equals(value))
+                    .findFirst()
+                    .orElseThrow(IllegalArgumentException::new);
+        }
+
+        public static boolean containsKey(Integer value) {
+            return Stream.of(AdministrativeUnitsLv1.values())
+                    .anyMatch(p -> p.getValue().equals(value));
+        }
     }
 
     public enum BloodType {
         A, B, O, AB
     }
 
-    public enum Sex {
+    public enum Sex implements EnumInterface<Sex, String> {
         MALE("Nam"),
         FEMALE("Nữ"),
         OTHER("Khác");
@@ -60,19 +128,26 @@ public class Utils {
             this.value = s;
         }
 
+        @Override
         public String getValue() {
             return value;
         }
 
-        public static Sex of(String sex) {
+        @Override
+        public Sex findKey(String sex) {
             return Stream.of(Sex.values())
                     .filter(p -> p.getValue().equals(sex))
                     .findFirst()
                     .orElseThrow(IllegalArgumentException::new);
         }
+
+        public static boolean containsKey(Integer value) {
+            return Stream.of(AdministrativeUnitsLv1.values())
+                    .anyMatch(p -> p.getValue().equals(value));
+        }
     }
 
-    public enum MaritalStatus {
+    public enum MaritalStatus implements EnumInterface<MaritalStatus, String> {
         SINGLE("Chưa kết hôn"),
         MARRIED("Đã kết hôn"),
         DIVORCED("Ly hôn");
@@ -82,11 +157,19 @@ public class Utils {
             this.value = s;
         }
 
+        @Override
         public String getValue() {
             return value;
         }
-        public static MaritalStatus of(String status) {
+
+        @Override
+        public MaritalStatus findKey(String status) {
             return Stream.of(MaritalStatus.values()).filter(targetEnum -> targetEnum.value.equals(status)).findFirst().orElseThrow(IllegalArgumentException::new);
+        }
+
+        public static boolean containsKey(Integer value) {
+            return Stream.of(AdministrativeUnitsLv1.values())
+                    .anyMatch(p -> p.getValue().equals(value));
         }
     }
 

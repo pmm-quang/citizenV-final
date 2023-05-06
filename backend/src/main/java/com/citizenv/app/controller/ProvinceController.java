@@ -26,32 +26,20 @@ public class ProvinceController {
 
     @GetMapping("/{provinceId}")
     public ResponseEntity<Object> getById(@PathVariable String provinceId) {
-        try {
-            ProvinceDto provinceDto = provinceService.getById(provinceId);
-            return new ResponseEntity<>(provinceDto, HttpStatus.OK);
-        } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ProvinceDto provinceDto = provinceService.getById(provinceId);
+        return new ResponseEntity<>(provinceDto, HttpStatus.OK);
     }
 
     @GetMapping("/administrativeUnitId/{admUnitId}")
     public ResponseEntity<Object> getAllByAdministrativeUnitId(@PathVariable int admUnitId) {
-        try {
-            List<ProvinceDto> list = provinceService.getAllByAdministrativeUnitId(admUnitId);
-            return new ResponseEntity<>(list, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        List<ProvinceDto> list = provinceService.getAllByAdministrativeUnitId(admUnitId);
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
     @GetMapping("/administrativeRegionId/{admRegionId}")
     public ResponseEntity<Object> getAllByAdministrativeRegionId(@PathVariable int admRegionId) {
-        try {
-            List<ProvinceDto> list = provinceService.getAllByAdministrativeRegionId(admRegionId);
-            return new ResponseEntity<>(list, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        List<ProvinceDto> list = provinceService.getAllByAdministrativeRegionId(admRegionId);
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
     @PostMapping("/")
@@ -61,7 +49,7 @@ public class ProvinceController {
     }
 
     @PutMapping("/{provinceId}")
-    public ResponseEntity<ProvinceDto> update(@PathVariable String provinceId, @RequestBody ProvinceDto province) throws NoSuchMethodException {
+    public ResponseEntity<ProvinceDto> update(@PathVariable String provinceId, @RequestBody ProvinceDto province) {
         ProvinceDto newProvince = provinceService.updateProvince(provinceId, province);
         return new ResponseEntity<>(newProvince, HttpStatus.OK);
     }

@@ -29,7 +29,7 @@ public class HamletController {
         return new ResponseEntity<>(hamletDto, HttpStatus.OK);
     }
 
-    @GetMapping("/ward/{wardCode}")
+    @GetMapping("/wardCode/{wardCode}")
     public ResponseEntity<List<HamletDto>> getAllByWardCode(@PathVariable String wardCode) {
         List<HamletDto> list = service.getAllByWardCode(wardCode);
         return new ResponseEntity<>(list, HttpStatus.OK);

@@ -17,6 +17,8 @@ public interface ProvinceRepository extends JpaRepository<Province, String> {
     @Override
     Optional<Province> findById(String s);
 
+    Optional<Province> findByAdministrativeCode(String admCode);
+
     List<Province> findAllByAdministrativeUnit(AdministrativeUnit administrativeUnit);
 
     List<Province> findAllByAdministrativeRegion(AdministrativeRegion administrativeRegion);

@@ -37,26 +37,8 @@ public class CitizenController {
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-
-/**
-    @PostMapping("/")
-    public ResponseEntity<CitizenDto> create(@RequestBody Map<String, Object> citizenJSONInfo) {
-        CitizenDto newCitizen = citizenService.createCitizen(citizenJSONInfo);
-        return new ResponseEntity<>(newCitizen, HttpStatus.CREATED);
-    }
-
-    @PutMapping("/{citizenId}")
-    public ResponseEntity<CitizenDto> update(@PathVariable String citizenId, @RequestBody Map<String, Object> citizenJSONInfo) throws NoSuchMethodException, ParseException {
-        CitizenDto newCitizen = citizenService.updateCitizen(citizenId, citizenJSONInfo);
-        return new ResponseEntity<>(newCitizen, HttpStatus.OK);
-    }
-
-    @DeleteMapping("/{citizenId}")
-    public ResponseEntity<String> deleteById(@PathVariable String citizenId) {
-        return new ResponseEntity<>(citizenService.deleteById(citizenId), HttpStatus.OK);
-    }
-
-    @GetMapping("/population")
+    /*Population (dân số)*/
+    /*@GetMapping("/population")
     public ResponseEntity<Long> getCountryPopulation() {
         Long population = citizenService.getCountryPopulation();
         return new ResponseEntity<Long>(population, HttpStatus.OK);
@@ -78,6 +60,27 @@ public class CitizenController {
     public ResponseEntity<List<Population>> getPopulationListGroupByWard() {
         List<Population> population = citizenService.getPopulationListGroupByWard();
         return new ResponseEntity<List<Population>>(population, HttpStatus.OK);
+    }*/
+
+
+/**
+    @PostMapping("/")
+    public ResponseEntity<CitizenDto> create(@RequestBody Map<String, Object> citizenJSONInfo) {
+        CitizenDto newCitizen = citizenService.createCitizen(citizenJSONInfo);
+        return new ResponseEntity<>(newCitizen, HttpStatus.CREATED);
     }
+
+    @PutMapping("/{citizenId}")
+    public ResponseEntity<CitizenDto> update(@PathVariable String citizenId, @RequestBody Map<String, Object> citizenJSONInfo) throws NoSuchMethodException, ParseException {
+        CitizenDto newCitizen = citizenService.updateCitizen(citizenId, citizenJSONInfo);
+        return new ResponseEntity<>(newCitizen, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{citizenId}")
+    public ResponseEntity<String> deleteById(@PathVariable String citizenId) {
+        return new ResponseEntity<>(citizenService.deleteById(citizenId), HttpStatus.OK);
+    }
+
+
     **/
 }

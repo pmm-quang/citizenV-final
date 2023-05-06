@@ -4,6 +4,7 @@ import com.citizenv.app.component.Utils;
 import com.citizenv.app.entity.AdministrativeRegion;
 import com.citizenv.app.entity.AdministrativeUnit;
 import com.citizenv.app.entity.Province;
+import com.citizenv.app.exception.InvalidArgumentException;
 import com.citizenv.app.exception.ResourceFoundException;
 import com.citizenv.app.exception.ResourceNotFoundException;
 import com.citizenv.app.payload.ProvinceDto;
@@ -74,35 +75,49 @@ public class ProvinceServiceImpl implements ProvinceService {
 
     @Override
     public ProvinceDto createProvince(Map<String, Object> JSONInfoAsMap) {
-        boolean isAllPropertiesFound = JSONInfoAsMap.containsKey("id") &&
+        boolean isAllPropertiesFound = JSONInfoAsMap.containsKey("code") &&
                 JSONInfoAsMap.containsKey("name") &&
                 JSONInfoAsMap.containsKey("administrativeRegionId") &&
-                JSONInfoAsMap.containsKey("administrativeUnitId");
-        if (!isAllPropertiesFound //kiem tra neu AdministrativeUnitsID dung voi level
-            || (Integer) JSONInfoAsMap.get("administrativeUnitId") != Utils.AdministrativeUnitsLv1.PROVINCE.getId()
-            || (Integer) JSONInfoAsMap.get("administrativeUnitId") != Utils.AdministrativeUnitsLv1.MUNICIPALITY.getId()) {
-            return null;
+                JSONInfoAsMap.containsKey("administrativeUnitId") &&
+                JSONInfoAsMap.containsKey("administrativeCode");
+        if (!isAllPropertiesFound) {
+            System.out.println("u fucked up");
+            throw new InvalidArgumentException();
         }
-        String id = (String) JSONInfoAsMap.get("code");
-        Optional<Province> foundProvince = repository.findById(id);
-        if (foundProvince.isEmpty()) {
-            logger.trace("Found no such Id. Safe to save");
-            Province newProvince = new Province();
-            administrativeRegionRepository.findById((Integer) JSONInfoAsMap.get("administrativeRegionId")).ifPresent(foundAdmRegion -> {
-                administrativeUnitRepository.findById((Integer) JSONInfoAsMap.get("administrativeUnitId")).ifPresent(foundAdmUnit -> {
-                    //kiem tra neu AdministrativeUnitsID dung voi level
-                    newProvince.setName((String) JSONInfoAsMap.get("name"));
-                    newProvince.setAdministrativeRegion(foundAdmRegion);
-                    newProvince.setAdministrativeUnit(foundAdmUnit);
-                    logger.trace("set things done");
-                    repository.save(newProvince);
-                });
-            });
+        if (!Utils.AdministrativeUnitsLv1.containsKey((Integer) JSONInfoAsMap.get("administrativeUnitId"))) {
+            System.out.println("u fucked up too");
+            throw new InvalidArgumentException();
+        }
 
-            logger.trace("provinceCreated");
-            return mapper.map(newProvince, ProvinceDto.class);
+        String code = (String) JSONInfoAsMap.get("code");
+        String admCode = (String) JSONInfoAsMap.get("administrativeCode");
+        Optional<Province> existedProvinceByCode = repository.findById(code);
+        Optional<Province> existedProvinceByAdmCode = repository.findByAdministrativeCode(admCode);
+
+        if (existedProvinceByCode.isPresent()) {
+            throw new ResourceFoundException("Province", "code", code);
         }
-        return null;
+
+        if (existedProvinceByAdmCode.isPresent()) {
+            throw new ResourceFoundException("Province", "administrativeCode", admCode);
+        }
+
+        System.out.println("Found no such Id. Safe to save");
+        Province newProvince = new Province();
+        administrativeRegionRepository.findById((Integer) JSONInfoAsMap.get("administrativeRegionId")).ifPresent(foundAdmRegion -> {
+            administrativeUnitRepository.findById((Integer) JSONInfoAsMap.get("administrativeUnitId")).ifPresent(foundAdmUnit -> {
+                newProvince.setCode((String) JSONInfoAsMap.get("code"));
+                newProvince.setName((String) JSONInfoAsMap.get("name"));
+                newProvince.setAdministrativeRegion(foundAdmRegion);
+                newProvince.setAdministrativeUnit(foundAdmUnit);
+                newProvince.setAdministrativeCode((String) JSONInfoAsMap.get("administrativeCode"));
+                System.out.println("set things done");
+                repository.save(newProvince);
+            });
+        });
+
+        logger.info("provinceCreated");
+        return mapper.map(newProvince, ProvinceDto.class);
     }
 
     @Override
@@ -128,7 +143,7 @@ public class ProvinceServiceImpl implements ProvinceService {
 
         boolean isAdministrativeUnitsLv1 = false;
         for (Utils.AdministrativeUnitsLv1 a : Utils.AdministrativeUnitsLv1.values()) {
-            if (administrativeUnitsID == a.getId()) {
+            if (administrativeUnitsID == a.getValue()) {
                 isAdministrativeUnitsLv1 = true;
                 break;
             }
@@ -147,38 +162,37 @@ public class ProvinceServiceImpl implements ProvinceService {
 
     public ProvinceDto updateProvince(String provinceIdNeedUpdate, Map<String, Object> JSONInfoAsMap) {
         Optional<Province> foundProvince = repository.findById(provinceIdNeedUpdate);
-        if ((Integer) JSONInfoAsMap.get("administrativeUnitId") != Utils.AdministrativeUnitsLv1.PROVINCE.getId()
-                || (Integer) JSONInfoAsMap.get("administrativeUnitId") != Utils.AdministrativeUnitsLv1.MUNICIPALITY.getId()) {
-            return null;
-        }
         if (foundProvince.isPresent()) {
             Province provinceNeedChange = foundProvince.get();
-            logger.trace("Found the thing. Updating...");
+            System.out.println("Found the thing. Updating...");
             for (String property :
                     JSONInfoAsMap.keySet()) {
                 switch (property) {
                     case "code": continue;
                     case "name": {
                         provinceNeedChange.setName((String) JSONInfoAsMap.get(property));
-                        logger.trace("Name changed");
+                        System.out.println("Name changed");
                         break;
                     }
                     case "administrativeUnitId": {
+                        if (!Utils.AdministrativeUnitsLv1.containsKey((Integer) JSONInfoAsMap.get("administrativeUnitId"))) {
+                            throw new InvalidArgumentException();
+                        }
                         administrativeUnitRepository.findById((Integer) JSONInfoAsMap.get("administrativeUnitId"))
                                 .ifPresent(provinceNeedChange::setAdministrativeUnit);
-                        logger.trace("admUnit changed");
+                        System.out.println("admUnit changed");
                         break;
                     }
                     case "administrativeRegionId": {
                         administrativeRegionRepository.findById((Integer) JSONInfoAsMap.get("administrativeRegionId"))
                                 .ifPresent(provinceNeedChange::setAdministrativeRegion);
-                        logger.trace("admRegion changed");
+                        System.out.println("admRegion changed");
                         break;
                     }
                 }
             }
             repository.save(provinceNeedChange);
-            logger.trace("provinceUpdated");
+            System.out.println("provinceUpdated");
             return mapper.map(provinceNeedChange, ProvinceDto.class);
         }
         return null;

@@ -122,7 +122,7 @@ public class DistrictServiceImpl implements DistrictService {
         boolean isAdministrativeUnitsLv2 = false;
         int administrativeUnitsID = district.getAdministrativeUnit().getId();
         for (Utils.AdministrativeUnitsLv2 a : Utils.AdministrativeUnitsLv2.values()) {
-            if (a.getId() == administrativeUnitsID) {
+            if (a.getValue() == administrativeUnitsID) {
                 isAdministrativeUnitsLv2 = true;
                 break;
             }
@@ -166,7 +166,7 @@ public class DistrictServiceImpl implements DistrictService {
         boolean isAdministrativeUnitsLv2 = false;
         int administrativeUnitsID = district.getAdministrativeUnit().getId();
         for (Utils.AdministrativeUnitsLv2 a : Utils.AdministrativeUnitsLv2.values()) {
-            if (a.getId() == administrativeUnitsID) {
+            if (a.getValue() == administrativeUnitsID) {
                 isAdministrativeUnitsLv2 = true;
                 break;
             }

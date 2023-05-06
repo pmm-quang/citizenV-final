@@ -75,7 +75,7 @@ public class WardServiceImpl implements WardService {
             int administrativeUnitsID = ward.getAdministrativeUnit().getId();
             boolean isAdministrativeUnitsLv3 = false;
             for (Utils.AdministrativeUnitsLv3 a : Utils.AdministrativeUnitsLv3.values()) {
-                if (a.getId() == administrativeUnitsID) {
+                if (a.getValue() == administrativeUnitsID) {
                     isAdministrativeUnitsLv3 = true;
                     break;
                 }
@@ -155,7 +155,7 @@ public class WardServiceImpl implements WardService {
 
     private boolean checkAdministrativeLv3(int admUnitId) {
         for (Utils.AdministrativeUnitsLv3 a : Utils.AdministrativeUnitsLv3.values()) {
-            if (a.getId() == admUnitId) {
+            if (a.getValue() == admUnitId) {
                 return true;
             }
         }

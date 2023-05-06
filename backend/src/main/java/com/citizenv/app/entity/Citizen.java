@@ -5,6 +5,7 @@ import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import java.util.Objects;
 
@@ -23,6 +24,13 @@ public class Citizen {
 
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
+
+    /*Tuổi của công dân, tự động tính khi Getter của Citizen được gọi*/
+    @Transient
+    private Integer age;
+    public Integer getAge() {
+        return Period.between(dateOfBirth, LocalDate.now()).getYears();
+    }
 
     private String bloodType;
 

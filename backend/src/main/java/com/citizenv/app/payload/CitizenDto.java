@@ -11,6 +11,7 @@ public class CitizenDto {
     private String name;
     @JsonFormat(pattern="yyyy-MM-dd")
     private LocalDate dateOfBirth;
+    private Integer age;
     private String bloodType;
     private String sex;
     private String maritalStatus;
