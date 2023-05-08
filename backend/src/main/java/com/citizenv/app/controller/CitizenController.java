@@ -1,6 +1,5 @@
 package com.citizenv.app.controller;
 
-import com.citizenv.app.entity.custom.Population;
 import com.citizenv.app.payload.CitizenDto;
 import com.citizenv.app.service.impl.CitizenServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,9 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.ParseException;
 import java.util.List;
-import java.util.Map;
 
 @CrossOrigin(origins = "http://localhost:8080/")
 @RestController
@@ -22,7 +19,7 @@ public class CitizenController {
     @GetMapping("/")
     public ResponseEntity<List<CitizenDto>> getAll() {
         List<CitizenDto> citizenDtoList = citizenService.getAll();
-        return new ResponseEntity<List<CitizenDto>>(citizenDtoList, HttpStatus.OK);
+        return new ResponseEntity<>(citizenDtoList, HttpStatus.OK);
     }
 
     @GetMapping("/{citizenId}")
@@ -35,6 +32,18 @@ public class CitizenController {
     public ResponseEntity<List<CitizenDto>> getAllByHamletCode(@PathVariable String hamletCode) {
         List<CitizenDto> list = citizenService.getAllByHamletCode(hamletCode);
         return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @PostMapping("/save")
+    public ResponseEntity<CitizenDto> createCitizen(@RequestBody CitizenDto citizen) {
+        CitizenDto citizenDto = citizenService.createCitizen(citizen);
+        return new ResponseEntity<>(citizenDto, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/save/{citizenId}")
+    public ResponseEntity<CitizenDto> updateCitizen(@PathVariable String citizenId, @RequestBody CitizenDto citizen) {
+        CitizenDto citizenDto = citizenService.updateCitizen(citizenId, citizen);
+        return new ResponseEntity<>(citizenDto, HttpStatus.OK);
     }
 
     /*Population (dân số)*/

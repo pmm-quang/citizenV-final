@@ -17,7 +17,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AddressDto implements Serializable {
-    private CitizenDto citizen;
+//    private CitizenDto citizen;
     private HamletDto hamlet;
     private AddressTypeDto addressType;
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 public class CitizenDto {
@@ -18,4 +19,6 @@ public class CitizenDto {
     private EthnicityDto ethnicity;
     private String otherNationality;
     private ReligionDto religion;
+    private List<AddressDto> addresses;
+    private List<AssociationDto> associations;
 }

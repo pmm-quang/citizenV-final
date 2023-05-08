@@ -3,28 +3,24 @@ package com.citizenv.app.service.impl;
 
 import com.citizenv.app.component.Utils;
 import com.citizenv.app.entity.*;
-import com.citizenv.app.entity.custom.Population;
+import com.citizenv.app.exception.InvalidException;
 import com.citizenv.app.exception.ResourceFoundException;
 import com.citizenv.app.exception.ResourceNotFoundException;
-import com.citizenv.app.payload.AddressDto;
-import com.citizenv.app.payload.CitizenDto;
+import com.citizenv.app.payload.*;
 import com.citizenv.app.repository.*;
 import com.citizenv.app.service.CitizenService;
-import com.mysql.cj.protocol.WriterWatcher;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
+@Transactional
 @Service
 public class CitizenServiceImpl implements CitizenService {
     @Autowired
@@ -44,12 +40,26 @@ public class CitizenServiceImpl implements CitizenService {
     private HamletRepository hamletRepo;
     @Autowired
     private AddressRepository addressRepo;
+    @Autowired
+    private EthnicityRepository ethnicityRepo;
+    @Autowired
+    private ReligionRepository religionRepo;
+    @Autowired
+    private AssociationRepository associationRepo;
 
 
     public List<CitizenDto> getAll() {
         List<Citizen> entities = repo.findAll();
         return entities.stream().map(l-> mapper.map(l, CitizenDto.class)).collect(Collectors.toList());
     }
+//    public List<CitizenCustom> getAll() {
+//        List<Citizen> entities = repo.findAll();
+//        List<CitizenCustom> list = new ArrayList<>();
+//        for (Citizen c: entities) {
+//            list.add(mapping(c));
+//        }
+//        return list;
+//    }
 
     public CitizenDto getById(String citizenId) {
         Citizen citizen = repo.findById(citizenId).orElseThrow(
@@ -103,114 +113,108 @@ public class CitizenServiceImpl implements CitizenService {
     public CitizenDto createCitizen(CitizenDto citizen) {
         String citizenId = citizen.getId();
         repo.findById(citizenId).ifPresent(
-                citizen1 -> {throw new ResourceFoundException("Citizen", "CititzenId", citizenId);
+                c -> {throw new ResourceFoundException("Citizen", "CititzenId", citizenId);
         });
-
-        return null;
-    }
-
-    public CitizenDto createCitizen(Map<String, Object> JSONInfoAsMap) {
-
-        /*boolean isAllPropertiesFound = JSONInfoAsMap.containsKey("id") &&
-                JSONInfoAsMap.containsKey("name") &&
-                JSONInfoAsMap.containsKey("sex") &&
-                JSONInfoAsMap.containsKey("dob") &&
-                JSONInfoAsMap.containsKey("provinceCode") &&
-                JSONInfoAsMap.containsKey("districtCode") &&
-                JSONInfoAsMap.containsKey("wardCode");
-        if (!isAllPropertiesFound) {
-            return null;
-        }
-
-        //Validate name
-        if (!Utils.validateName((String) JSONInfoAsMap.get("name"))) {
-            return null;
-        }
-        if (!Utils.validateSex((String) JSONInfoAsMap.get("sex"))) {
-            return null;
-        }
-
-        String id = (String) JSONInfoAsMap.get("id");
-        if (!Utils.validateNationalId((String) JSONInfoAsMap.get("id"))) {
-            return null;
-        }
-
-        Optional<Citizen> foundCitizen = repository.findById(id);
-        if (foundCitizen.isEmpty()) {
-            logger.trace("Found no such Id. Safe to save");
-            Citizen newCitizen = new Citizen();
-            provinceRepository.findById((String) JSONInfoAsMap.get("provinceCode")).ifPresent(foundProvince -> {
-                districtRepository.findById((String) JSONInfoAsMap.get("districtCode")).ifPresent(foundDistrict -> {
-                    wardRepository.findById((String) JSONInfoAsMap.get("wardCode")).ifPresent(foundWard -> {
-                        newCitizen.setId(id);
-                        newCitizen.setName((String) JSONInfoAsMap.get("name"));
-                        newCitizen.setSex((String) JSONInfoAsMap.get("sex"));
-                        newCitizen.setDateOfBirth(LocalDate.parse((String) JSONInfoAsMap.get("dob"), DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-                        newCitizen.setProvince(foundProvince);
-                        newCitizen.setDistrict(foundDistrict);
-                        newCitizen.setWard(foundWard);
-                        logger.trace("set things done");
-                    });
-                });
-            });
-            repository.save(newCitizen);
-            logger.trace("citizenCreated");
-            return mapper.map(newCitizen, CitizenDto.class);
-        }*/
-        return null;
-    }
-
-    public CitizenDto updateCitizen(String citizenIdNeedUpdate, Map<String, Object> JSONInfoAsMap) throws ParseException {
-        Optional<Citizen> foundCitizen = repo.findById(citizenIdNeedUpdate);
-        if (foundCitizen.isPresent()) {
-            Citizen citizenNeedChange = foundCitizen.get();
-            logger.trace("Found the thing. Updating...");
-            for (String property :
-                    JSONInfoAsMap.keySet()) {
-                switch (property) {
-                    case "id": {
-                        if (!Utils.validateNationalId(property)) {
-                            return null;
-                        }
-                        citizenNeedChange.setId((String) JSONInfoAsMap.get(property));
-                        break;
-                    }
-                    case "name": {
-                        if (!Utils.validateName(property)) {
-                            return null;
-                        }
-                        citizenNeedChange.setName((String) JSONInfoAsMap.get(property));
-                        logger.trace("Name changed");
-                        break;
-                    }
-                    case "sex": {
-                        if (!Utils.validateSex(property)) {
-                            return null;
-                        }
-                        citizenNeedChange.setSex((String) JSONInfoAsMap.get(property));
-                        logger.trace("Sex changed");
-                        break;
-                    }
-                    case "dob": {
-                        citizenNeedChange.setDateOfBirth(LocalDate.parse((String) JSONInfoAsMap.get(property), DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-                        logger.trace("Date changed");
-                        break;
-                    }
-                }
-
+       if (validateInfo(citizen)) {
+           Citizen newCitizen = mapper.map(citizen, Citizen.class);
+           newCitizen.setName(Utils.standardizeName(citizen.getName()));
+           Citizen createCitizen = repo.save(newCitizen);
+           for (int i = 0; i < newCitizen.getAddresses().size(); i++) {
+               newCitizen.getAddresses().get(i).setCitizen(createCitizen);
+           }
+            for (int i = 0; i < newCitizen.getAssociations().size(); i++) {
+                newCitizen.getAssociations().get(i).setCitizen(createCitizen);
             }
-            repo.save(citizenNeedChange);
-            logger.trace("citizenUpdated");
-            return mapper.map(citizenNeedChange, CitizenDto.class);
+           addressRepo.saveAll(newCitizen.getAddresses());
+           associationRepo.saveAll(newCitizen.getAssociations());
+           return mapper.map(createCitizen, CitizenDto.class);
+      }
+       return null;
+    }
+
+    @Override
+    public CitizenDto updateCitizen(String citizenId, CitizenDto citizen) {
+        Citizen foundCitizen = repo.findById(citizenId).orElseThrow(
+                () -> new ResourceNotFoundException("Citizen", "CitizenId", citizenId)
+        );
+        String cIdUpdate = citizen.getId();
+        if (!cIdUpdate.equals(citizenId)) {
+            repo.findById(cIdUpdate).ifPresent(
+                    citizen1 -> {throw new ResourceFoundException("Citizen", "CitizenId", cIdUpdate);});
         }
+        if (validateInfo(citizen)) {
+            mapper.map(citizen, foundCitizen);
+        }
+        return mapper.map(foundCitizen, CitizenDto.class);
+    }
+
+    @Override
+    public CitizenDto deleteCitizen(String citizenId) {
         return null;
     }
 
-    public String deleteById(String citizenId) {
 
-        repo.delete(repo.findById(citizenId)
-                .orElseThrow(() -> new ResourceNotFoundException("Citizen", "citizenId", citizenId)));
-        return "Deleted";
+    private boolean validateInfo(CitizenDto citizen) {
+        String citizenId = citizen.getId();
+        String provinceCodeOfQueQuan = null;
+
+        //Kiểm tra mã địa chỉ - address
+        for (AddressDto a: citizen.getAddresses()) {
+            Hamlet h = hamletRepo.findById(a.getHamlet().getCode()).orElseThrow(
+                    () -> new ResourceNotFoundException("Hamlet", "HamletCode", a.getHamlet().getCode())
+            );
+            if (a.getAddressType().getId() == 1) {
+                provinceCodeOfQueQuan = h.getWard().getDistrict().getProvince().getCode();
+            }
+        }
+        // Kiểm tra số định danh- id
+        if (!Utils.validateNationalId(citizenId, citizen.getSex(), provinceCodeOfQueQuan, citizen.getDateOfBirth())) {
+            throw new InvalidException("Ma so dinh danh khong hop le");
+        }
+        //Kiểm tra định dạng tên tiếng Việt hợp lệ - name
+//        String name = citizen.getName();
+//        if (!Utils.validateName(name)) {
+//            throw new InvalidException("Dinh dang ten khong hop le");
+//        }
+
+        //Kiểm tra giới tính hợp lệ - sex
+        String sex = citizen.getSex();
+        if (!Utils.validateSex(sex)) {
+            throw new InvalidException("Gioi tinh khong hop le");
+        }
+
+        //Kiểm tra nhóm máu - bloodType
+        String blood = citizen.getBloodType();
+        try {
+            Utils.BloodType.valueOf(blood);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidException("Nhom mau khong hop le");
+        }
+
+        //Kiểm tra ngày sinh hợp lệ - dateOfBirth
+        LocalDate dob = citizen.getDateOfBirth();
+        if (dob.isAfter(LocalDate.now())) {
+            throw new InvalidException("Ngay thang nam sinh khong hop le");
+        }
+
+        //Kiểm tra dân tộc - ethnicity
+        if (citizen.getEthnicity() != null) {
+            Integer ethnicityId = citizen.getEthnicity().getId();
+            Ethnicity foundEthnicity = ethnicityRepo.findById(ethnicityId).orElseThrow(
+                    () -> new ResourceNotFoundException("Ethnicity", "EthnicityId", "" + ethnicityId)
+            );
+        }
+
+        //Kiểm tra tôn giáo - religion
+        if (citizen.getReligion() != null) {
+            Integer religionId = citizen.getReligion().getId();
+            Religion foundReligion = religionRepo.findById(religionId).orElseThrow(
+                    () -> new ResourceNotFoundException("Religion", "ReligionId","" + religionId)
+            );
+        }
+
+        return true;
     }
+
 
 }

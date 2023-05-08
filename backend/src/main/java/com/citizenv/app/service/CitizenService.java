@@ -12,7 +12,9 @@ public interface CitizenService {
     List<CitizenDto> getAllByDistrictCode(String districtCode);
     List<CitizenDto> getAllByProvinceCode(String provinceCode);
     List<CitizenDto> getAllByAddressId(String addressId); //get dia chi thuong tru
-
     CitizenDto createCitizen(CitizenDto citizen);
+    CitizenDto updateCitizen(String citizenId, CitizenDto citizen);
+
+    CitizenDto deleteCitizen(String citizenId);
 
 }

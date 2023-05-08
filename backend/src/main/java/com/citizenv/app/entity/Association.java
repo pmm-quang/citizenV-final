@@ -13,7 +13,7 @@ public class Association {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "citizen_id")
     private Citizen citizen;
 

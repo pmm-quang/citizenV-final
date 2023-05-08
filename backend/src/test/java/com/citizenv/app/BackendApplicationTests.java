@@ -6,6 +6,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDate;
+
 
 class BackendApplicationTests {
 
@@ -19,7 +21,12 @@ class BackendApplicationTests {
     }
 
     @Test
+    public void validateNationId() {
+        assertTrue(Utils.validateNationalId("024063128572", "Nam", "24", LocalDate.parse("1963-08-24")));
+    }
+
+    @Test
     public void validateNameTest() {
-        assertTrue(Utils.validateName("Bà Rịa - Vũng Tàu"));
+        assertTrue(Utils.validateName("Bà Rịa - Vũng Tàu"));
     }
 }

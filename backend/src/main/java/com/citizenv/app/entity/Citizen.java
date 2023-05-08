@@ -48,12 +48,12 @@ public class Citizen {
     @JoinColumn(name = "religion_id")
     private Religion religion;
 
-    @OneToMany(mappedBy = "citizen", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "citizen", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<Address> addresses;
 
-    @OneToMany(mappedBy = "citizen", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "citizen", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<Association> associations;

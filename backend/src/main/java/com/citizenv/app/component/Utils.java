@@ -1,5 +1,6 @@
 package com.citizenv.app.component;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -246,7 +247,7 @@ public class Utils {
      * </ul>
      */
     public static boolean validateName(String name) {
-        String nameRegEx = "^[A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ][a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ']{1,6}(-*)(?:[ ][A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ][a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]{1,6})*[ -]*(?:[ -']*[A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ][a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]{1,6})*$";
+        String nameRegEx = "^[A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ][a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ']{0,6}(-*)(?:[ '][A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ][a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]{1,6})*[ -]*(?:[ -']*[A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ]['][a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]{1,6})*$";
         return Pattern.compile(nameRegEx).matcher(name).matches();
     }
 
@@ -287,7 +288,36 @@ public class Utils {
         6 last are random, they said.
         I'm too lazy, so this only check the first condition.
      */
-    public static boolean validateNationalId(String id) {
-        return id.length() == 12;
+    public static boolean validateNationalId(String id, String sex, String provinceCode, LocalDate dateOfBirth) {
+        if(id.length() != 12) return false;
+
+        String firstThreeDigits = id.substring(1, 3); // ma tinh thanh noi dang ky khai sinh
+        String nextOneDigit = id.substring(3, 4); // ma gioi tinh theo nam sinh
+        String nextTwoDigits = id.substring(4, 6); // 2 so cuoi nam sinh
+
+        boolean validateProvinceCode = false;
+        boolean validateSex = false;
+        boolean validateBirth = false;
+
+        int yearOfBirth = dateOfBirth.getYear();
+
+        if (firstThreeDigits.equals(provinceCode)) validateProvinceCode = true;
+        if (nextTwoDigits.equals((String.valueOf(yearOfBirth)).substring(2))) validateBirth = true;
+
+        switch (sex) {
+            case "Nam" : if (yearOfBirth >= 1900 && yearOfBirth <= 1999) {
+                                if (nextOneDigit.equals("0")) validateSex = true;
+                        } else if (yearOfBirth >= 2000 && yearOfBirth <= 2099) {
+                                if (nextOneDigit.equals("2")) validateSex = true;
+                        }
+                        break;
+            case "Nữ" : if (yearOfBirth >= 1900 && yearOfBirth <= 1999) {
+                            if (nextOneDigit.equals("1")) validateSex = true;
+                        } else if (yearOfBirth >= 2000 && yearOfBirth <= 2099) {
+                            if (nextOneDigit.equals("3")) validateSex = true;
+                        }
+                        break;
+        }
+        return validateProvinceCode && validateSex && validateBirth;
     }
 }
