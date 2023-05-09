@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 
 class BackendApplicationTests {
@@ -28,5 +30,17 @@ class BackendApplicationTests {
     @Test
     public void validateNameTest() {
         assertTrue(Utils.validateName("Bà Rịa - Vũng Tàu"));
+    }
+
+    @Test
+    public void TestList() {
+        List<Integer> a = new ArrayList<>();
+        a.add(1);
+        a.add(null);
+        a.add(3);
+        List<Integer> b = new ArrayList<>();
+        b.add(1);
+        b.removeAll(a);
+        System.out.println(b.size());
     }
 }

@@ -15,6 +15,6 @@ public interface CitizenService {
     CitizenDto createCitizen(CitizenDto citizen);
     CitizenDto updateCitizen(String citizenId, CitizenDto citizen);
 
-    CitizenDto deleteCitizen(String citizenId);
+    void deleteCitizen(String citizenId);
 
 }

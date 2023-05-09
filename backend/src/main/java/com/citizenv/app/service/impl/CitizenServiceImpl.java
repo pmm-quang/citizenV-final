@@ -11,6 +11,7 @@ import com.citizenv.app.repository.*;
 import com.citizenv.app.service.CitizenService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.Session;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -118,19 +119,16 @@ public class CitizenServiceImpl implements CitizenService {
        if (validateInfo(citizen)) {
            Citizen newCitizen = mapper.map(citizen, Citizen.class);
            newCitizen.setName(Utils.standardizeName(citizen.getName()));
+           newCitizen.getAddresses().forEach(address -> address.setCitizen(newCitizen));
+           newCitizen.getAssociations().forEach(association -> association.setCitizen(newCitizen));
            Citizen createCitizen = repo.save(newCitizen);
-           for (int i = 0; i < newCitizen.getAddresses().size(); i++) {
-               newCitizen.getAddresses().get(i).setCitizen(createCitizen);
-           }
-            for (int i = 0; i < newCitizen.getAssociations().size(); i++) {
-                newCitizen.getAssociations().get(i).setCitizen(createCitizen);
-            }
-           addressRepo.saveAll(newCitizen.getAddresses());
-           associationRepo.saveAll(newCitizen.getAssociations());
+//           addressRepo.saveAll(newCitizen.getAddresses());
+//           associationRepo.saveAll(newCitizen.getAssociations());
            return mapper.map(createCitizen, CitizenDto.class);
       }
        return null;
     }
+
 
     @Override
     public CitizenDto updateCitizen(String citizenId, CitizenDto citizen) {
@@ -138,19 +136,65 @@ public class CitizenServiceImpl implements CitizenService {
                 () -> new ResourceNotFoundException("Citizen", "CitizenId", citizenId)
         );
         String cIdUpdate = citizen.getId();
-        if (!cIdUpdate.equals(citizenId)) {
-            repo.findById(cIdUpdate).ifPresent(
-                    citizen1 -> {throw new ResourceFoundException("Citizen", "CitizenId", cIdUpdate);});
-        }
+
         if (validateInfo(citizen)) {
-            mapper.map(citizen, foundCitizen);
+            if (!cIdUpdate.equals(citizenId)) {
+                repo.findById(cIdUpdate).ifPresent(
+                        citizen1 -> {throw new ResourceFoundException("Citizen", "CitizenId", cIdUpdate);});
+                Citizen newCitizen = mapper.map(citizen, Citizen.class);
+                newCitizen.setName(Utils.standardizeName(citizen.getName()));
+                newCitizen.getAddresses().forEach(address -> address.setCitizen(newCitizen));
+                newCitizen.getAssociations().forEach(association -> association.setCitizen(newCitizen));
+                Citizen createCitizen = repo.save(newCitizen);
+                repo.delete(foundCitizen);
+                return mapper.map(createCitizen, CitizenDto.class);
+            } else {
+                List<Integer> addressIdListOfOriginalCitizen = foundCitizen.getAddresses().stream().map(Address::getId).collect(Collectors.toList());
+                List<Integer> associationIdListOfOriginalCitizen = foundCitizen.getAssociations().stream().map(Association::getId).collect(Collectors.toList());
+                List<Integer> addressIdListOfNewCitizen = citizen.getAddresses().stream().map(AddressDto::getId).collect(Collectors.toList());
+                List<Integer> associationIdListOfNewCitizen = citizen.getAssociations().stream().map(AssociationDto::getId).collect(Collectors.toList());
+                addressIdListOfOriginalCitizen.removeAll(addressIdListOfNewCitizen);
+//                if (addressIdListOfOriginalCitizen.size() > 0) {
+//                    addressIdListOfOriginalCitizen.forEach(id -> {
+//                        addressRepo.deleteById(id);
+//                    });
+//                }
+//                associationIdListOfOriginalCitizen.removeAll(associationIdListOfNewCitizen);
+//                if (associationIdListOfOriginalCitizen.size() > 0) {
+//                    associationIdListOfOriginalCitizen.forEach(a -> {
+//                        associationRepo.deleteById(a);
+//                    });
+//                }
+                foundCitizen.getAddresses().forEach(address -> address.setCitizen(foundCitizen));
+                foundCitizen.getAssociations().forEach(association -> association.setCitizen(foundCitizen));
+                repo.save(foundCitizen);
+                if (addressIdListOfOriginalCitizen.size() > 0) {
+                    addressIdListOfOriginalCitizen.forEach(id -> {
+                        addressRepo.deleteById(id);
+                    });
+                }
+                associationIdListOfOriginalCitizen.removeAll(associationIdListOfNewCitizen);
+                if (associationIdListOfOriginalCitizen.size() > 0) {
+                    associationIdListOfOriginalCitizen.forEach(a -> {
+                        associationRepo.deleteById(a);
+                    });
+                }
+                Citizen updateCititzen = mapper.map(citizen, Citizen.class);
+                updateCititzen.getAddresses().forEach(address -> address.setCitizen(updateCititzen));
+                updateCititzen.getAssociations().forEach(association -> association.setCitizen(updateCititzen));
+                repo.save(updateCititzen);
+                return mapper.map(updateCititzen, CitizenDto.class);
+            }
         }
-        return mapper.map(foundCitizen, CitizenDto.class);
+        return null;
     }
 
     @Override
-    public CitizenDto deleteCitizen(String citizenId) {
-        return null;
+    public void deleteCitizen(String citizenId) {
+        Citizen foundCitizen = repo.findById(citizenId).orElseThrow(
+                () -> new ResourceNotFoundException("Citizen", "CitizenId", citizenId)
+        );
+        repo.delete(foundCitizen);
     }
 
 
@@ -159,13 +203,20 @@ public class CitizenServiceImpl implements CitizenService {
         String provinceCodeOfQueQuan = null;
 
         //Kiểm tra mã địa chỉ - address
+        int countRequiredAddress = 0;
         for (AddressDto a: citizen.getAddresses()) {
+            if (a.getAddressType().getId() == 1 || a.getAddressType().getId() == 2) {
+                countRequiredAddress ++;
+            }
             Hamlet h = hamletRepo.findById(a.getHamlet().getCode()).orElseThrow(
                     () -> new ResourceNotFoundException("Hamlet", "HamletCode", a.getHamlet().getCode())
             );
             if (a.getAddressType().getId() == 1) {
                 provinceCodeOfQueQuan = h.getWard().getDistrict().getProvince().getCode();
             }
+        }
+        if (countRequiredAddress != 2) {
+            throw new InvalidException("Chua nhap du cac truong dia chi bat buoc");
         }
         // Kiểm tra số định danh- id
         if (!Utils.validateNationalId(citizenId, citizen.getSex(), provinceCodeOfQueQuan, citizen.getDateOfBirth())) {

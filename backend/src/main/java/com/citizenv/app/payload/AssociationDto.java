@@ -17,6 +17,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class AssociationDto implements Serializable {
 //    private CitizenDto citizen;
+    private Integer id;
     private String associatedCitizenName;
     private AssociationTypeDto associationType;
 }
