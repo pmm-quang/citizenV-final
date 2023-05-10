@@ -6,9 +6,10 @@ import com.citizenv.app.exception.ResourceNotFoundException;
 import com.citizenv.app.payload.error.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
+@CrossOrigin(origins = "http://localhost:3000/")
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler({ ResourceNotFoundException.class, ResourceFoundException.class })
