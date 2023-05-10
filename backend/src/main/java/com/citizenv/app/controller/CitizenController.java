@@ -34,6 +34,24 @@ public class CitizenController {
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
+    @GetMapping("/ward/{wardCode}")
+    public ResponseEntity<List<CitizenDto>> getAllByWardCode(@PathVariable String wardCode) {
+        List<CitizenDto> list = citizenService.getAllByWardCode(wardCode);
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @GetMapping("/district/{districtCode}")
+    public ResponseEntity<List<CitizenDto>> getAllByDistrictCode(@PathVariable String districtCode) {
+        List<CitizenDto> list = citizenService.getAllByDistrictCode(districtCode);
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @GetMapping("/province/{provinceCode}")
+    public ResponseEntity<List<CitizenDto>> getAllByProvinceCode(@PathVariable String provinceCode) {
+        List<CitizenDto> list = citizenService.getAllByProvinceCode(provinceCode);
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
     @PostMapping("/save")
     public ResponseEntity<CitizenDto> createCitizen(@RequestBody CitizenDto citizen) {
         CitizenDto citizenDto = citizenService.createCitizen(citizen);
@@ -45,32 +63,6 @@ public class CitizenController {
         CitizenDto citizenDto = citizenService.updateCitizen(citizenId, citizen);
         return new ResponseEntity<>(citizenDto, HttpStatus.OK);
     }
-
-    /*Population (dân số)*/
-    /*@GetMapping("/population")
-    public ResponseEntity<Long> getCountryPopulation() {
-        Long population = citizenService.getCountryPopulation();
-        return new ResponseEntity<Long>(population, HttpStatus.OK);
-    }
-
-    @GetMapping("/population/province")
-    public ResponseEntity<List<Population>> getPopulationListGroupByProvince() {
-        List<Population> population = citizenService.getPopulationListGroupByProvince();
-        return new ResponseEntity<List<Population>>(population, HttpStatus.OK);
-    }
-
-    @GetMapping("/population/district")
-    public ResponseEntity<List<Population>> getPopulationListGroupByDistrict() {
-        List<Population> population = citizenService.getPopulationListGroupByDistrict();
-        return new ResponseEntity<List<Population>>(population, HttpStatus.OK);
-    }
-
-    @GetMapping("/population/ward")
-    public ResponseEntity<List<Population>> getPopulationListGroupByWard() {
-        List<Population> population = citizenService.getPopulationListGroupByWard();
-        return new ResponseEntity<List<Population>>(population, HttpStatus.OK);
-    }*/
-
 
 /**
     @PostMapping("/")

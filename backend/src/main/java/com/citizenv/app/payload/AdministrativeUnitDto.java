@@ -6,4 +6,5 @@ import lombok.Data;
 public class AdministrativeUnitDto {
     private Integer id;
     private String fullName;
+    private String shortName;
 }

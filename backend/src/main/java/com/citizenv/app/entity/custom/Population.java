@@ -8,4 +8,8 @@ import lombok.Data;
 public class Population {
     private String name;
     private Long population;
+
+    public void increasePopulation(Long amount) {
+        population += amount;
+    }
 }

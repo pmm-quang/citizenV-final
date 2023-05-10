@@ -21,4 +21,12 @@ public class AddressType {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<Address> addresses;
+
+    public AddressType(Integer i) {
+        id = i;
+    }
+
+    public AddressType() {
+
+    }
 }

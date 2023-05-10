@@ -126,7 +126,7 @@ public class ProvinceServiceImpl implements ProvinceService {
                 () -> new ResourceNotFoundException("Province", "ProvinceCode", provinceIdNeedUpdate));
 
         String provinceCode = province.getCode();
-        if (!foundProvince.equals(provinceCode)) {
+        if (!provinceIdNeedUpdate.equals(provinceCode)) {
             repository.findById(provinceCode).ifPresent(
                     p -> {throw new ResourceFoundException("Province", "ProvinceCode", provinceCode);}
             );
