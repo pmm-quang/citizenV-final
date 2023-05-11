@@ -7,6 +7,9 @@ import { Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
 function NavbarPage() {
+  const role_acc = JSON.parse(localStorage.getItem("user"));
+  const author = role_acc.roles[0].authority;
+  console.log(role_acc)
   let navigate = useNavigate();
   return (
     <div>
@@ -14,13 +17,14 @@ function NavbarPage() {
         <img src={logo} className='logoIcon' />
         <p className="nameApp">CitizenV</p>
         <div className='formLogout'>
-          A1_User
+          {role_acc.username + " - " + role_acc.roles[0].authority}
           <AiOutlineLogout className='iconLogout' onClick={() => navigate('/login')}/>
         </div>
 
       </div>
       <div className="listOptions">
-        <div className='option' style={{ marginLeft: '115px' }} onClick={() => {navigate("/province")}}>Quản lý tỉnh/thành phố</div>
+        {(author === 'A1') ? <div className='option' style={{ marginLeft: '115px' }} onClick={() => {navigate("/province")}}>Quản lý tỉnh/thành phố</div> : null}
+        {(author === 'A2') ? <div className='option' style={{ marginLeft: '115px' }} onClick={() => {navigate("/district")}}>Quản lý quận/huyện/thị xã</div> : null}
         <div className='option' onClick={() => {navigate("/account")}}>Quản lý tài khoản</div>
         <div className='option' onClick={() => {navigate("/residential")}}>Thông tin dân cư</div>
         <div className='option' onClick={() => {navigate("/province")}}>Thống kê</div>

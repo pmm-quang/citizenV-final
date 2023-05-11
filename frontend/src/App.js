@@ -6,7 +6,10 @@ import DataEntry from './Residential/DataEntry';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './Home';
 import Account from './Management/Account';
+<<<<<<< Updated upstream
 import Ward from './Management/Ward';
+=======
+>>>>>>> Stashed changes
 import District from './Management/District';
 
 function App() {
@@ -18,8 +21,9 @@ function App() {
         <Route path='/residential' element={<Residential />} />
         <Route path='/findresidential' element={<FindResidential />} />
         <Route path='/province' element={<Province />} />
+        <Route path='/district' element={<District />} />
         <Route path='/citizeninput' element={<DataEntry />} />
-        <Route path='/account/' element={<Account />} />
+        <Route path='/account' element={<Account />} />
       </Routes>
     </BrowserRouter>
   );
