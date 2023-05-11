@@ -10,29 +10,37 @@ import java.util.List;
 @Table(name = "users")
 @Data
 public class User {
-    @Id
-    @Column(name = "username", nullable = false)
+
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "username", unique = true)
     private String username;
 
     private String password;
 
     private Boolean isActive;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "code")
-    private AdministrativeDivision code;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_id")
-    private Role role;
-
-    @OneToMany(mappedBy = "grantUser", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private List<Declaration> grantedDeclarations;
+    private List<UserRole> userRoles;
 
-    @OneToMany(mappedBy = "proceedUser", fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private List<Declaration> proceedDeclarations;
+    @OneToOne
+    @JoinColumn(name = "division_code")
+    private AdministrativeDivision division;
+
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "role_id")
+//    private Role role;
+
+//    @OneToMany(mappedBy = "grantUser", fetch = FetchType.LAZY)
+//    @ToString.Exclude
+//    @EqualsAndHashCode.Exclude
+//    private List<Declaration> grantedDeclarations;
+//
+//    @OneToMany(mappedBy = "proceedUser", fetch = FetchType.LAZY)
+//    @ToString.Exclude
+//    @EqualsAndHashCode.Exclude
+//    private List<Declaration> proceedDeclarations;
 }

@@ -7,6 +7,13 @@ import java.util.stream.Stream;
 
 public class Utils {
 
+    public static final Long A1 = 1L;
+    public static final Long A2 = 2L;
+    public static final Long A3 = 3L;
+    public static final Long B1 = 4L;
+    public static final Long B2 = 5L;
+    public static final Long EDITOR = 6L;
+
     interface EnumInterface<K, V> {
         V getValue();
         K findKey(V value);

@@ -14,6 +14,7 @@ div {
   padding: 10px;
   margin: 10px;
   flex: 500px;
+  text-align: center;
 }
 
 .logoLogin {
@@ -31,6 +32,7 @@ div {
   font-weight: 600;
   padding-top: 30px;
   padding-bottom: 10px;
+  justify-content: center;
 }
 
 .titleUser {
@@ -50,6 +52,11 @@ div {
   margin-top: 50px;
 }
 
+.notifyLogin {
+  font-weight: 600;
+  color: red
+}
+
 @media screen and (max-width: 1050px) {
   .formLogin {
     background-color: rgb(231, 230, 230);
@@ -58,3 +65,4 @@ div {
     margin: auto
   }
 }
+

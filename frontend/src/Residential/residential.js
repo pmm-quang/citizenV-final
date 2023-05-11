@@ -11,6 +11,7 @@ import axios from 'axios';
 
 
 function Residential() {
+    const role = 1;
     const [showOption, setShowOption] = useState(true);
     const [showDetail, setShowDetail] = useState(false);
     const [regionId, setRegionID] = useState();
@@ -241,7 +242,7 @@ function Residential() {
                         {listHamlets}
                     </Form.Select>
                 </div>
-                <div className="selectOption">
+                {(role === 1 || role === 2 || role === 3) ? <div className="selectOption">
                     <Form.Select aria-label="Default select example" value={wardCode} onChange={(e) => {
                         if (e.target.value !== '0') fetchHalmet(e.target.value)
                         else setHalmets([])
@@ -250,8 +251,8 @@ function Residential() {
                         <option value='0'>Xã/phường/thị trấn</option>
                         {listWards}
                     </Form.Select>
-                </div>
-                <div className="selectOption">
+                </div> : null}
+                {(role === 1 || role === 2) ? <div className="selectOption">
                     <Form.Select aria-label="Default select example" value={districtCode} onChange={(e) => {
                         if (e.target.value !== '0') fetchWard(e.target.value)
                         else setWards([])
@@ -261,8 +262,8 @@ function Residential() {
                         <option value='0'>Quận/huyện/thị xã</option>
                         {listDistricts}
                     </Form.Select>
-                </div>
-                <div className="selectOption">
+                </div> : null}
+                {(role === 1) ? <div className="selectOption">
                     <Form.Select aria-label="Default select example" value={provinceCode} onChange={(e) => {
                         if (e.target.value !== '0') fetchDistrict(e.target.value)
                         else setDistricts([]);
@@ -273,8 +274,8 @@ function Residential() {
                         <option value="0">Tỉnh/Thành phố</option>
                         {listProvinces}
                     </Form.Select>
-                </div>
-                <div className="selectOption">
+                </div> : null}
+                {(role === 1) ? <div className="selectOption">
                     <Form.Select aria-label="Default select example" value={regionId} onChange={(e) => {
                         if (e.target.value !== '0') fetchProvince(e.target.value)
                         else {
@@ -289,7 +290,7 @@ function Residential() {
                         <option value='0'>Khu vực</option>
                         {regionItems}
                     </Form.Select>
-                </div>
+                </div> : null}
             </div>
         )
     })
@@ -300,7 +301,7 @@ function Residential() {
                 {(!showOption) ? <Button className='buttonIcon' onClick={() => setShowOption(true)}>Lọc theo địa chỉ thường trú</Button> : null}
                 {(showOption) ? <SelectShowOption /> : null}
                 <div>
-                    <Table striped bordered hover size="sm" className="tableResidential">
+                    <Table striped bordered hover size="sm" className='tableCitizen'>
                         <thead>
                             <tr>
                                 <th>CMMD/CCCD</th>

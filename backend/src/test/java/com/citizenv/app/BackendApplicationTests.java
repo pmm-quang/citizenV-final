@@ -4,14 +4,20 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.citizenv.app.component.Utils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 
+@SpringBootTest
 class BackendApplicationTests {
+
+    @Autowired
+    private PasswordEncoder encoder;
 
     @BeforeEach
     void setUp() {
@@ -42,5 +48,10 @@ class BackendApplicationTests {
         b.add(1);
         b.removeAll(a);
         System.out.println(b.size());
+    }
+
+    @Test
+    public void encode() {
+        System.out.println(encoder.encode("abc"));
     }
 }

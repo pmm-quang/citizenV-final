@@ -12,11 +12,10 @@ import java.util.List;
 @Table(name = "roles")
 @Getter
 @Setter
-@ToString
 public class Role {
     @Id
-    @Column(name = "id", nullable = false)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String name;
 
@@ -25,5 +24,10 @@ public class Role {
     @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private List<User> users;
+    private List<UserRole> userRoles;
+
+//    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
+//    @ToString.Exclude
+//    @EqualsAndHashCode.Exclude
+//    private List<User> users;
 }

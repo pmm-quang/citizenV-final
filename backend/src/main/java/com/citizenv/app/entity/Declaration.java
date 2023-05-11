@@ -13,13 +13,13 @@ public class Declaration {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "grant_code")
-    private User grantUser;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "proceed_code")
-    private User proceedUser;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "grant_code")
+//    private User grantUser;
+//
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "proceed_code")
+//    private User proceedUser;
 
     @Column(name = "start_time", columnDefinition = "DATETIME")
     private LocalTime startTime;
