@@ -25,8 +25,4 @@ public class AdministrativeDivision {
     @JoinColumn(name = "administrative_unit_id")
     private AdministrativeUnit administrativeUnit;
 
-    @OneToMany(mappedBy = "code", fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private List<User> users;
 }
