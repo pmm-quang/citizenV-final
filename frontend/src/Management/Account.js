@@ -4,10 +4,8 @@ import NavbarPage from "../Navbar/NavbarPage.js";
 import Button from "react-bootstrap/Button";
 import { useState, useEffect } from "react";
 import Table from "react-bootstrap/Table";
-import Form from "react-bootstrap/Form";
 import axios from "axios";
 import Modal from "react-bootstrap/Modal";
-import InputGroup from "react-bootstrap/InputGroup";
 
 function Account() {
   return (
