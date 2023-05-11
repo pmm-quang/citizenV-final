@@ -5,6 +5,7 @@ import Province from './Management/Province';
 import DataEntry from './Residential/DataEntry';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './Home';
+import Account from './Management/Account';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path='/findresidential' element={<FindResidential />} />
         <Route path='/province' element={<Province />} />
         <Route path='/citizeninput' element={<DataEntry />} />
+        <Route path='/account/' element={<Account />} />
       </Routes>
     </BrowserRouter>
   );

@@ -1,0 +1,31 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
+.account-main-page {
+    margin: 3vh 1vw 0 3vw;
+    display: flex;
+    justify-content: center;
+}
+
+.account-table {
+    width: 75vw;
+    margin-right: 3vw;
+    flex: 4
+}
+
+th, td {
+    text-align: center;
+}
+
+.account-option-list {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.account-option {
+    max-width: 15vw;
+    margin-bottom: 3vh;
+}
