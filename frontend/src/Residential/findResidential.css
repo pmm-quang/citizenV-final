@@ -1,0 +1,77 @@
+.findFlex {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-left: 40px;
+    margin-top: 10px;
+}
+
+.flex {
+    flex: 400px
+}
+
+.flex_address {
+    flex: 400px;
+    border: 1px solid black;
+    border-radius: 5px;
+    margin-right: 20px;;
+}
+
+.titleAddress {
+    margin-left: 20px;
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.optionInput {
+    width: 90%;
+    margin-top: 10px;
+    height: 40px
+}
+
+.optionInputYear {
+    width: 10%;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    height: 40px
+}
+
+.titleSelectOption {
+    margin: 20px 20px 20px 20px;
+}
+
+.textInput {
+    font-weight: 600;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.dob {
+    margin-left: 40px;
+    margin-top: 10px;
+}
+
+.dobInput {
+    width: 50%;
+}
+
+.dobYear {
+    display: inline-block;
+    font-weight: 600;
+}
+
+.acpButton {
+    margin: 0;
+    position: absolute;
+    left: 50%;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+.detailed-resident-info {
+    margin-left: 10%;
+    margin-top: 20px;
+}
+
