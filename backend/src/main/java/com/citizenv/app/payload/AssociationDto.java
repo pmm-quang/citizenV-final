@@ -18,6 +18,7 @@ import java.io.Serializable;
 public class AssociationDto implements Serializable {
 //    private CitizenDto citizen;
     private Integer id;
+    private String associatedCitizenId;
     private String associatedCitizenName;
     private AssociationTypeDto associationType;
 }
