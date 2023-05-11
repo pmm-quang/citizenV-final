@@ -17,11 +17,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(500).body(e.getMessage());
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleUnwantedException(Exception e) {
-        e.printStackTrace();
-        return ResponseEntity.status(500).body("Unknown error (General exception)");
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<String> handleUnwantedException(Exception e) {
+//        e.printStackTrace();
+//        return ResponseEntity.status(500).body("Unknown error (General exception)");
+//    }
 
     @ExceptionHandler(InvalidException.class)
     public ResponseEntity<ErrorResponse> invalidException(Exception e) {

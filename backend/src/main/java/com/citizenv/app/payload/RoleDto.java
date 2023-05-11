@@ -10,7 +10,7 @@ import java.io.Serializable;
  */
 @Data
 public class RoleDto {
-    private final Integer id;
+    private final Long id;
     private final String name;
     private final String description;
 }
