@@ -18,8 +18,9 @@ function App() {
         <Route path='/residential' element={<Residential />} />
         <Route path='/findresidential' element={<FindResidential />} />
         <Route path='/province' element={<Province />} />
+        <Route path='/district' element={<District />} />
         <Route path='/citizeninput' element={<DataEntry />} />
-        <Route path='/account/' element={<Account />} />
+        <Route path='/account' element={<Account />} />
       </Routes>
     </BrowserRouter>
   );

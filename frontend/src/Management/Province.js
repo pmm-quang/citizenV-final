@@ -10,7 +10,6 @@ import Modal from 'react-bootstrap/Modal';
 import { BsChevronRight, BsChevronDoubleRight, BsChevronDoubleLeft, BsChevronLeft } from 'react-icons/bs'
 
 function Province() {
-
     const [provinces, setProvinces] = useState([]);
     const [show, setShow] = useState(false);
     const [showEdit, setShowEdit] = useState(false);

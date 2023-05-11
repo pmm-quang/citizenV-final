@@ -8,6 +8,69 @@ import axios from "axios";
 import Modal from "react-bootstrap/Modal";
 
 function Account() {
+  const [selectAll, setSelectAll] = useState(false);
+  const [accountList, setAccountList] = useState([
+    {
+      id: 1,
+      province: "Hà Nội",
+      begin: "12/05/2023",
+      end: "22/05/2023",
+      status: "Chưa khai báo",
+    },
+    {
+      id: 2,
+      province: "Hà Giang",
+      begin: "12/05/2023",
+      end: "22/05/2023",
+      status: "Chưa khai báo",
+    },
+  ]);
+
+  const checkAccount = (accountList) => {
+    const updatedCheckboxes = accountList.map((checkbox) => ({
+      ...checkbox,
+      checked: false,
+    }));
+    setAccountList(updatedCheckboxes);
+  };
+
+  const handleSelectAll = () => {
+    const updatedCheckboxes = accountList.map((checkbox) => ({
+      ...checkbox,
+      checked: !selectAll,
+    }));
+    setAccountList(updatedCheckboxes);
+    setSelectAll(!selectAll);
+  };
+
+  const handleCheckboxChange = (id) => {
+    const updatedCheckboxes = accountList.map((checkbox) =>
+      checkbox.id === id
+        ? { ...checkbox, checked: !checkbox.checked }
+        : checkbox
+    );
+    setAccountList(updatedCheckboxes);
+    setSelectAll(updatedCheckboxes.every((checkbox) => checkbox.checked));
+  };
+
+  const tableAccount = accountList.map((account) => (
+    <tr className="top-row" key={account.id} style = {{backgroundColor: account.checked ? 'yellow' : null}}>
+      <th className="top-row-checkbox">
+        <input
+          type="checkbox"
+          id="checkbox-all"
+          checked={account.checked}
+          onChange={() => handleCheckboxChange(account.id)}
+        ></input>
+      </th>
+      <th className="top-row-title">{account.id}</th>
+      <th className="top-row-title">{account.province}</th>
+      <th className="top-row-title">{account.begin}</th>
+      <th className="top-row-title">{account.end}</th>
+      <th className="top-row-title">{account.status}</th>
+    </tr>
+  ));
+
   return (
     <div>
       <NavbarPage />
@@ -17,7 +80,12 @@ function Account() {
             <thead>
               <tr className="top-row">
                 <th className="top-row-checkbox">
-                  <input type="checkbox"></input>
+                  <input
+                    type="checkbox"
+                    id="checkbox-all"
+                    checked={selectAll}
+                    onChange={handleSelectAll}
+                  ></input>
                 </th>
                 <th className="top-row-title">Mã</th>
                 <th className="top-row-title">Tỉnh/Thành phố</th>
@@ -26,136 +94,14 @@ function Account() {
                 <th className="top-row-title">Trạng thái</th>
               </tr>
             </thead>
-
-            <tbody>
-              <tr className="item-row">
-                <td className="item-row-checkbox">
-                  <input type="checkbox"></input>
-                </td>
-                <td className="item-row-data">01</td>
-                <td className="item-row-data">Hà Nội</td>
-                <td className="item-row-data">13:25 12/05/2023</td>
-                <td className="item-row-data">13:25 21/05/2023</td>
-                <td className="item-row-data">Đã hoàn thành</td>
-              </tr>
-              <tr className="item-row">
-                <td className="item-row-checkbox">
-                  <input type="checkbox"></input>
-                </td>
-                <td className="item-row-data">02</td>
-                <td className="item-row-data">Hà Giang</td>
-                <td className="item-row-data">13:25 12/05/2023</td>
-                <td className="item-row-data">13:25 21/05/2023</td>
-                <td className="item-row-data">Đã hoàn thành</td>
-              </tr>
-              <tr className="item-row">
-                <td className="item-row-checkbox">
-                  <input type="checkbox"></input>
-                </td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-              </tr>
-              <tr className="item-row">
-                <td className="item-row-checkbox">
-                  <input type="checkbox"></input>
-                </td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-              </tr>
-              <tr className="item-row">
-                <td className="item-row-checkbox">
-                  <input type="checkbox"></input>
-                </td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-              </tr>
-              <tr className="item-row">
-                <td className="item-row-checkbox">
-                  <input type="checkbox"></input>
-                </td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-              </tr>
-              <tr className="item-row">
-                <td className="item-row-checkbox">
-                  <input type="checkbox"></input>
-                </td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-              </tr>
-              <tr className="item-row">
-                <td className="item-row-checkbox">
-                  <input type="checkbox"></input>
-                </td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-              </tr>
-              <tr className="item-row">
-                <td className="item-row-checkbox">
-                  <input type="checkbox"></input>
-                </td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-              </tr>
-              <tr className="item-row">
-                <td className="item-row-checkbox">
-                  <input type="checkbox"></input>
-                </td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-              </tr>
-              <tr className="item-row">
-                <td className="item-row-checkbox">
-                  <input type="checkbox"></input>
-                </td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-              </tr>
-              <tr className="item-row">
-                <td className="item-row-checkbox">
-                  <input type="checkbox"></input>
-                </td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-                <td className="item-row-data"></td>
-              </tr>
-            </tbody>
+            <tbody>{tableAccount}</tbody>
           </Table>
         </div>
 
         <div className="account-option-list">
-            <Button className="account-option">Thêm tài khoản</Button>
-            <Button className="account-option">Xem lịch sử</Button>
-            <Button className="account-option">Cấp quyền khai báo</Button>
+          <Button className="account-option">Thêm tài khoản</Button>
+          <Button className="account-option">Xem lịch sử</Button>
+          <Button className="account-option">Cấp quyền khai báo</Button>
         </div>
       </div>
     </div>
