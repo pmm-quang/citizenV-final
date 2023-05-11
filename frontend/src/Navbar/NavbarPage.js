@@ -4,8 +4,10 @@ import './NavbarPage.css'
 import logo from './logo_account.png'
 import {AiFillCaretDown, AiOutlineMenu} from "react-icons/ai";
 import { Button } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 function NavbarPage() {
+  let navigate = useNavigate();
   return (
     <div>
       <div className="headerPage">
@@ -18,12 +20,12 @@ function NavbarPage() {
 
       </div>
       <div className="listOptions">
-        <div className='option' style={{ marginLeft: '115px' }}>Quản lý tỉnh/thành phố</div>
-        <div className='option'>Quản lý tài khoản</div>
-        <div className='option'>Thông tin dân cư</div>
-        <div className='option'>Thống kê</div>
-        <div className='option'>Tìm kiếm người dân</div>
-        <div className='option'>Nhập liệu</div>
+        <div className='option' style={{ marginLeft: '115px' }} onClick={() => {navigate("/province")}}>Quản lý tỉnh/thành phố</div>
+        <div className='option' onClick={() => {navigate("/account")}}>Quản lý tài khoản</div>
+        <div className='option' onClick={() => {navigate("/residential")}}>Thông tin dân cư</div>
+        <div className='option' onClick={() => {navigate("/province")}}>Thống kê</div>
+        <div className='option' onClick={() => {navigate("/findresidential")}}>Tìm kiếm người dân</div>
+        <div className='option' onClick={() => {navigate("/citizeninput")}}>Nhập liệu</div>
         
         <div className='sub-nav'>
           <AiOutlineMenu className='icon-sub-nav'  style={{height: '60px'}}/>

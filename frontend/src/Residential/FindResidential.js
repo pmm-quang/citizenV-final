@@ -37,7 +37,7 @@ function Residential() {
             console.error(err);
         }
     };
-    
+
 
     const fetchDistrict = async (provinceCode) => {
         try {
@@ -57,15 +57,15 @@ function Residential() {
     );
 
     const listProvinces = provinces.map((post) =>
-        <option key={post.code} value = {post.code}>{post.code + ". " + post.name}</option>
+        <option key={post.code} value={post.code}>{post.code + ". " + post.name}</option>
     );
 
     const listDistricts = districts.map((post) =>
-        <option key={post.code} value = {post.code}>{post.code + ". " + post.name}</option>
+        <option key={post.code} value={post.code}>{post.code + ". " + post.name}</option>
     );
 
     const listWards = wards.map((post) =>
-        <option key={post.code} value = {post.code}>{post.code + ". " + post.name}</option>
+        <option key={post.code} value={post.code}>{post.code + ". " + post.name}</option>
     );
 
     const FormInput = (() => {
@@ -80,19 +80,20 @@ function Residential() {
                         <div className="textInput">Số CMMD/CCCD: </div>
                         <Form.Control type="text" className='optionInput' />
                     </div>
+                    <div className="flex">
+                        <div className="textInput">Năm sinh: </div>
+                        <Form.Select aria-label="Default select example" className='optionInputYear'>
+                            {listItems}
+                        </Form.Select>
+                    </div>
                 </div>
-                <div className="dob">
-                    <div className="textInput">Năm sinh: </div>
-                    <Form.Select aria-label="Default select example" className='optionInputYear'>
-                        {listItems}
-                    </Form.Select>
-                </div>
+
                 <div className="findFlex">
                     <div className="flex_address">
                         <div className="titleAddress">11. Quê quán </div>
                         <div className="titleSelectOption">
                             <div className="textInput">Tỉnh/Thành phố: </div>
-                            <Form.Select aria-label="Default select example" className='optionInput' value = {provinceCode} onChange={(e) => {
+                            <Form.Select aria-label="Default select example" className='optionInput' value={provinceCode} onChange={(e) => {
                                 fetchDistrict(e.target.value)
                                 setProvinceCode(e.target.value)
                                 setWards([])
@@ -100,14 +101,14 @@ function Residential() {
                                 {listProvinces}
                             </Form.Select>
                             <div className="textInput">Quận/huyện/thị xã: </div>
-                            <Form.Select aria-label="Default select example" className='optionInput' value = {districtCode} onChange={(e) => {
+                            <Form.Select aria-label="Default select example" className='optionInput' value={districtCode} onChange={(e) => {
                                 fetchWard(e.target.value)
                                 setDistrictCode(e.target.value)
                             }}>
                                 {listDistricts}
                             </Form.Select>
                             <div className="textInput">Xã/phường/thị trấn: </div>
-                            <Form.Select aria-label="Default select example" className='optionInput'  value = {wardCode} onChange={(e) => {
+                            <Form.Select aria-label="Default select example" className='optionInput' value={wardCode} onChange={(e) => {
                                 setWardCode(e.target.value)
                             }}>
                                 {listWards}

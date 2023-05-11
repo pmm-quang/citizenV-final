@@ -14,11 +14,21 @@ function DataEntry() {
     const [provinces, setProvinces] = useState([]);
     const [districts, setDistricts] = useState([]);
     const [wards, setWards] = useState([]);
-
+    const [ethnicity, setEthnicity] = useState([]);
+   
     const fetchProvince = async () => {
         try {
             const response = await axios('http://localhost:8080/api/v1/province/');
             setProvinces(response.data);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const fetchEthnicity = async () => {
+        try {
+            const response = await axios(' http://localhost:8080/api/v1/ethnicity/');
+            setEthnicity(response.data);
         } catch (err) {
             console.error(err);
         }
@@ -45,7 +55,12 @@ function DataEntry() {
 
     useEffect(() => {
         fetchProvince();
+        fetchEthnicity()
     }, [])
+
+    const listEthnicity = ethnicity.map((post) =>
+        <option key={post.id} value={post.id}>{post.id + ". " + post.name}</option>
+    );
 
     const listProvinces = provinces.map((post) =>
         <option key={post.code} value={post.code}>{post.code + ". " + post.name}</option>
@@ -100,34 +115,28 @@ function DataEntry() {
                             <option value={2}>Đã ly hôn</option>
                         </Form.Select>
                     </div>
-                </div>
-                <div className="findFlex">
                     <div className='flex'>
                         <div className="textInput">6. Dân tộc: </div>
-                        <Form.Control type="text" className='optionInput' />
+                        <Form.Select className='optionInput'>{listEthnicity}</Form.Select>
                     </div>
+                </div>
+                <div className="findFlex">
                     <div className='flex'>
                         <div className="textInput">7. Tôn giáo </div>
                         <Form.Control type="text" className='optionInput' />
                     </div>
-                    <div className='flex'>
-                        <div className="textInput">8. Trình độ văn hóa</div>
-                        <Form.Control type="text" className='optionInput' />
-                    </div>
-                </div>
-                <div className="findFlex">
                     <div className="flex">
-                        <div className="textInput">9. Quốc tịch khác: </div>
+                        <div className="textInput">8. Quốc tịch khác: </div>
                         <Form.Control type="text" className='optionNameInput' />
                     </div>
                     <div className="flex">
-                        <div className="textInput">10. Số CCCD/CMND: </div>
+                        <div className="textInput">9. Số CCCD/CMND: </div>
                         <Form.Control type="number" className='optionNameInput' />
                     </div>
                 </div>
                 <div className="findFlex" style={{ marginTop: '20px' }}>
                     <div className="flex_address">
-                        <div className="titleAddress">11. Quê quán </div>
+                        <div className="titleAddress">10. Quê quán </div>
                         <div className="titleSelectOption">
                             <div className="textInput">Tỉnh/Thành phố: </div>
                             <Form.Select aria-label="Default select example" className='optionSelectInput' value={provinceCode} onChange={(e) => {
@@ -153,7 +162,7 @@ function DataEntry() {
                         </div>
                     </div>
                     <div className="flex_address">
-                        <div className="titleAddress">12. Địa chỉ thường trú </div>
+                        <div className="titleAddress">11. Địa chỉ thường trú </div>
                         <div className="titleSelectOption">
                             <div className="textInput">Tỉnh/Thành phố: </div>
                             <Form.Select aria-label="Default select example" className='optionSelectInput'>
@@ -170,7 +179,7 @@ function DataEntry() {
                         </div>
                     </div>
                     <div className="flex_address">
-                        <div className="titleAddress">13. Địa chỉ tạm trú </div>
+                        <div className="titleAddress">12. Địa chỉ tạm trú </div>
                         <div className="titleSelectOption">
                             <div className="textInput">Tỉnh/Thành phố: </div>
                             <Form.Select aria-label="Default select example" className='optionSelectInput'>
