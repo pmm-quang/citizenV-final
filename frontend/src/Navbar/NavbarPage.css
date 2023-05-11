@@ -1,0 +1,81 @@
+div {
+    font-family: Arial, Helvetica, sans-serif;
+  }  
+
+.headerPage {
+    height: 50px;
+    position: relative;
+}
+
+.logoIcon {
+    width: 95px;
+    height: 95px;
+    margin-left: 10px;
+    margin-top: 10px;
+    position: absolute;
+}
+
+.listOptions {
+    background-color: #D8D8D8;
+    height: 60px;
+}
+
+.option {
+    width: calc(100%/7);
+    color: rgb(0, 0, 133);
+    font-weight: 600;
+    font-size: 15px;
+    text-align: center;
+    height: 100%;
+    display: inline-block;
+    padding: 18px;
+}
+
+.option:hover {
+    background-color: #3F72AF;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.nameApp {
+    margin-left: 115px;
+    display: inline-block;
+    font-weight: 600;
+    font-size: 30px;
+    font-style: italic;
+    margin-top: 5px;
+}
+
+.formLogout {
+    background-color: #3F72AF;
+    width: 150px;
+    height: 40px;
+    display: inline-block;
+    border-radius: 5px;
+    padding: 7px;
+    color: white;
+    font-weight: 600;
+    text-align: left;
+    float: right;
+    margin-right: 20px;
+    margin-top: 5px;
+}
+
+.iconLogout {
+    display: inline-block;
+    float: right;
+    margin-top: 4px;
+    margin-right: 5px;
+}
+
+.iconLogout:hover {
+    cursor: pointer;
+    color: red;
+}
+
+@media screen and (max-width: 991px) {
+
+  }
+
