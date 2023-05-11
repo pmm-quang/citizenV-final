@@ -66,3 +66,37 @@ Label {
 .rowTable:active {
     background-color: yellow;
 }
+
+.panigation {
+    position: fixed; 
+    bottom:0%;
+    width:100%;
+    text-align: center;
+    align-items: center;
+    background-color: #6093d0;
+    height: 30px;
+    border: 1px solid black;
+}
+
+.page {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    margin: 0 auto;
+    border: 1px solid black;
+}
+
+.pageNumber {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    margin: 0 auto;
+    border: 1px solid black;
+    font-weight: 600;
+}
+
+.page:hover {
+    background-color: #3F72AF;
+}
