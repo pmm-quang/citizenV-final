@@ -1,6 +1,7 @@
 package com.citizenv.app.payload;
 import com.citizenv.app.entity.AdministrativeDivision;
 import com.citizenv.app.entity.UserRole;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

@@ -38,7 +38,11 @@ public class AuthController {
         Map<String, Object> info = new HashMap<>();
         info.put("username", authentication.getName());
         info.put("roles", authentication.getAuthorities());
-        info.put("detail", authentication.getDetails());
+        CustomUserDetail customUserDetail = (CustomUserDetail) authentication.getPrincipal();
+        UserDto userDto = mapper.map(customUserDetail.getUser(), UserDto.class);
+//        info.put("detail");
+        info.put("division", userDto.getDivision());
+
         return new ResponseEntity<>(info, HttpStatus.OK);
     }
 

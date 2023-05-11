@@ -42,8 +42,14 @@ public class SecurityConfig {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .anyRequest().permitAll()
-                .and().httpBasic();
+                .antMatchers("/api/v1/auth/login").permitAll()
+                .anyRequest().authenticated()
+                .and().httpBasic()
+                .and()
+                .logout()
+                .logoutUrl("/logout")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID");
         return http.build();
     }
 }
