@@ -6,7 +6,10 @@ import DataEntry from './Residential/DataEntry';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './Home';
 import Account from './Management/Account';
+<<<<<<< Updated upstream
 import Ward from './Management/Ward';
+=======
+>>>>>>> Stashed changes
 import District from './Management/District';
 
 function App() {

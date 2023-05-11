@@ -25,8 +25,8 @@ public class ProvinceController {
         return new ResponseEntity<List<ProvinceDto>>(provinceDtoList, HttpStatus.OK);
     }
 
-    @GetMapping("/page/{page}/")
-    public ResponseEntity<Map<String, Object>> getAll(@PathVariable int page) {
+    @GetMapping(value = "/", params = "page")
+    public ResponseEntity<Map<String, Object>> getAll(@RequestParam int page) {
         Map<String, Object> provinceDtoPaginationList = provinceService.getAll(page);
         return new ResponseEntity<>(provinceDtoPaginationList, HttpStatus.OK);
     }

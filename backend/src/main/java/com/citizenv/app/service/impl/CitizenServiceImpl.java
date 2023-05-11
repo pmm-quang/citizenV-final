@@ -14,6 +14,8 @@ import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +55,12 @@ public class CitizenServiceImpl implements CitizenService {
         List<Citizen> entities = repo.findAll();
         return entities.stream().map(l-> mapper.map(l, CitizenDto.class)).collect(Collectors.toList());
     }
+
+    @Override
+    public Map<String, Object> getAll(int page) {
+        Page<Citizen> citizenEntities = repo.findAll(PageRequest.of(page - 1, 15));
+        return getStringObjectMap(page, citizenEntities);
+    }
 //    public List<CitizenCustom> getAll() {
 //        List<Citizen> entities = repo.findAll();
 //        List<CitizenCustom> list = new ArrayList<>();
@@ -79,12 +87,59 @@ public class CitizenServiceImpl implements CitizenService {
     }
 
     @Override
+    public Map<String, Object> getAllByHamletCode(String hamletCode, int page) {
+        Hamlet foundHamlet = hamletRepo.findById(hamletCode).orElseThrow(
+                ()-> new ResourceNotFoundException("Hamlet", "HamletCode", hamletCode)
+        );
+        Page<Citizen> citizensPage = repo.findAllByHamletCode(hamletCode, 2, PageRequest.of(page - 1, 15));
+        return getStringObjectMap(page, citizensPage);
+    }
+
+    @Override
+    public Map<String, Object> getAllByDistrictCode(String districtCode, int page) {
+        District foundDistrict = districtRepo.findById(districtCode).orElseThrow(
+                () -> new ResourceNotFoundException("District", "DistrictCode", districtCode)
+        );
+        Page<Citizen> citizensPage = repo.findAllByWardCode(districtCode, 2, PageRequest.of(page - 1, 15));
+        return getStringObjectMap(page, citizensPage);
+    }
+
+    @Override
+    public Map<String, Object> getAllByProvinceCode(String provinceCode, int page) {
+        Province foundProvince = provinceRepo.findById(provinceCode).orElseThrow(
+                () -> new ResourceNotFoundException("Province", "ProvinceCode", provinceCode)
+        );
+        Page<Citizen> citizensPage = repo.findAllByProvinceCode(provinceCode, 2, PageRequest.of(page - 1, 15));
+        return getStringObjectMap(page, citizensPage);
+    }
+
+    private Map<String, Object> getStringObjectMap(int page, Page<Citizen> citizensPage) {
+        List<CitizenDto> list = citizensPage.stream().map(l-> mapper.map(l, CitizenDto.class)).collect(Collectors.toList());
+        Map<String, Object> res = new HashMap<>();
+        res.put("totalPages", citizensPage.getTotalPages());
+        res.put("totalElements", citizensPage.getTotalElements());
+        res.put("page", page);
+        res.put("pageSize", citizensPage.getNumberOfElements());
+        res.put("citizens", list);
+        return res;
+    }
+
+    @Override
     public List<CitizenDto> getAllByWardCode(String wardCode) {
         Ward foundWard = wardRepo.findById(wardCode).orElseThrow(
                 () -> new ResourceNotFoundException("Ward", "WardCode", wardCode)
         );
         List<Citizen> entities = repo.findAllByWardCode(wardCode, 2);
         return entities.stream().map(l-> mapper.map(l, CitizenDto.class)).collect(Collectors.toList());
+    }
+
+    @Override
+    public Map<String, Object> getAllByWardCode(String wardCode, int page) {
+        Ward foundWard = wardRepo.findById(wardCode).orElseThrow(
+                () -> new ResourceNotFoundException("Ward", "WardCode", wardCode)
+        );
+        Page<Citizen> citizensPage = repo.findAllByWardCode(wardCode, 2, PageRequest.of(page - 1, 15));
+        return getStringObjectMap(page, citizensPage);
     }
 
     @Override
@@ -196,6 +251,8 @@ public class CitizenServiceImpl implements CitizenService {
         );
         repo.delete(foundCitizen);
     }
+
+
 
 
     private boolean validateInfo(CitizenDto citizen) {

@@ -9,11 +9,14 @@ import axios from 'axios';
 import Modal from 'react-bootstrap/Modal';
 
 function District() {
+    const role_acc = JSON.parse(localStorage.getItem("user"));
+    const user = role_acc.username;
 
     const [districts, setDistricts] = useState([]);
     const [show, setShow] = useState(false);
     const [showEdit, setShowEdit] = useState(false);
     const [units, setUnits] = useState([]);
+    const [regions, setRegions] = useState([]);
     const [nameDistrict, setNameDistrict] = useState();
     const [idDistrict, setIdDistrict] = useState();
     const [unitDistrict, setUnitDistrict] = useState();
@@ -21,14 +24,15 @@ function District() {
 
     const fetchFullDistrict = async () => {
         try {
-            const response = await axios('http://localhost:8080/api/v1/district/');
+            const response = await axios('http://localhost:8080/api/v1/district/provinceCode/' + user);
+            console.log(response.data)
             setDistricts(response.data);
         } catch (err) {
             console.error(err);
         }
     };
 
-    const fetchDetailDistrict = async (code) => {
+    const fetchDetaildistrict = async (code) => {
         try {
             const response = await axios('http://localhost:8080/api/v1/district/' + code);
             setIdDistrict(response.data.code)
@@ -58,6 +62,7 @@ function District() {
                     <Form>
                         <Form.Group className="mb-3">
                             <Form.Label>Tên Quận/Huyện/Thị xã (*)</Form.Label>
+                            <Form.Label>Tên quận/huyện/thị xã (*)</Form.Label>
                             <Form.Control
                                 type="text"
                                 autoFocus
@@ -83,8 +88,8 @@ function District() {
 
                 <Modal.Footer>
                     <div className="note">
-                        <p>(*) Tên Quận/Huyện/Thị xã không được trùng lặp với tên Quận/Huyện/Thị xã đã được khai báo</p>
-                        <p>(**) Mã số của Quận/Huyện/Thị xã không được trùng lặp với mã số của Quận/Huyện/Thị xã đã được khai báo</p>
+                        <p>(*) Tên quận/huyện/thị xã không được trùng lặp với tên quận/huyện/thị xã đã được khai báo</p>
+                        <p>(**) Mã số của quận/huyện/thị xã không được trùng lặp với mã số của quận/huyện/thị xã đã được khai báo</p>
                     </div>
                     <Button variant="secondary" onClick={() => { setShow(false) }}>
                         Đóng
@@ -101,12 +106,12 @@ function District() {
         return (
             <Modal show={showEdit}>
                 <Modal.Header className='headerModal'>
-                    <Modal.Title className='titleModal'>Cập nhật Quận/Huyện/Thị xã</Modal.Title>
+                    <Modal.Title className='titleModal'>Cập nhật thông tin của quận/huyện/thị xã</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
                         <Form.Group className="mb-3">
-                            <Form.Label>Tên Quận/Huyện/Thị xã</Form.Label>
+                            <Form.Label>Tên quận/huyện/thị xã</Form.Label>
                             <Form.Control
                                 type="text"
                                 autoFocus
@@ -117,6 +122,7 @@ function District() {
                             className="mb-3"
                         >
                             <Form.Label>Mã Quận/Huyện/Thị xã</Form.Label>
+
                             <Form.Control
                                 type="number"
                                 autoFocus
@@ -126,8 +132,8 @@ function District() {
                         <Form.Group
                             className="mb-3"
                         >
-                            <Form.Label>Đơn vị</Form.Label>
-                            <Form.Select defaultValue={unitDistrict}><option value={1}>1. Thành phố trực thuộc tỉnh</option><option value={2}>2. Quận</option><option value={3}>3.Huyện</option><option value={4}>4. Thị xã</option></Form.Select>
+                            <Form.Label>Phân loại đơn vị hành chính</Form.Label>
+                            <Form.Select defaultValue={unitDistrict}><option value={5}>1. Quận</option><option value={6}>2. Thị xã</option><option value={7}>3. Huyện</option></Form.Select>
                         </Form.Group>
                     </Form>
                 </Modal.Body>
@@ -159,7 +165,7 @@ function District() {
 
     const listDistricts = districts.map((post) =>
         <tr key={post.code} value={post.code} onClick={() => {
-            fetchDetailDistrict(post.code)
+            fetchDetaildistrict(post.code)
             post.isActive = true
         }} className="rowTable" style={{ backgroundColor: (post.isActive) ? "yellow" : "white" }}>
             <td>{post.code}</td>
@@ -176,9 +182,8 @@ function District() {
                         <thead>
                             <tr>
                                 <th>Mã</th>
-                                <th>Đơn vị</th>
-                                <th>Quận/Huyện/Thị Xã</th>
-                                <th>Khu vực</th>
+                                <th>Tên đơn vị</th>
+                                <th>Phân loại đơn vị hành chính</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -194,7 +199,8 @@ function District() {
     return (
         <div>
             <NavbarPage />
-            <Button className="buttonAdd" onClick={() => { setShow(true) }}>+ Quận/Huyện/Thị Xã</Button>
+            <Button className="buttonAdd" onClick={() => { setShow(true) }}>+ Khai báo quận/huyện/thị xã</Button>
+
             <div>
                 <TableResidential />
                 {(show) ? <ModalDistrict /> : null}

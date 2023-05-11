@@ -2,6 +2,8 @@ package com.citizenv.app.repository;
 
 import com.citizenv.app.entity.Citizen;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -34,10 +36,24 @@ public interface CitizenRepository extends JpaRepository<Citizen, String> {
     @Query(value = "select c from Citizen c " +
             "join Address a on c.id = a.citizen.id " +
             "join Hamlet h on h.code = a.hamlet.code " +
+            "where h.code = :hamletCode and a.addressType.id = :addressTypeId")
+    Page<Citizen> findAllByHamletCode(@Param("hamletCode") String hamletCode,
+                                      @Param("addressTypeId") Integer addressTypeId, Pageable pageable);
+    @Query(value = "select c from Citizen c " +
+            "join Address a on c.id = a.citizen.id " +
+            "join Hamlet h on h.code = a.hamlet.code " +
             "join Ward w on w.code = h.ward.code " +
             "where w.code = :wardCode and a.addressType.id = :addressTypeId")
     List<Citizen> findAllByWardCode(@Param("wardCode") String wardCode,
                                     @Param("addressTypeId") Integer addressTypeId);
+
+    @Query(value = "select c from Citizen c " +
+            "join Address a on c.id = a.citizen.id " +
+            "join Hamlet h on h.code = a.hamlet.code " +
+            "join Ward w on w.code = h.ward.code " +
+            "where w.code = :wardCode and a.addressType.id = :addressTypeId")
+    Page<Citizen> findAllByWardCode(@Param("wardCode") String wardCode,
+                                    @Param("addressTypeId") Integer addressTypeId, Pageable pageable);
     @Query(value = "select c from Citizen c " +
             "join Address a on c.id = a.citizen.id " +
             "join Hamlet h on h.code = a.hamlet.code " +
@@ -46,6 +62,15 @@ public interface CitizenRepository extends JpaRepository<Citizen, String> {
             "where d.code = :districtCode and a.addressType.id = :addressTypeId")
     List<Citizen> findAllByDistrictCode(@Param("districtCode") String districtCode,
                                         @Param("addressTypeId") Integer addressTypeId);
+
+    @Query(value = "select c from Citizen c " +
+            "join Address a on c.id = a.citizen.id " +
+            "join Hamlet h on h.code = a.hamlet.code " +
+            "join Ward w on w.code = h.ward.code " +
+            "join District d on d.code = w.district.code " +
+            "where d.code = :districtCode and a.addressType.id = :addressTypeId")
+    Page<Citizen> findAllByDistrictCode(@Param("districtCode") String districtCode,
+                                        @Param("addressTypeId") Integer addressTypeId, Pageable pageable);
     @Query(value = "select c from Citizen c " +
             "join Address a on c.id = a.citizen.id " +
             "join Hamlet h on h.code = a.hamlet.code " +
@@ -55,6 +80,16 @@ public interface CitizenRepository extends JpaRepository<Citizen, String> {
             "where p.code = :provinceCode and a.addressType.id = :addressTypeId")
     List<Citizen> findAllByProvinceCode(@Param("provinceCode") String provinceCode,
                                         @Param("addressTypeId") Integer addressTypeId);
+
+    @Query(value = "select c from Citizen c " +
+            "join Address a on c.id = a.citizen.id " +
+            "join Hamlet h on h.code = a.hamlet.code " +
+            "join Ward w on w.code = h.ward.code " +
+            "join District d on d.code = w.district.code " +
+            "join Province p on p.code = d.province.code " +
+            "where p.code = :provinceCode and a.addressType.id = :addressTypeId")
+    Page<Citizen> findAllByProvinceCode(@Param("provinceCode") String provinceCode,
+                                        @Param("addressTypeId") Integer addressTypeId, Pageable pageable);
 
 
     /*@Query("SELECT new com.citizenv.app.entity.custom.Population(p.name, COUNT(id)) " +

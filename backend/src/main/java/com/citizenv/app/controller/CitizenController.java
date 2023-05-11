@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin(origins = {"http://localhost:3000/", "http://localhost:3001/"})
 @RestController
@@ -22,10 +23,40 @@ public class CitizenController {
         return new ResponseEntity<>(citizenDtoList, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/", params = "page")
+    public ResponseEntity<Map<String, Object>> getAll(@RequestParam int page) {
+        Map<String, Object> dtoPaginationList = citizenService.getAll(page);
+        return new ResponseEntity<>(dtoPaginationList, HttpStatus.OK);
+    }
+
     @GetMapping("/{citizenId}")
     public ResponseEntity<CitizenDto> getById(@PathVariable String citizenId) {
         CitizenDto citizenDto = citizenService.getById(citizenId);
         return new ResponseEntity<>(citizenDto, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/hamlet/{hamletCode}", params = "page")
+    public ResponseEntity<Map<String, Object>> getAllByHamletCode(@PathVariable String hamletCode, @RequestParam int page) {
+        Map<String, Object> list = citizenService.getAllByHamletCode(hamletCode, page);
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/ward/{wardCode}", params = "page")
+    public ResponseEntity<Map<String, Object>> getAllByWardCode(@PathVariable String wardCode, @RequestParam int page) {
+        Map<String, Object> list = citizenService.getAllByWardCode(wardCode, page);
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/district/{districtCode}", params = "page")
+    public ResponseEntity<Map<String, Object>> getAllByDistrictCode(@PathVariable String districtCode, @RequestParam int page) {
+        Map<String, Object> list = citizenService.getAllByDistrictCode(districtCode, page);
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/province/{provinceCode}", params = "page")
+    public ResponseEntity<Map<String, Object>> getAllByProvinceCode(@PathVariable String provinceCode, @RequestParam int page) {
+        Map<String, Object> list = citizenService.getAllByProvinceCode(provinceCode, page);
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
     @GetMapping("/hamlet/{hamletCode}")
