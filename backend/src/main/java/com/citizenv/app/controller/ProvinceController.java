@@ -4,6 +4,7 @@ import com.citizenv.app.exception.ResourceNotFoundException;
 import com.citizenv.app.payload.ProvinceDto;
 import com.citizenv.app.service.ProvinceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,12 @@ public class ProvinceController {
     public ResponseEntity<List<ProvinceDto>> getAll() {
         List<ProvinceDto> provinceDtoList = provinceService.getAll();
         return new ResponseEntity<List<ProvinceDto>>(provinceDtoList, HttpStatus.OK);
+    }
+
+    @GetMapping("/page/{page}/")
+    public ResponseEntity<Map<String, Object>> getAll(@PathVariable int page) {
+        Map<String, Object> provinceDtoPaginationList = provinceService.getAll(page);
+        return new ResponseEntity<>(provinceDtoPaginationList, HttpStatus.OK);
     }
 
     @GetMapping("/{provinceId}")
