@@ -14,4 +14,6 @@ public interface PopulationService {
     List<Population> getPopulationsBySex();
 
     List<Population> getPopulationsByAgeGroup();
+
+    List<Population> getRegionPopulations();
 }

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:3000/")
+@CrossOrigin(origins = {"http://localhost:3000/", "http://localhost:3001/"})
 @RestController
 @RequestMapping("api/v1/statistics")
 public class StatisticsController {
@@ -23,6 +23,12 @@ public class StatisticsController {
     public ResponseEntity<Long> getCountryPopulation() {
         Long population = populationService.getCountryPopulation();
         return new ResponseEntity<>(population, HttpStatus.OK);
+    }
+
+    @GetMapping("/population/region")
+    public ResponseEntity<List<Population>> getRegionPopulations() {
+        List<Population> population = populationService.getRegionPopulations();
+        return new ResponseEntity<List<Population>>(population, HttpStatus.OK);
     }
 
     @GetMapping("/population/province")

@@ -30,14 +30,14 @@ public interface CitizenRepository extends JpaRepository<Citizen, String> {
             "join Hamlet h on h.code = a.hamlet.code " +
             "where h.code = :hamletCode and a.addressType.id = :addressTypeId")
     List<Citizen> findAllByHamletCode(@Param("hamletCode") String hamletCode,
-                                      @Param("addressTypeId") String addressTypeId);
+                                      @Param("addressTypeId") Integer addressTypeId);
     @Query(value = "select c from Citizen c " +
             "join Address a on c.id = a.citizen.id " +
             "join Hamlet h on h.code = a.hamlet.code " +
             "join Ward w on w.code = h.ward.code " +
             "where w.code = :wardCode and a.addressType.id = :addressTypeId")
     List<Citizen> findAllByWardCode(@Param("wardCode") String wardCode,
-                                    @Param("addressTypeId") String addressTypeId);
+                                    @Param("addressTypeId") Integer addressTypeId);
     @Query(value = "select c from Citizen c " +
             "join Address a on c.id = a.citizen.id " +
             "join Hamlet h on h.code = a.hamlet.code " +
@@ -45,7 +45,7 @@ public interface CitizenRepository extends JpaRepository<Citizen, String> {
             "join District d on d.code = w.district.code " +
             "where d.code = :districtCode and a.addressType.id = :addressTypeId")
     List<Citizen> findAllByDistrictCode(@Param("districtCode") String districtCode,
-                                        @Param("addressTypeId") String addressTypeId);
+                                        @Param("addressTypeId") Integer addressTypeId);
     @Query(value = "select c from Citizen c " +
             "join Address a on c.id = a.citizen.id " +
             "join Hamlet h on h.code = a.hamlet.code " +
@@ -54,7 +54,7 @@ public interface CitizenRepository extends JpaRepository<Citizen, String> {
             "join Province p on p.code = d.province.code " +
             "where p.code = :provinceCode and a.addressType.id = :addressTypeId")
     List<Citizen> findAllByProvinceCode(@Param("provinceCode") String provinceCode,
-                                        @Param("addressTypeId") String addressTypeId);
+                                        @Param("addressTypeId") Integer addressTypeId);
 
 
     /*@Query("SELECT new com.citizenv.app.entity.custom.Population(p.name, COUNT(id)) " +

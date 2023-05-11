@@ -74,7 +74,7 @@ public class CitizenServiceImpl implements CitizenService {
                 ()-> new ResourceNotFoundException("Hamlet", "HamletCode", hamletCode)
         );
 //        List<Citizen> entities = repo.findAllByHamletCode(hamletCode, "1");
-        List<Citizen> entities = repo.findByAddresses_Hamlet_code(hamletCode);
+        List<Citizen> entities = repo.findAllByHamletCode(hamletCode, 2);
         return entities.stream().map(l-> mapper.map(l, CitizenDto.class)).collect(Collectors.toList());
     }
 
@@ -83,7 +83,7 @@ public class CitizenServiceImpl implements CitizenService {
         Ward foundWard = wardRepo.findById(wardCode).orElseThrow(
                 () -> new ResourceNotFoundException("Ward", "WardCode", wardCode)
         );
-        List<Citizen> entities = repo.findAllByWardCode(wardCode, "1");
+        List<Citizen> entities = repo.findAllByWardCode(wardCode, 2);
         return entities.stream().map(l-> mapper.map(l, CitizenDto.class)).collect(Collectors.toList());
     }
 
@@ -92,7 +92,7 @@ public class CitizenServiceImpl implements CitizenService {
         District foundDistrict = districtRepo.findById(districtCode).orElseThrow(
                 () -> new ResourceNotFoundException("District", "DistrictCode", districtCode)
         );
-        List<Citizen> entities = repo.findAllByDistrictCode(districtCode, "1");
+        List<Citizen> entities = repo.findAllByDistrictCode(districtCode, 2);
         return entities.stream().map(l-> mapper.map(l, CitizenDto.class)).collect(Collectors.toList());
     }
 
@@ -101,7 +101,7 @@ public class CitizenServiceImpl implements CitizenService {
         Province foundProvince = provinceRepo.findById(provinceCode).orElseThrow(
                 () -> new ResourceNotFoundException("Province", "ProvinceCode", provinceCode)
         );
-        List<Citizen> entities = repo.findAllByProvinceCode(provinceCode, "1");
+        List<Citizen> entities = repo.findAllByProvinceCode(provinceCode, 2);
         return entities.stream().map(l-> mapper.map(l, CitizenDto.class)).collect(Collectors.toList());
     }
 

@@ -117,4 +117,16 @@ public class PopulationServiceImpl implements PopulationService {
         }
         return result;
     }
+
+    @Override
+    public List<Population> getRegionPopulations() {
+        List<Address> addressesForPopulationCount = addressRepository.findByAddressType_Id(2);
+        List<Population> result = new ArrayList<>();
+        for (Address current :
+                addressesForPopulationCount) {
+            String currentName = current.getHamlet().getWard().getDistrict().getProvince().getAdministrativeRegion().getName();
+            result.stream().filter(population -> population.getName().equals(currentName)).findFirst().ifPresentOrElse(currentPopulation -> currentPopulation.increasePopulation(1L), () -> result.add(new Population(currentName, 1L)));
+        }
+        return result;
+    }
 }
