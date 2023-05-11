@@ -16,8 +16,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -44,6 +47,18 @@ public class ProvinceServiceImpl implements ProvinceService {
     public List<ProvinceDto> getAll() {
         List<Province> provinceEntities = repository.findAll();
         return provinceEntities.stream().map(l-> mapper.map(l, ProvinceDto.class)).collect(Collectors.toList());
+    }
+
+    @Override
+    public Map<String, Object> getAll(int page) {
+        Page<Province> provinceEntities = repository.findAll(PageRequest.of(page - 1, 15));
+        List<ProvinceDto> list = provinceEntities.stream().map(l-> mapper.map(l, ProvinceDto.class)).collect(Collectors.toList());
+        Map<String, Object> res = new HashMap<>();
+        res.put("totalPages", provinceEntities.getTotalPages());
+        res.put("page", page);
+        res.put("pageElements", provinceEntities.getNumberOfElements());
+        res.put("provinces", list);
+        return res;
     }
 
     @Override

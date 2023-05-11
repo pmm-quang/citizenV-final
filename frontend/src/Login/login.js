@@ -5,8 +5,10 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import { AiOutlineUser, AiOutlineKey } from "react-icons/ai";
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
+  let navigate = useNavigate()
   return (
     <div className="App">
       <div className="Login">
@@ -40,7 +42,7 @@ function Login() {
                     />
                   </InputGroup>
                 </Form.Group>
-                <Button className='buttonLogin'>
+                <Button className='buttonLogin' onClick = {() => navigate('/')}>
                   Đăng nhập
                 </Button>
               </Form>

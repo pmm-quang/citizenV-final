@@ -300,7 +300,7 @@ function Residential() {
                 {(!showOption) ? <Button className='buttonIcon' onClick={() => setShowOption(true)}>Lọc theo địa chỉ thường trú</Button> : null}
                 {(showOption) ? <SelectShowOption /> : null}
                 <div>
-                    <Table striped bordered hover size="sm" className="tableResidential">
+                    <Table striped bordered hover size="sm" className='tableCitizen'>
                         <thead>
                             <tr>
                                 <th>CMMD/CCCD</th>
