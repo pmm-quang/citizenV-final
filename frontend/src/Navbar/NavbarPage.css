@@ -1,6 +1,6 @@
 div {
     font-family: Arial, Helvetica, sans-serif;
-  }  
+}
 
 .headerPage {
     height: 50px;
@@ -16,15 +16,16 @@ div {
 }
 
 .listOptions {
-    background-color: #D8D8D8;
+    background-color: #d8d8d8;
     height: 60px;
 }
 
 .option {
-    width: calc(100%/7);
+    /* width: calc(100%/7); */
+    min-width: 12vw;
     color: rgb(0, 0, 133);
     font-weight: 600;
-    font-size: 15px;
+    font-size: 14px;
     text-align: center;
     height: 100%;
     display: inline-block;
@@ -32,7 +33,7 @@ div {
 }
 
 .option:hover {
-    background-color: #3F72AF;
+    background-color: #3f72af;
     border-radius: 10px;
     color: white;
     cursor: pointer;
@@ -49,7 +50,7 @@ div {
 }
 
 .formLogout {
-    background-color: #3F72AF;
+    background-color: #3f72af;
     width: 150px;
     height: 40px;
     display: inline-block;
@@ -75,7 +76,63 @@ div {
     color: red;
 }
 
-@media screen and (max-width: 991px) {
+.sub-nav {
+    display: none;
+}
 
-  }
+@media screen and (max-width: 1100px) {
+    .sub-option-list {
+        display: none;
+        position: absolute;
+    }
 
+    .listOptions>.option {
+        display: none;
+    }
+
+    .listOptions {}
+
+    .listOptions .sub-nav:hover .sub-option-list {
+        display: block;
+        position: absolute;
+        min-width: 25vw;
+        background-color: #d8d8d8;
+        text-align: center;
+    }
+
+    .sub-nav {
+        display: block;
+        float: right;
+        background-color: #3f72af;
+        color: white;
+        text-align: center;
+        min-width: 25vw;
+        min-height: 100%;
+        position: relative;
+    }
+
+    #icon-sub-nav {
+        text-align: center;
+        display: inline-block;
+    }
+
+    .sub-option {
+        /* width: calc(100%/7); */
+        min-width: 100%;
+        color: rgb(0, 0, 133);
+        font-weight: 600;
+        font-size: 14px;
+        text-align: center;
+        height: 100%;
+        display: inline-block;
+        padding: 18px;
+    }
+
+    .sub-option:hover {
+        background-color: #3f72af;
+        border-radius: 10px;
+        color: white;
+        cursor: pointer;
+        font-weight: 600;
+    }
+}
