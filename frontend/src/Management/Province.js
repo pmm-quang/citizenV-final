@@ -7,24 +7,28 @@ import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
 import axios from 'axios';
 import Modal from 'react-bootstrap/Modal';
+import { BsChevronRight, BsChevronDoubleRight, BsChevronDoubleLeft, BsChevronLeft } from 'react-icons/bs'
 
 function Province() {
 
     const [provinces, setProvinces] = useState([]);
     const [show, setShow] = useState(false);
     const [showEdit, setShowEdit] = useState(false);
-    const [units, setUnits] = useState([]);
     const [regions, setRegions] = useState([]);
     const [nameProvince, setNameProvince] = useState();
     const [idProvince, setIdProvince] = useState();
     const [regionProvince, setRegionProvince] = useState();
     const [unitProvince, setUnitProvince] = useState();
+    const [page, setPage] = useState(1);
+    const [numberPage, setNumberPage] = useState(0);
+    const [administrativeCode, setAdministrativeCode] = useState();
 
-
-    const fetchFullProvince = async () => {
+    const fetchFullProvince = async (page) => {
         try {
-            const response = await axios('http://localhost:8080/api/v1/province/');
-            setProvinces(response.data);
+            const response = await axios('http://localhost:8080/api/v1/province/page/' + page + "/");
+            setProvinces(response.data.provinces);
+            console.log(provinces)
+            setNumberPage(response.data.totalPages)
         } catch (err) {
             console.error(err);
         }
@@ -46,6 +50,8 @@ function Province() {
             setNameProvince(response.data.name)
             setRegionProvince(response.data.administrativeRegion.id)
             setUnitProvince(response.data.administrativeUnit.id)
+            console.log(unitProvince)
+            setAdministrativeCode(response.data.administrativeCode)
             setShowEdit(true)
         } catch (err) {
             console.error(err);
@@ -53,7 +59,7 @@ function Province() {
     };
 
     useEffect(() => {
-        fetchFullProvince();
+        fetchFullProvince(1);
         fetchFullRegions();
     }, [])
 
@@ -119,6 +125,30 @@ function Province() {
         )
     }
 
+    const Pagination = () => {
+        return (
+            <div className="panigation">
+                {(page !== 1) ? <div className="page" onClick={() => {
+                    setPage(1)
+                    fetchFullProvince(1)
+                }}><BsChevronDoubleLeft /></div> : null}
+                {(page !== 1) ? <div className="page" onClick={() => {
+                    setPage(page - 1)
+                    fetchFullProvince(page - 1)
+                }}><BsChevronLeft /></div> : null}
+                <div className="pageNumber">{page}</div>
+                {(page !== numberPage) ? <div className="page" onClick={() => {
+                    setPage(page + 1)
+                    fetchFullProvince(page + 1)
+                }}><BsChevronRight /></div> : null}
+                {(page !== numberPage) ? <div className="page" onClick={() => {
+                    setPage(numberPage)
+                    fetchFullProvince(numberPage)
+                }}><BsChevronDoubleRight /></div> : null}
+            </div>
+        )
+    }
+
     const ModalEditProvince = () => {
         return (
             <Modal show={showEdit}>
@@ -133,6 +163,9 @@ function Province() {
                                 type="text"
                                 autoFocus
                                 defaultValue={nameProvince}
+                                onChange={(e) => {
+                                
+                                }}
                             />
                         </Form.Group>
                         <Form.Group
@@ -143,19 +176,26 @@ function Province() {
                                 type="number"
                                 autoFocus
                                 defaultValue={idProvince}
+                                onChange={(e) => {
+                                   
+                                }}
                             />
                         </Form.Group>
                         <Form.Group
                             className="mb-3"
                         >
                             <Form.Label>Đơn vị</Form.Label>
-                            <Form.Select defaultValue={unitProvince}><option value={1}>1. Thành phố trực thuộc trung ương</option><option value={2}>2. Tỉnh</option></Form.Select>
+                            <Form.Select defaultValue={unitProvince} onChange={(e) => {
+                             
+                            }}><option value='1'>1. Thành phố trực thuộc trung ương</option><option value='2'>2. Tỉnh</option></Form.Select>
                         </Form.Group>
                         <Form.Group
                             className="mb-3"
                         >
                             <Form.Label>Khu vực</Form.Label>
-                            <Form.Select defaultValue={regionProvince}>{listRegionItems}</Form.Select>
+                            <Form.Select defaultValue={regionProvince} onChange={(e) => {
+                               
+                            }}>{listRegionItems}</Form.Select>
                         </Form.Group>
                     </Form>
                 </Modal.Body>
@@ -228,6 +268,7 @@ function Province() {
                 <TableResidential />
                 {(show) ? <ModalProvince /> : null}
                 <ModalEditProvince />
+                <Pagination />
             </div>
         </div>
     );
