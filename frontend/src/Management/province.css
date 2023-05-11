@@ -35,27 +35,14 @@ td {
     height: 1cm;
 }
 
-
-#detailed-resident-info-header {
-    display: flex;
-    margin: 10px;
+.headerModal {
+    background-color: #B9B9B9;
 }
 
-#detailed-resident-info-title {
-    margin: 0 0 0 20px;
-}
-
-.detailed-resident-info-table {
-    margin-left: 20px;
-
-}
-
-.detailed-resident-info-table .row-head {
-    width: 15vw;
-}
-
-.returnButton {
-    margin-left: 10px;
+.titleModal {
+    font-size: 16px;
+    font-weight: 600;
+    color: blakc;
 }
 
 .tableInfo {
@@ -64,4 +51,18 @@ td {
     border: 1px solid black;
     border-radius: 5px; 
     margin-top: 0px;
+}
+
+.note {
+    font-size: 12px;
+    font-weight: 400;
+}
+
+Label {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.rowTable:active {
+    background-color: yellow;
 }

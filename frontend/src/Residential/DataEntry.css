@@ -1,0 +1,77 @@
+.findFlex {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-left: 40px;
+    margin-top: 10px;
+}
+
+.flex {
+    flex: 400px
+}
+
+.flex_address {
+    flex: 400px;
+    border: 1px solid black;
+    border-radius: 5px;
+    margin-right: 20px;;
+}
+
+.titleAddress {
+    margin-left: 20px;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.optionNameInput {
+    width: 90%;
+    height: 40px;
+    margin-top: 10px;
+}
+
+.optionBloodTypeInput {
+    width: 20%;
+    height: 40px;
+    margin-top: 10px;
+}
+
+.optionInput {
+    width: 85%;
+    height: 40px
+}
+
+.optionSelectInput {
+    width: 95%;
+    height: 40px;
+    margin-left: 10px;
+    margin-top: 10px;
+}
+
+.titleSelectOption {
+    margin: 20px 20px 20px 20px;
+}
+
+.textInput {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.acpButton {
+    margin-bottom: 20px;
+    left: 50%;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+.detailed-resident-info {
+    margin-left: 10%;
+    margin-top: 20px;
+}
+
+.buttonPrint {
+    float: right;
+    margin-top: 10px;
+    margin-right: 5%;
+    width: 12%;
+}
