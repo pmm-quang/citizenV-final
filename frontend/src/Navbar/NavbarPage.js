@@ -2,7 +2,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Form from 'react-bootstrap/Form';
 import './NavbarPage.css'
 import logo from './logo_account.png'
-import {AiFillCaretDown, AiOutlineMenu} from "react-icons/ai";
+import {AiOutlineMenu, AiOutlineLogout} from "react-icons/ai";
 import { Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
@@ -15,7 +15,7 @@ function NavbarPage() {
         <p className="nameApp">CitizenV</p>
         <div className='formLogout'>
           A1_User
-          <AiFillCaretDown className='iconLogout'/>
+          <AiOutlineLogout className='iconLogout' onClick={() => navigate('/login')}/>
         </div>
 
       </div>
