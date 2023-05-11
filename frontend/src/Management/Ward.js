@@ -8,32 +8,32 @@ import Form from 'react-bootstrap/Form';
 import axios from 'axios';
 import Modal from 'react-bootstrap/Modal';
 
-function District() {
+function Ward() {
 
-    const [districts, setDistricts] = useState([]);
+    const [wards, setWards] = useState([]);
     const [show, setShow] = useState(false);
     const [showEdit, setShowEdit] = useState(false);
     const [units, setUnits] = useState([]);
-    const [nameDistrict, setNameDistrict] = useState();
-    const [idDistrict, setIdDistrict] = useState();
-    const [unitDistrict, setUnitDistrict] = useState();
+    const [nameWard, setNameWard] = useState();
+    const [idWard, setIdWard] = useState();
+    const [unitWard, setUnitWard] = useState();
 
 
-    const fetchFullDistrict = async () => {
+    const fetchFullWard = async () => {
         try {
-            const response = await axios('http://localhost:8080/api/v1/district/');
-            setDistricts(response.data);
+            const response = await axios('http://localhost:8080/api/v1/ward/');
+            setWards(response.data);
         } catch (err) {
             console.error(err);
         }
     };
 
-    const fetchDetailDistrict = async (code) => {
+    const fetchDetailWard = async (code) => {
         try {
-            const response = await axios('http://localhost:8080/api/v1/district/' + code);
-            setIdDistrict(response.data.code)
-            setNameDistrict(response.data.name)
-            setUnitDistrict(response.data.administrativeUnit.id)
+            const response = await axios('http://localhost:8080/api/v1/ward/' + code);
+            setIdWard(response.data.code)
+            setNameWard(response.data.name)
+            setUnitWard(response.data.administrativeUnit.id)
             setShowEdit(true)
         } catch (err) {
             console.error(err);
@@ -41,23 +41,23 @@ function District() {
     };
 
     useEffect(() => {
-        fetchFullDistrict();
+        fetchFullWard();
     }, [])
 
-    const formatData = (districts) => {
-        return districts.map((item) => ({ ...item, isActive: false }))
+    const formatData = (wards) => {
+        return wards.map((item) => ({ ...item, isActive: false }))
     }
 
-    const ModalDistrict = () => {
+    const ModalWard = () => {
         return (
             <Modal show={show}>
                 <Modal.Header className='headerModal'>
-                    <Modal.Title className='titleModal'>Khai báo Quận/Huyện/Thị xã</Modal.Title>
+                    <Modal.Title className='titleModal'>Khai báo Xã/Phường/Thị trấn</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
                         <Form.Group className="mb-3">
-                            <Form.Label>Tên Quận/Huyện/Thị xã (*)</Form.Label>
+                            <Form.Label>Tên Xã/Phường/Thị trấn (*)</Form.Label>
                             <Form.Control
                                 type="text"
                                 autoFocus
@@ -66,7 +66,7 @@ function District() {
                         <Form.Group
                             className="mb-3"
                         >
-                            <Form.Label>Cấp mã cho Quận/Huyện/Thị xã (**)</Form.Label>
+                            <Form.Label>Cấp mã cho Xã/Phường/Thị trấn (**)</Form.Label>
                             <Form.Control
                                 type="number"
                                 autoFocus
@@ -76,15 +76,15 @@ function District() {
                             className="mb-3"
                         >
                             <Form.Label>Đơn vị</Form.Label>
-                            <Form.Select><option value={1}>1. Thành phố trực thuộc tỉnh</option><option value={2}>2. Quận</option><option value={3}>3.Huyện</option><option value={4}>4. Thị xã</option></Form.Select>
+                            <Form.Select><option value={1}>1. Xã</option><option value={2}>2. Phường</option><option value={3}>3.Thị trấn</option></Form.Select>
                         </Form.Group>
                     </Form>
                 </Modal.Body>
 
                 <Modal.Footer>
                     <div className="note">
-                        <p>(*) Tên Quận/Huyện/Thị xã không được trùng lặp với tên Quận/Huyện/Thị xã đã được khai báo</p>
-                        <p>(**) Mã số của Quận/Huyện/Thị xã không được trùng lặp với mã số của Quận/Huyện/Thị xã đã được khai báo</p>
+                        <p>(*) Tên Xã/Phường/Thị trấn không được trùng lặp với tên Xã/Phường/Thị trấn đã được khai báo</p>
+                        <p>(**) Mã số của Xã/Phường/Thị trấn không được trùng lặp với mã số của Xã/Phường/Thị trấn đã được khai báo</p>
                     </div>
                     <Button variant="secondary" onClick={() => { setShow(false) }}>
                         Đóng
@@ -97,45 +97,45 @@ function District() {
         )
     }
 
-    const ModalEditDistrict = () => {
+    const ModalEditWard = () => {
         return (
             <Modal show={showEdit}>
                 <Modal.Header className='headerModal'>
-                    <Modal.Title className='titleModal'>Cập nhật Quận/Huyện/Thị xã</Modal.Title>
+                    <Modal.Title className='titleModal'>Cập nhật Xã/Phường/Thị trấn</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
                         <Form.Group className="mb-3">
-                            <Form.Label>Tên Quận/Huyện/Thị xã</Form.Label>
+                            <Form.Label>Tên Xã/Phường/Thị trấn</Form.Label>
                             <Form.Control
                                 type="text"
                                 autoFocus
-                                defaultValue={nameDistrict}
+                                defaultValue={nameWard}
                             />
                         </Form.Group>
                         <Form.Group
                             className="mb-3"
                         >
-                            <Form.Label>Mã Quận/Huyện/Thị xã</Form.Label>
+                            <Form.Label>Mã Xã/Phường/Thị trấn</Form.Label>
                             <Form.Control
                                 type="number"
                                 autoFocus
-                                defaultValue={idDistrict}
+                                defaultValue={idWard}
                             />
                         </Form.Group>
                         <Form.Group
                             className="mb-3"
                         >
                             <Form.Label>Đơn vị</Form.Label>
-                            <Form.Select defaultValue={unitDistrict}><option value={1}>1. Thành phố trực thuộc tỉnh</option><option value={2}>2. Quận</option><option value={3}>3.Huyện</option><option value={4}>4. Thị xã</option></Form.Select>
+                            <Form.Select><option value={1}>1. Xã</option><option value={2}>2. Phường</option><option value={3}>3.Thị trấn</option></Form.Select>
                         </Form.Group>
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => {
                         setShowEdit(false)
-                        districts.map((item) => {
-                            if (item.code === idDistrict) {
+                        wards.map((item) => {
+                            if (item.code === idWard) {
                                 item.isActive = false;
                             }
                         })
@@ -144,8 +144,8 @@ function District() {
                     </Button>
                     <Button variant="primary" onClick={() => {
                         setShowEdit(false)
-                        districts.map((item) => {
-                            if (item.code === idDistrict) {
+                        wards.map((item) => {
+                            if (item.code === idWard) {
                                 item.isActive = false;
                             }
                         })
@@ -157,9 +157,9 @@ function District() {
         )
     }
 
-    const listDistricts = districts.map((post) =>
+    const listWards = wards.map((post) =>
         <tr key={post.code} value={post.code} onClick={() => {
-            fetchDetailDistrict(post.code)
+            fetchDetailWard(post.code)
             post.isActive = true
         }} className="rowTable" style={{ backgroundColor: (post.isActive) ? "yellow" : "white" }}>
             <td>{post.code}</td>
@@ -177,12 +177,12 @@ function District() {
                             <tr>
                                 <th>Mã</th>
                                 <th>Đơn vị</th>
-                                <th>Quận/Huyện/Thị Xã</th>
+                                <th>Xã/Phường/Thị trấn</th>
                                 <th>Khu vực</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {listDistricts}
+                            {listWards}
                         </tbody>
                     </Table>
                 </div>
@@ -194,14 +194,14 @@ function District() {
     return (
         <div>
             <NavbarPage />
-            <Button className="buttonAdd" onClick={() => { setShow(true) }}>+ Quận/Huyện/Thị Xã</Button>
+            <Button className="buttonAdd" onClick={() => { setShow(true) }}>+ Xã/Phường/Thị trấn</Button>
             <div>
                 <TableResidential />
-                {(show) ? <ModalDistrict /> : null}
-                <ModalEditDistrict />
+                {(show) ? <ModalWard /> : null}
+                <ModalEditWard />
             </div>
         </div>
     );
 }
 
-export default District;
+export default Ward;

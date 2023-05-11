@@ -6,6 +6,8 @@ import DataEntry from './Residential/DataEntry';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './Home';
 import Account from './Management/Account';
+import Ward from './Management/Ward';
+import District from './Management/District';
 
 function App() {
   return (
