@@ -6,6 +6,7 @@ import com.citizenv.app.service.DistrictService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,9 +24,9 @@ public class DistrictController {
         return new ResponseEntity<List<DistrictDto>>(districtDtoList, HttpStatus.OK);
     }
 
-    @GetMapping("/{districtId}")//OK
-    public ResponseEntity<DistrictDto> getById(@PathVariable String districtId) {
-        DistrictDto districtDto = districtService.getById(districtId);
+    @GetMapping("/{districtCode}")//OK
+    public ResponseEntity<DistrictDto> getByCode(@PathVariable String districtCode) {
+        DistrictDto districtDto = districtService.getByCode(districtCode);
         return new ResponseEntity<>(districtDto, HttpStatus.OK);
     }
 
@@ -37,5 +38,18 @@ public class DistrictController {
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @PostMapping("/save")
+    public ResponseEntity<DistrictDto> createDistrict(@RequestBody DistrictDto district) {
+        DistrictDto districtDto = districtService.createDistrict(district);
+        return new ResponseEntity<>(districtDto, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/save/{districtCode}")
+    public ResponseEntity<DistrictDto> updateDistrict(@PathVariable String districtCode,
+                                                      @RequestBody DistrictDto district) {
+        DistrictDto districtDto = districtService.updateDistrict(districtCode, district);
+        return ResponseEntity.ok().body(district);
     }
 }

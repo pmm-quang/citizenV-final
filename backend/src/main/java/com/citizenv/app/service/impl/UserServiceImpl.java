@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
             repository.findByUsername(newUsername).ifPresent(user1 -> {
                 throw new ResourceFoundException("User", "username",newUsername);
             });
-            AdministrativeDivision division = divisionRepo.findById(divisionCode).orElseThrow(
+            AdministrativeDivision division = divisionRepo.findByCode(divisionCode).orElseThrow(
                     () -> new ResourceNotFoundException("division", "divisionCode", divisionCode)
             );
             User newUser = new User();

@@ -15,8 +15,9 @@ import java.util.List;
 @Setter
 @ToString
 public class AdministrativeDivision {
-    @Id
-    @Column(name = "code", nullable = false)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(unique = true, nullable = false)
     private String code;
 
     private String name;

@@ -27,7 +27,7 @@ public class User {
     private List<UserRole> userRoles;
 
     @OneToOne
-    @JoinColumn(name = "division_code")
+    @JoinColumn(name = "division_id")
     private AdministrativeDivision division;
 
 //    @ManyToOne(fetch = FetchType.LAZY)

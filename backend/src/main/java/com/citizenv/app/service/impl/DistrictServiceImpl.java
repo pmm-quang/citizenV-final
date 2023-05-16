@@ -4,6 +4,7 @@ import com.citizenv.app.component.Utils;
 import com.citizenv.app.entity.AdministrativeUnit;
 import com.citizenv.app.entity.District;
 import com.citizenv.app.entity.Province;
+import com.citizenv.app.exception.InvalidException;
 import com.citizenv.app.exception.ResourceFoundException;
 import com.citizenv.app.exception.ResourceNotFoundException;
 import com.citizenv.app.payload.DistrictDto;
@@ -14,7 +15,9 @@ import com.citizenv.app.service.DistrictService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -34,20 +37,29 @@ public class DistrictServiceImpl implements DistrictService {
     @Autowired
     private AdministrativeUnitRepository administrativeUnitRepository;
 
+    @Override
     public List<DistrictDto> getAll() {
         List<District> entities = repository.findAll();
         return entities.stream().map(l-> mapper.map(l, DistrictDto.class)).collect(Collectors.toList());
     }
-
-    public DistrictDto getById(String districtId) {
+    @Override
+    public DistrictDto getById(Long districtId) {
         District district = repository.findById(districtId).orElseThrow(
                 () -> new ResourceNotFoundException("District", "DistrictCode", " " + districtId));
         return mapper.map(district, DistrictDto.class);
     }
 
     @Override
+    public DistrictDto getByCode(String code) {
+        District district = repository.findByCode(code).orElseThrow(
+                () -> new ResourceNotFoundException("District", "DistrictCode", code)
+        );
+        return mapper.map(district, DistrictDto.class);
+    }
+
+    @Override
     public List<DistrictDto> getAllByProvinceCode(String provinceCode) {
-        Province foundProvince = provinceRepository.findById(provinceCode).orElseThrow(
+        Province foundProvince = provinceRepository.findByCode(provinceCode).orElseThrow(
                 () -> new ResourceNotFoundException("Province", "ProvinceCode", provinceCode)
         );
         List<District> list = repository.findAllByProvince(foundProvince);
@@ -65,159 +77,96 @@ public class DistrictServiceImpl implements DistrictService {
         return dtoList;
     }
 
-    @Override
-    public DistrictDto createDistrict(Map<String, Object> JSONInfoAsMap) {
-        boolean isAllPropertiesFound = JSONInfoAsMap.containsKey("code") &&
-                JSONInfoAsMap.containsKey("name") &&
-                JSONInfoAsMap.containsKey("provinceId") &&
-                JSONInfoAsMap.containsKey("administrativeUnitId");
-        if (!isAllPropertiesFound) {
-            return  null;
-        }
-
-        boolean isAdministrativeUnitsLv2 = false;
-        for (Utils.AdministrativeUnitsLv2 a : Utils.AdministrativeUnitsLv2.values()) {
-            if (JSONInfoAsMap.get("administrativeUnitId") == a) {
-                isAdministrativeUnitsLv2 = true;
-                break;
-            }
-        }
-        if (!isAdministrativeUnitsLv2) {
-            return null;
-        }
-        String id = (String) JSONInfoAsMap.get("code");
-        Optional<District> foundDistrict = repository.findById(id);
-        if (foundDistrict.isEmpty()) {
-            District newDistrict = new District();
-            provinceRepository.findById((String) JSONInfoAsMap.get("provinceId")).ifPresent(foundProvince -> {
-                administrativeUnitRepository.findById((Integer) JSONInfoAsMap.get("administrativeUnitId")).ifPresent(foundAdmUnit -> {
-                    newDistrict.setCode(id);
-                    newDistrict.setName((String) JSONInfoAsMap.get("name"));
-                    newDistrict.setProvince(foundProvince);
-                    newDistrict.setAdministrativeUnit(foundAdmUnit);
-                    repository.save(newDistrict);
-                });
-            });
-            return mapper.map(newDistrict, DistrictDto.class);
-        }
-        return null;
-    }
 
     @Override
     public DistrictDto createDistrict(DistrictDto district) {
         String newDistrictCode = district.getCode();
-        repository.findById(newDistrictCode).ifPresent(
+        repository.findByCode(newDistrictCode).ifPresent(
                 foundDistrict -> {throw new ResourceFoundException("District", "DistrictCode", newDistrictCode);});
 
-        String provinceCode = district.getProvince().getCode();
-        Province foundProvince = provinceRepository.findById(provinceCode).orElseThrow(
-                ()-> new ResourceNotFoundException("Province", "ProvinceCode", provinceCode)
-        );
 
-        int admUnitId = district.getAdministrativeUnit().getId();
-        AdministrativeUnit foundAdmUnit = administrativeUnitRepository.findById(admUnitId).orElseThrow(
-                () -> new ResourceNotFoundException("AdministrativeUnit", "AdministrativeUnitId", String.valueOf(admUnitId))
-        );
-
-        boolean isAdministrativeUnitsLv2 = false;
-        int administrativeUnitsID = district.getAdministrativeUnit().getId();
-        for (Utils.AdministrativeUnitsLv2 a : Utils.AdministrativeUnitsLv2.values()) {
-            if (a.getValue() == administrativeUnitsID) {
-                isAdministrativeUnitsLv2 = true;
-                break;
-            }
-        }
-
-        if (newDistrictCode.indexOf(provinceCode) == 0 && isAdministrativeUnitsLv2) {
-            District newDistrict = new District();
-            newDistrict.setCode(newDistrictCode);
-            newDistrict.setName(district.getName());
-            newDistrict.setProvince(foundProvince);
-            newDistrict.setAdministrativeUnit(foundAdmUnit);
-            return mapper.map(repository.save(newDistrict), DistrictDto.class);
-        }
-        return null;
+        Map<String, Object> map = vaidate(district);
+        Province foundProvince = (Province) map.get("province");
+        AdministrativeUnit foundAdmUnit = (AdministrativeUnit) map.get("admUnit");
+        District createDistrict = mapper.map(district, District.class);
+        createDistrict.setProvince(foundProvince);
+        createDistrict.setAdministrativeUnit(foundAdmUnit);
+        District newDistrict = repository.save(createDistrict);
+        return mapper.map(newDistrict, DistrictDto.class);
 
     }
 
+    @Transactional
     @Override
     public DistrictDto updateDistrict(String districtCodeNeedUpdate, DistrictDto district) {
         String districtCode = district.getCode();
-        District foundDistrict = repository.findById(districtCodeNeedUpdate).orElseThrow(
+        District foundDistrict = repository.findByCode(districtCodeNeedUpdate).orElseThrow(
                 () -> new ResourceNotFoundException("District", "DistrictCode", districtCodeNeedUpdate)
         );
 
         if (!districtCode.equals(districtCodeNeedUpdate)) {
-            repository.findById(districtCode).ifPresent(
+            repository.findByCode(districtCode).ifPresent(
                     fd -> {throw new ResourceFoundException("District", "DistrictCodeUpdate", districtCode);}
             );
         }
 
-        int admUnitId = district.getAdministrativeUnit().getId();
-        AdministrativeUnit foundAdmUnit = administrativeUnitRepository.findById(admUnitId).orElseThrow(
-                () -> new ResourceNotFoundException("AdministrativeUnit", "AdministrativeUnitID", String.valueOf(admUnitId))
-        );
+        Map<String, Object> map = vaidate(district);
+        Province foundProvince = (Province) map.get("province");
+        AdministrativeUnit foundAdmUnit = (AdministrativeUnit) map.get("admUnit");
+        foundDistrict.setCode(district.getCode());
+        foundDistrict.setName(district.getName());
+        foundDistrict.setProvince(foundProvince);
+        foundDistrict.setAdministrativeUnit(foundAdmUnit);
+        return mapper.map(foundDistrict, DistrictDto.class);
+    }
+    @Override
+    public void deleteDistrict(String districtCode) {
 
+    }
+
+    private boolean validate(DistrictDto district) {
+        String name = district.getName();
+        Integer admUnitId = district.getAdministrativeUnit().getId();
+        String districtCode = district.getCode();
         String provinceCode = district.getProvince().getCode();
-        Province foundProvince = provinceRepository.findById(provinceCode).orElseThrow(
+        if (!Utils.AdministrativeUnitsLv2.containsKey(admUnitId)) {
+            throw new InvalidException("Ma don vi hanh chinh khong chinh xac");
+        }
+        if (districtCode.indexOf(provinceCode) != 0) {
+            throw new InvalidException("Ma dơn vi khong hop le");
+        }
+//        if (!Utils.validateName(name)) {
+//            throw new InvalidException("Ten khong hop le");
+//        }
+        return true;
+    }
+
+    private Map<String, Object> vaidate(DistrictDto district) {
+        String name = district.getName();
+        Integer admUnitId = district.getAdministrativeUnit().getId();
+        String districtCode = district.getCode();
+        String provinceCode = district.getProvince().getCode();
+        if (!Utils.AdministrativeUnitsLv2.containsKey(admUnitId)) {
+            throw new InvalidException("Ma don vi hanh chinh khong chinh xac");
+        }
+        if (districtCode.indexOf(provinceCode) != 0) {
+            throw new InvalidException("Ma dơn vi khong hop le");
+        }
+//        if (!Utils.validateName(name)) {
+//            throw new InvalidException("Ten khong hop le");
+//        }
+//        String provinceCode = district.getProvince().getCode();
+        Province foundProvince = provinceRepository.findByCode(provinceCode).orElseThrow(
                 ()-> new ResourceNotFoundException("Province", "ProvinceCode", provinceCode)
         );
 
-        boolean isAdministrativeUnitsLv2 = false;
-        int administrativeUnitsID = district.getAdministrativeUnit().getId();
-        for (Utils.AdministrativeUnitsLv2 a : Utils.AdministrativeUnitsLv2.values()) {
-            if (a.getValue() == administrativeUnitsID) {
-                isAdministrativeUnitsLv2 = true;
-                break;
-            }
-        }
-
-        if (districtCode.indexOf(provinceCode) == 0 && isAdministrativeUnitsLv2) {
-           foundDistrict.setCode(districtCode);
-           foundDistrict.setName(district.getName());
-           foundDistrict.setProvince(foundProvince);
-           foundDistrict.setAdministrativeUnit(foundAdmUnit);
-           return mapper.map(repository.save(foundDistrict), DistrictDto.class);
-        }
-        return null;
-    }
-
-    @Override
-    public DistrictDto updateDistrict(String districtIdNeedUpdate, Map<String, Object> JSONInfoAsMap) {
-        Optional<District> foundDistrict = repository.findById(districtIdNeedUpdate);
-        boolean isAdministrativeUnitsLv2 = false;
-        for (Utils.AdministrativeUnitsLv2 a : Utils.AdministrativeUnitsLv2.values()) {
-            if (JSONInfoAsMap.get("administrativeUnitId") == a) {
-                isAdministrativeUnitsLv2 = true;
-                break;
-            }
-        }
-        if (!isAdministrativeUnitsLv2) {
-            return null;
-        }
-        if (foundDistrict.isPresent()) {
-            District districtNeedChange = new District();
-            for (String property : JSONInfoAsMap.keySet()) {
-                switch (property) {
-                    case "code" :
-                        districtNeedChange.setCode((String) JSONInfoAsMap.get("code"));
-                        break;
-                    case "name" :
-                        districtNeedChange.setName((String) JSONInfoAsMap.get("name"));
-                        break;
-                    case "administrativeUnitId" :
-                        administrativeUnitRepository.findById((Integer) JSONInfoAsMap.get("administrativeUnitId"))
-                                .ifPresent(districtNeedChange::setAdministrativeUnit);
-                        break;
-                    case "provinceId" :
-                        provinceRepository.findById((String) JSONInfoAsMap.get("provinceId"))
-                                .ifPresent(districtNeedChange::setProvince);
-                        break;
-                }
-            }
-            repository.save(districtNeedChange);
-            return mapper.map(districtIdNeedUpdate, DistrictDto.class);
-        }
-        return null;
+//        int admUnitId = district.getAdministrativeUnit().getId();
+        AdministrativeUnit foundAdmUnit = administrativeUnitRepository.findById(admUnitId).orElseThrow(
+                () -> new ResourceNotFoundException("AdministrativeUnit", "AdministrativeUnitId", String.valueOf(admUnitId))
+        );
+        Map<String, Object> map = new HashMap<>();
+        map.put("province", foundProvince);
+        map.put("admUnit", foundAdmUnit);
+        return map;
     }
 }

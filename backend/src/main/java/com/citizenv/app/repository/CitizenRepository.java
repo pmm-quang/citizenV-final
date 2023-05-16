@@ -15,7 +15,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CitizenRepository extends JpaRepository<Citizen, String> {
+public interface CitizenRepository extends JpaRepository<Citizen, Long> {
+
+    Optional<Citizen> findByNationalId(String nationalId);
 
     @Modifying
     @Transactional

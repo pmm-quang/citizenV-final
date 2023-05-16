@@ -8,11 +8,11 @@ import java.util.List;
 
 @Entity
 @Table(name = "wards")
-@PrimaryKeyJoinColumn(name = "code")
+//@PrimaryKeyJoinColumn(name = "id")
 @Data
 public class Ward extends AdministrativeDivision {
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "district_code")
+    @JoinColumn(name = "district_id")
     private District district;
 
     @OneToMany(mappedBy = "ward", fetch = FetchType.LAZY)

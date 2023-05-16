@@ -1,8 +1,8 @@
 package com.citizenv.app.controller;
 
-import com.citizenv.app.exception.ResourceException;
-import com.citizenv.app.exception.ResourceFoundException;
 import com.citizenv.app.payload.HamletDto;
+import com.citizenv.app.payload.custom.CustomHamletRequest;
+import com.citizenv.app.payload.custom.CustomWardRequest;
 import com.citizenv.app.service.HamletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,28 +41,21 @@ public class HamletController {
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-    @PostMapping("/create/")
-    public ResponseEntity<Object> createHamlet(@RequestBody HamletDto hamlet) {
-        try {
-            HamletDto hamletDto = service.createHamlet(hamlet);
-            return hamletDto != null ? new ResponseEntity<>(hamletDto, HttpStatus.OK) : new ResponseEntity<>("Mã đơn vị không trùng khớp hoặc cấp bậc hành chính không chính xác", HttpStatus.OK);
-//            if (hamletDto != null) {
-//                return new ResponseEntity<>(hamletDto, HttpStatus.CREATED);
-//            }
-//            return new ResponseEntity<>("Mã đơn vị không trùng khớp hoặc cấp bậc hành chính không chính xác", HttpStatus.OK);
-        } catch (ResourceException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    @PostMapping("/save")
+    public ResponseEntity<HamletDto> createHamlet(@RequestBody CustomHamletRequest hamlet) {
+        HamletDto hamletDto = service.createHamlet(hamlet);
+        return ResponseEntity.status(201).body(hamletDto);
     }
 
-    @PutMapping("/update/{hamletCode}/")
+    @PutMapping("/save/{hamletCode}")
     public ResponseEntity<Object> updateHamlet(@PathVariable String hamletCode,
-                                                  @RequestBody HamletDto hamlet) {
-        try {
-            HamletDto hamletDto = service.updateHamlet(hamletCode, hamlet);
-            return hamletDto != null ? new ResponseEntity<>(hamletDto, HttpStatus.OK) : new ResponseEntity<>("Mã đơn vị không trùng khớp hoặc cấp bậc hành chính không chính xác", HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+                                                  @RequestBody CustomHamletRequest hamlet) {
+        HamletDto hamletDto = service.updateHamlet(hamletCode, hamlet);
+        return ResponseEntity.ok().body(hamletDto);
+    }
+    @GetMapping("/no/")
+    public void getNo() {
+        service.nono();
+        System.out.println("haha");
     }
 }

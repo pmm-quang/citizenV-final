@@ -7,7 +7,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "provinces")
-@PrimaryKeyJoinColumn(name = "code")
+//@PrimaryKeyJoinColumn(name = "id")
 @Getter
 @Setter
 @ToString

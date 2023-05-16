@@ -4,9 +4,11 @@ import com.citizenv.app.component.Utils;
 import com.citizenv.app.entity.AdministrativeUnit;
 import com.citizenv.app.entity.District;
 import com.citizenv.app.entity.Ward;
+import com.citizenv.app.exception.InvalidException;
 import com.citizenv.app.exception.ResourceFoundException;
 import com.citizenv.app.exception.ResourceNotFoundException;
 import com.citizenv.app.payload.WardDto;
+import com.citizenv.app.payload.custom.CustomWardRequest;
 import com.citizenv.app.repository.AdministrativeUnitRepository;
 import com.citizenv.app.repository.DistrictRepository;
 import com.citizenv.app.repository.WardRepository;
@@ -16,8 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -42,15 +45,16 @@ public class WardServiceImpl implements WardService {
     }
 
     @Override
-    public WardDto getById(String wardCode) {
-       Ward foundWard = repo.findById(wardCode)
-               .orElseThrow(() -> new ResourceNotFoundException("Ward", "WardCode",wardCode));
+    public WardDto getByCode(String code) {
+        Ward foundWard = repo.findByCode(code).orElseThrow(
+                () -> new ResourceNotFoundException("Ward", "WardCode", code)
+        );
         return mapper.map(foundWard, WardDto.class);
     }
 
     @Override
     public List<WardDto> getByDistrictCode(String districtCode) {
-        District foundDistrict = districtRepo.findById(districtCode).orElseThrow(
+        District foundDistrict = districtRepo.findByCode(districtCode).orElseThrow(
                 () -> new ResourceNotFoundException("District", "DistrictCode", districtCode)
         );
         List<Ward> list = repo.findAllByDistrict(foundDistrict);
@@ -70,95 +74,152 @@ public class WardServiceImpl implements WardService {
 
     @Override
     public WardDto createWard(String wardCode,String districtCode, WardDto ward) {
-        Optional<Ward> foundWard = repo.findById(wardCode);
-        if (foundWard.isEmpty()) {
-            int administrativeUnitsID = ward.getAdministrativeUnit().getId();
-            boolean isAdministrativeUnitsLv3 = false;
-            for (Utils.AdministrativeUnitsLv3 a : Utils.AdministrativeUnitsLv3.values()) {
-                if (a.getValue() == administrativeUnitsID) {
-                    isAdministrativeUnitsLv3 = true;
-                    break;
-                }
-            }
-            if (!isAdministrativeUnitsLv3) {
-                return null;
-            }
 
-            District foundDistrict = districtRepo.findById(districtCode)
-                    .orElseThrow(() -> new ResourceNotFoundException("District", "DistrictCode", districtCode));
-            Ward newWard = mapper.map(ward, Ward.class);
-            repo.save(newWard);
-            return mapper.map(newWard, WardDto.class);
-        }
         return null;
     }
 
     @Override
     public WardDto createWard(WardDto ward) {
         String wardCode = ward.getCode();
-        repo.findById(wardCode).ifPresent(
+        repo.findByCode(wardCode).ifPresent(
                 w -> {throw new ResourceFoundException("Ward", "WardCode", wardCode);}
         );
-        String districtCode = ward.getDistrict().getCode();
-        District foundDistrict = districtRepo.findById(districtCode).orElseThrow(
-                () -> new ResourceNotFoundException("District", "DistrictCode", districtCode)
-        );
-        int admUnitId = ward.getAdministrativeUnit().getId();
-        AdministrativeUnit foundAdmUnit = admUnitRepo.findById(admUnitId).orElseThrow(
-                () -> new ResourceNotFoundException("AdministrativeUnit", "AdministrativeUnitId", String.valueOf(admUnitId))
-        );
-
-
-        if (wardCode.indexOf(districtCode) == 0 && checkAdministrativeLv3(admUnitId)) {
-            Ward newWard = new Ward();
-            newWard.setCode(wardCode);
-            newWard.setName(ward.getName());
-            newWard.setDistrict(foundDistrict);
-            newWard.setAdministrativeUnit(foundAdmUnit);
-
-            return mapper.map(repo.save(newWard), WardDto.class);
-        }
-        return null;
+        Ward createWard = validate(ward);
+        Ward newWard = repo.save(createWard);
+        return mapper.map(newWard, WardDto.class);
     }
 
+    @Override
+    public WardDto createWard(CustomWardRequest ward) {
+        repo.findByCode(ward.getCode()).ifPresent(w -> {
+            throw new ResourceFoundException("Ward", "WardCode", ward.getCode());
+        });
+        Ward createWard = validate(ward.getCode(), ward.getName(), ward.getDistrictCode(), ward.getAdministrativeUnitId());
+        Ward newWard = repo.save(createWard);
+        return mapper.map(newWard, WardDto.class);
+    }
     @Transactional
     @Override
     public WardDto updateWard(String wardNeedUpdateID, WardDto ward) {
-        Ward foundWard = repo.findById(wardNeedUpdateID).orElseThrow(
+        Ward foundWard = repo.findByCode(wardNeedUpdateID).orElseThrow(
                 () -> new ResourceNotFoundException("Ward", "WardCode", wardNeedUpdateID)
         );
         String wardCode = ward.getCode();
         if (!wardCode.equals(wardNeedUpdateID)) {
-            repo.findById(wardCode).ifPresent(
+            repo.findByCode(wardCode).ifPresent(
                     w -> {throw new ResourceFoundException("Ward", "WardCode", wardCode);}
             );
         }
-        String districtCode = ward.getDistrict().getCode();
-        District foundDistrict = districtRepo.findById(districtCode).orElseThrow(
-                () -> new ResourceNotFoundException("District", "DistrictCode", districtCode)
-        );
-        int admUnitId = ward.getAdministrativeUnit().getId();
-        AdministrativeUnit foundAdmUnit = admUnitRepo.findById(admUnitId).orElseThrow(
-                () -> new ResourceNotFoundException("AdministrativeUnit", "AdministrativeUnitId", String.valueOf(admUnitId))
-        );
-
-        if (wardCode.indexOf(districtCode) == 0 && checkAdministrativeLv3(admUnitId)) {
-//            foundWard.setCode(wardCode);
-//            foundWard.setName(ward.getName());
-//            foundWard.setDistrict(foundDistrict);
-//            foundWard.setAdministrativeUnit(foundAdmUnit);
-            repo.update(wardNeedUpdateID, wardCode, ward.getName(), foundDistrict, foundAdmUnit);
-            return mapper.map(repo.findById(wardCode), WardDto.class);
-        }
-        return null;
+        Ward createWard = validate(ward.getCode(), ward.getName(), ward.getDistrict().getCode(), ward.getAdministrativeUnit().getId());
+        foundWard.setName(createWard.getName());
+        foundWard.setCode(createWard.getCode());
+        foundWard.setAdministrativeUnit(createWard.getAdministrativeUnit());
+        foundWard.setDistrict(createWard.getDistrict());
+        return mapper.map(foundWard, WardDto.class);
     }
 
-    private boolean checkAdministrativeLv3(int admUnitId) {
-        for (Utils.AdministrativeUnitsLv3 a : Utils.AdministrativeUnitsLv3.values()) {
-            if (a.getValue() == admUnitId) {
-                return true;
-            }
+    @Transactional
+    @Override
+    public WardDto updateWard(String wardNeedUpdateCode, CustomWardRequest ward) {
+        Ward foundWard = repo.findByCode(wardNeedUpdateCode).orElseThrow(
+                () -> new ResourceNotFoundException("Ward", "WardCode", wardNeedUpdateCode)
+        );
+        String wardCode = ward.getCode();
+        if (!wardCode.equals(wardNeedUpdateCode)) {
+            repo.findByCode(wardCode).ifPresent(
+                    w -> {throw new ResourceFoundException("Ward", "WardCode", wardCode);}
+            );
         }
-        return false;
+        Ward createWard = validate(ward);
+        foundWard.setCode(createWard.getCode());
+        foundWard.setName(createWard.getName());
+        foundWard.setAdministrativeUnit(createWard.getAdministrativeUnit());
+        foundWard.setDistrict(createWard.getDistrict());
+        return mapper.map(foundWard, WardDto.class);
+    }
+
+    private Ward validate(WardDto ward) {
+        String wardCode = ward.getCode();
+        String wardName = ward.getName();
+        String districtCode = ward.getDistrict().getCode();
+        Integer admUnitId = ward.getAdministrativeUnit().getId();
+        AdministrativeUnit foundAdmUnit = admUnitRepo.findById(admUnitId).orElseThrow(
+                () -> new ResourceNotFoundException("AdministrativeUnit","AdministrativeUnitId", String.valueOf(admUnitId))
+        );
+
+        District foundDistrict = districtRepo.findByCode(districtCode).orElseThrow(
+                () -> new ResourceNotFoundException("District", "DistrictCode", districtCode)
+        );
+
+        if (!Utils.AdministrativeUnitsLv3.containsKey(admUnitId)) {
+            throw new InvalidException("Ma don vi hanh chinh khong hop le");
+        }
+        if (wardCode.indexOf(districtCode) != 0) {
+            throw new InvalidException("Ma don vi khong hop le");
+        }
+//        if (!Utils.validateName(wardName)) {
+//            throw new InvalidException("Ten don vi khong hop le");
+//        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("admUnit", foundAdmUnit);
+        map.put("district", foundDistrict);
+        Ward newWard = mapper.map(ward, Ward.class);
+        newWard.setDistrict(foundDistrict);
+        newWard.setAdministrativeUnit(foundAdmUnit);
+        return newWard;
+    }
+    private Ward validate(CustomWardRequest ward) {
+        String wardCode = ward.getCode();
+        String wardName = ward.getName();
+        String districtCode = ward.getDistrictCode();
+        Integer admUnitId = ward.getAdministrativeUnitId();
+        AdministrativeUnit foundAdmUnit = admUnitRepo.findById(admUnitId).orElseThrow(
+                () -> new ResourceNotFoundException("AdministrativeUnit","AdministrativeUnitId", String.valueOf(admUnitId))
+        );
+
+        District foundDistrict = districtRepo.findByCode(districtCode).orElseThrow(
+                () -> new ResourceNotFoundException("District", "DistrictCode", districtCode)
+        );
+
+        if (!Utils.AdministrativeUnitsLv3.containsKey(admUnitId)) {
+            throw new InvalidException("Ma don vi hanh chinh khong hop le");
+        }
+        if (wardCode.indexOf(districtCode) != 0) {
+            throw new InvalidException("Ma don vi khong hop le");
+        }
+//        if (!Utils.validateName(wardName)) {
+//            throw new InvalidException("Ten don vi khong hop le");
+//        }
+        Ward newWard = new Ward();
+        newWard.setCode(wardCode);
+        newWard.setName(wardName);
+        newWard.setDistrict(foundDistrict);
+        newWard.setAdministrativeUnit(foundAdmUnit);
+        return newWard;
+    }
+    private Ward validate(String wardCode, String wardName, String districtCode, Integer admUnitId) {
+        AdministrativeUnit foundAdmUnit = admUnitRepo.findById(admUnitId).orElseThrow(
+                () -> new ResourceNotFoundException("AdministrativeUnit","AdministrativeUnitId", String.valueOf(admUnitId))
+        );
+
+        District foundDistrict = districtRepo.findByCode(districtCode).orElseThrow(
+                () -> new ResourceNotFoundException("District", "DistrictCode", districtCode)
+        );
+
+        if (!Utils.AdministrativeUnitsLv3.containsKey(admUnitId)) {
+            throw new InvalidException("Ma don vi hanh chinh khong hop le");
+        }
+        if (wardCode.indexOf(districtCode) != 0) {
+            throw new InvalidException("Ma don vi khong hop le");
+        }
+//        if (!Utils.validateName(wardName)) {
+//            throw new InvalidException("Ten don vi khong hop le");
+//        }
+        Ward newWard = new Ward();
+        newWard.setCode(wardCode);
+        newWard.setName(wardName);
+        newWard.setDistrict(foundDistrict);
+        newWard.setAdministrativeUnit(foundAdmUnit);
+        return newWard;
     }
 }

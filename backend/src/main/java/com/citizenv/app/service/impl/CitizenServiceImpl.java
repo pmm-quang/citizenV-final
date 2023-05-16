@@ -77,8 +77,15 @@ public class CitizenServiceImpl implements CitizenService {
     }
 
     @Override
+    public CitizenDto getByNationalId(String nationalId) {
+        Citizen citizen = repo.findById(nationalId).orElseThrow(
+                () -> new ResourceNotFoundException("Customer", "CustomerID", nationalId));
+        return mapper.map(citizen, CitizenDto.class);
+    }
+
+    @Override
     public List<CitizenDto> getAllByHamletCode(String hamletCode) {
-        Hamlet foundHamlet = hamletRepo.findById(hamletCode).orElseThrow(
+        Hamlet foundHamlet = hamletRepo.findByCode(hamletCode).orElseThrow(
                 ()-> new ResourceNotFoundException("Hamlet", "HamletCode", hamletCode)
         );
 //        List<Citizen> entities = repo.findAllByHamletCode(hamletCode, "1");
@@ -126,7 +133,7 @@ public class CitizenServiceImpl implements CitizenService {
 
     @Override
     public List<CitizenDto> getAllByWardCode(String wardCode) {
-        Ward foundWard = wardRepo.findById(wardCode).orElseThrow(
+        Ward foundWard = wardRepo.findByCode(wardCode).orElseThrow(
                 () -> new ResourceNotFoundException("Ward", "WardCode", wardCode)
         );
         List<Citizen> entities = repo.findAllByWardCode(wardCode, 2);
@@ -144,7 +151,7 @@ public class CitizenServiceImpl implements CitizenService {
 
     @Override
     public List<CitizenDto> getAllByDistrictCode(String districtCode) {
-        District foundDistrict = districtRepo.findById(districtCode).orElseThrow(
+        District foundDistrict = districtRepo.findByCode(districtCode).orElseThrow(
                 () -> new ResourceNotFoundException("District", "DistrictCode", districtCode)
         );
         List<Citizen> entities = repo.findAllByDistrictCode(districtCode, 2);
@@ -153,7 +160,7 @@ public class CitizenServiceImpl implements CitizenService {
 
     @Override
     public List<CitizenDto> getAllByProvinceCode(String provinceCode) {
-        Province foundProvince = provinceRepo.findById(provinceCode).orElseThrow(
+        Province foundProvince = provinceRepo.findByCode(provinceCode).orElseThrow(
                 () -> new ResourceNotFoundException("Province", "ProvinceCode", provinceCode)
         );
         List<Citizen> entities = repo.findAllByProvinceCode(provinceCode, 2);
@@ -167,7 +174,7 @@ public class CitizenServiceImpl implements CitizenService {
 
     @Override
     public CitizenDto createCitizen(CitizenDto citizen) {
-        String citizenId = citizen.getId();
+        String citizenId = citizen.getNationalId();
         repo.findById(citizenId).ifPresent(
                 c -> {throw new ResourceFoundException("Citizen", "CititzenId", citizenId);
         });
@@ -190,7 +197,7 @@ public class CitizenServiceImpl implements CitizenService {
         Citizen foundCitizen = repo.findById(citizenId).orElseThrow(
                 () -> new ResourceNotFoundException("Citizen", "CitizenId", citizenId)
         );
-        String cIdUpdate = citizen.getId();
+        String cIdUpdate = citizen.getNationalId();
 
         if (validateInfo(citizen)) {
             if (!cIdUpdate.equals(citizenId)) {
@@ -256,7 +263,7 @@ public class CitizenServiceImpl implements CitizenService {
 
 
     private boolean validateInfo(CitizenDto citizen) {
-        String citizenId = citizen.getId();
+        String citizenId = citizen.getNationalId();
         String provinceCodeOfQueQuan = null;
 
         //Kiểm tra mã địa chỉ - address
@@ -265,7 +272,7 @@ public class CitizenServiceImpl implements CitizenService {
             if (a.getAddressType().getId() == 1 || a.getAddressType().getId() == 2) {
                 countRequiredAddress ++;
             }
-            Hamlet h = hamletRepo.findById(a.getHamlet().getCode()).orElseThrow(
+            Hamlet h = hamletRepo.findByCode(a.getHamlet().getCode()).orElseThrow(
                     () -> new ResourceNotFoundException("Hamlet", "HamletCode", a.getHamlet().getCode())
             );
             if (a.getAddressType().getId() == 1) {

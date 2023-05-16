@@ -17,9 +17,13 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class Citizen {
     @Id
-    @Column(name = "id", nullable = false)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    @Column(unique = true, nullable = false)
+    private String nationalId;
+
+    @Column(nullable = false)
     private String name;
 
     @Column(name = "date_of_birth")

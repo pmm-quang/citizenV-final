@@ -7,9 +7,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-public interface DistrictRepository extends JpaRepository<District, String> {
+public interface DistrictRepository extends JpaRepository<District, Long> {
+
+    Optional<District> findByCode(String code);
     List<District> findAllByProvince(Province province);
     List<District> findAllByAdministrativeUnit(AdministrativeUnit administrativeUnit);
 }

@@ -10,6 +10,7 @@ public interface CitizenService {
 
     Map<String, Object> getAll(int page);
     CitizenDto getById(String citizenId);
+    CitizenDto getByNationalId(String nationalId);
     List<CitizenDto> getAllByHamletCode(String hamletCode);
     List<CitizenDto> getAllByWardCode(String wardCode);
     List<CitizenDto> getAllByDistrictCode(String districtCode);

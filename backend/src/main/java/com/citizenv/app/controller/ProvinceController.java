@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@CrossOrigin(origins = {"http://localhost:3000/", "http://localhost:3001/"})
+//@CrossOrigin(origins = {"http://localhost:3000/", "http://localhost:3001/"})
 @RestController
 @RequestMapping("api/v1/province")
 public class ProvinceController {
@@ -31,9 +31,9 @@ public class ProvinceController {
         return new ResponseEntity<>(provinceDtoPaginationList, HttpStatus.OK);
     }
 
-    @GetMapping("/{provinceId}")
-    public ResponseEntity<Object> getById(@PathVariable String provinceId) {
-        ProvinceDto provinceDto = provinceService.getById(provinceId);
+    @GetMapping("/{provinceCode}")
+    public ResponseEntity<ProvinceDto> getByCode(@PathVariable String provinceCode) {
+        ProvinceDto provinceDto = provinceService.getByCode(provinceCode);
         return new ResponseEntity<>(provinceDto, HttpStatus.OK);
     }
 
@@ -50,25 +50,20 @@ public class ProvinceController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<Object> create(@RequestBody Map<String, Object> provinceJSONInfo) {
-         ProvinceDto newProvince = provinceService.createProvince(provinceJSONInfo);
+    public ResponseEntity<Object> create(@RequestBody ProvinceDto provinceDto) {
+         ProvinceDto newProvince = provinceService.createProvince(provinceDto);
          return new ResponseEntity<>(newProvince, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{provinceId}")
-    public ResponseEntity<ProvinceDto> update(@PathVariable String provinceId, @RequestBody ProvinceDto province) {
-        ProvinceDto newProvince = provinceService.updateProvince(provinceId, province);
+    @PutMapping("/{provinceCode}")
+    public ResponseEntity<ProvinceDto> update(@PathVariable String provinceCode, @RequestBody ProvinceDto province) {
+        ProvinceDto newProvince = provinceService.updateProvince(provinceCode, province);
         return new ResponseEntity<>(newProvince, HttpStatus.OK);
     }
 
-//    @PutMapping("/{provinceId}")
-//    public ResponseEntity<ProvinceDto> update(@PathVariable String provinceId, @RequestBody Map<String, Object> provinceJSONInfo) throws NoSuchMethodException {
-//        ProvinceDto newProvince = provinceService.updateProvince(provinceId, provinceJSONInfo);
-//        return new ResponseEntity<>(newProvince, HttpStatus.OK);
-//    }
 
     @DeleteMapping("/{provinceId}")
-    public ResponseEntity<String> deleteById(@PathVariable String provinceId) {
+    public ResponseEntity<String> deleteById(@PathVariable Long provinceId) {
             return new ResponseEntity<>(provinceService.deleteById(provinceId), HttpStatus.OK);
     }
 }

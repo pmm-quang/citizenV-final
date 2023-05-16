@@ -18,7 +18,7 @@ public class Address {
     private Citizen citizen;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hamlet_code")
+    @JoinColumn(name = "hamlet_id")
     private Hamlet hamlet;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -7,17 +7,18 @@ import java.util.Map;
 
 public interface DistrictService {
     List<DistrictDto> getAll();
-    DistrictDto getById(String districtId);
+    DistrictDto getById(Long districtId);
+
+    DistrictDto getByCode(String code);
 
     List<DistrictDto> getAllByProvinceCode(String provinceCode);
 
     List<DistrictDto> getAllByAdministrativeUnitId(int admUnitId);
 
-    DistrictDto createDistrict(Map<String, Object> JSONInfoAsMap);
-
     DistrictDto createDistrict(DistrictDto district);
 
     DistrictDto updateDistrict(String districtCodeNeedUpdate, DistrictDto district);
-    DistrictDto updateDistrict(String districtIdNeedUpdate, Map<String, Object> JSONInfoAsMap);
+
+    void deleteDistrict(String districtCode);
 
 }

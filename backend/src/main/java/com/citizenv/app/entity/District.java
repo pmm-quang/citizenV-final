@@ -9,11 +9,12 @@ import java.util.List;
 
 @Entity
 @Table(name = "districts")
-@PrimaryKeyJoinColumn(name = "code")
+//@PrimaryKeyJoinColumn(name = "id")
 @Data
 public class District extends AdministrativeDivision {
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "province_code")
+    @JoinColumn(name = "province_id")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Province province;

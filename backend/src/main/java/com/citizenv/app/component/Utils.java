@@ -66,7 +66,7 @@ public class Utils {
         }
 
         public static boolean containsKey(Integer value) {
-            return Stream.of(AdministrativeUnitsLv1.values())
+            return Stream.of(AdministrativeUnitsLv2.values())
                     .anyMatch(p -> p.getValue().equals(value));
         }
     }
@@ -92,7 +92,7 @@ public class Utils {
         }
 
         public static boolean containsKey(Integer value) {
-            return Stream.of(AdministrativeUnitsLv1.values())
+            return Stream.of(AdministrativeUnitsLv3.values())
                     .anyMatch(p -> p.getValue().equals(value));
         }
     }
@@ -117,7 +117,7 @@ public class Utils {
         }
 
         public static boolean containsKey(Integer value) {
-            return Stream.of(AdministrativeUnitsLv1.values())
+            return Stream.of(AdministrativeUnitsLv4.values())
                     .anyMatch(p -> p.getValue().equals(value));
         }
     }

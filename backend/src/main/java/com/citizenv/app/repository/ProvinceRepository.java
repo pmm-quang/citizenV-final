@@ -12,12 +12,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ProvinceRepository extends JpaRepository<Province, String> {
+public interface ProvinceRepository extends JpaRepository<Province, Long> {
     @Override
     List<Province> findAll();
 
+    Optional<Province> findByCode(String code);
+
     @Override
-    Optional<Province> findById(String s);
+    Optional<Province> findById(Long s);
 
     Optional<Province> findByAdministrativeCode(String admCode);
 

@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 public class CitizenDto {
-    private String id;
+    private String nationalId;
     private String name;
     @JsonFormat(pattern="yyyy-MM-dd")
     private LocalDate dateOfBirth;

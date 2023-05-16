@@ -9,10 +9,11 @@ public interface ProvinceService {
     List<ProvinceDto> getAll();
 
     Map<String, Object> getAll(int page);
-    ProvinceDto getById(String provinceId);
+    ProvinceDto getById(Long provinceId);
+    ProvinceDto getByCode(String code);
     List<ProvinceDto> getAllByAdministrativeUnitId(int admUnitId);
     List<ProvinceDto> getAllByAdministrativeRegionId(int admRegionId);
-    ProvinceDto createProvince(Map<String, Object> JSONInfoAsMap);
-    ProvinceDto updateProvince(String provinceIdNeedUpdate, ProvinceDto province);
-    String deleteById(String provinceId);
+    ProvinceDto createProvince(ProvinceDto province);
+    ProvinceDto updateProvince(String provinceCodeNeedUpdate, ProvinceDto province);
+    String deleteById(Long provinceCode);
 }

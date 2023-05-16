@@ -51,7 +51,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public List<AddressDto> getByHamletCode(String hamletCode) {
-        Hamlet foundHamlet = hamletRepository.findById(hamletCode).orElseThrow(
+        Hamlet foundHamlet = hamletRepository.findByCode(hamletCode).orElseThrow(
                 ()-> new ResourceNotFoundException("Hamlet", "HamletCode", hamletCode)
         );
         List<Address> list = repository.findAllByHamlet(foundHamlet);
@@ -61,7 +61,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public List<AddressDto> getByHamletCodeAndAddressType(String hamletCode, Integer addressTypeId) {
-        Hamlet foundHamlet = hamletRepository.findById(hamletCode).orElseThrow(
+        Hamlet foundHamlet = hamletRepository.findByCode(hamletCode).orElseThrow(
                 ()-> new ResourceNotFoundException("Hamlet", "HamletCode", hamletCode)
         );
 

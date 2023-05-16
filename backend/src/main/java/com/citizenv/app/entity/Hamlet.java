@@ -8,11 +8,11 @@ import java.util.List;
 
 @Entity
 @Table(name = "hamlets")
-@PrimaryKeyJoinColumn(name = "code")
+//@PrimaryKeyJoinColumn(name = "id")
 @Data
 public class Hamlet extends AdministrativeDivision {
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ward_code")
+    @JoinColumn(name = "ward_id")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Ward ward;
