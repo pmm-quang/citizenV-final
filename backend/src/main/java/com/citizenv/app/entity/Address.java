@@ -24,4 +24,10 @@ public class Address {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address_type")
     private AddressType addressType;
+
+    public void setParam (Citizen citizen, Hamlet hamlet, AddressType addressType) {
+        this.citizen = citizen;
+        this.hamlet = hamlet;
+        this.addressType = addressType;
+    }
 }

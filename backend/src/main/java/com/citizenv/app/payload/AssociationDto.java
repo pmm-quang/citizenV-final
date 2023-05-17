@@ -15,10 +15,10 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AssociationDto implements Serializable {
+public class AssociationDto {
 //    private CitizenDto citizen;
     private Integer id;
-    private String associatedCitizenId;
+    private String associatedCitizenNationalId;
     private String associatedCitizenName;
     private AssociationTypeDto associationType;
 }

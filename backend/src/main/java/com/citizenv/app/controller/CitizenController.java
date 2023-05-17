@@ -1,6 +1,7 @@
 package com.citizenv.app.controller;
 
 import com.citizenv.app.payload.CitizenDto;
+import com.citizenv.app.payload.custom.CustomCitizenRequest;
 import com.citizenv.app.service.impl.CitizenServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,9 +30,9 @@ public class CitizenController {
         return new ResponseEntity<>(dtoPaginationList, HttpStatus.OK);
     }
 
-    @GetMapping("/{citizenId}")
-    public ResponseEntity<CitizenDto> getById(@PathVariable String citizenId) {
-        CitizenDto citizenDto = citizenService.getById(citizenId);
+    @GetMapping("/{nationalId}")
+    public ResponseEntity<CitizenDto> getByNationalId(@PathVariable String nationalId) {
+        CitizenDto citizenDto = citizenService.getByNationalId(nationalId);
         return new ResponseEntity<>(citizenDto, HttpStatus.OK);
     }
 
@@ -84,13 +85,13 @@ public class CitizenController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<CitizenDto> createCitizen(@RequestBody CitizenDto citizen) {
+    public ResponseEntity<CitizenDto> createCitizen(@RequestBody CustomCitizenRequest citizen) {
         CitizenDto citizenDto = citizenService.createCitizen(citizen);
         return new ResponseEntity<>(citizenDto, HttpStatus.CREATED);
     }
 
     @PutMapping("/save/{citizenId}")
-    public ResponseEntity<CitizenDto> updateCitizen(@PathVariable String citizenId, @RequestBody CitizenDto citizen) {
+    public ResponseEntity<CitizenDto> updateCitizen(@PathVariable String citizenId, @RequestBody CustomCitizenRequest citizen) {
         CitizenDto citizenDto = citizenService.updateCitizen(citizenId, citizen);
         return new ResponseEntity<>(citizenDto, HttpStatus.OK);
     }

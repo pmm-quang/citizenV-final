@@ -1,6 +1,7 @@
 package com.citizenv.app.service;
 
 import com.citizenv.app.payload.CitizenDto;
+import com.citizenv.app.payload.custom.CustomCitizenRequest;
 
 import java.util.List;
 import java.util.Map;
@@ -28,4 +29,7 @@ public interface CitizenService {
     Map<String, Object> getAllByDistrictCode(String districtCode, int page);
 
     Map<String, Object> getAllByProvinceCode(String provinceCode, int page);
+
+    CitizenDto createCitizen(CustomCitizenRequest citizen);
+    CitizenDto updateCitizen(String nationalId, CustomCitizenRequest citizen);
 }

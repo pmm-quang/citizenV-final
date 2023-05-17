@@ -57,7 +57,7 @@ public class Citizen {
     @EqualsAndHashCode.Exclude
     private List<Address> addresses;
 
-    @OneToMany(mappedBy = "citizen", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(mappedBy = "citizen", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<Association> associations;
