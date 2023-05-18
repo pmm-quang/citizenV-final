@@ -1,0 +1,47 @@
+.optionInput {
+    width: 300px;
+    float: right;
+    margin-right: 30px;
+}
+
+.title{
+    margin-right: 10px;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.selectOption {
+    float: right;
+    display: flex;
+    align-items: center;
+}
+
+.flexStatic {
+    display: flex;
+    margin-top: 50px;
+    margin-left: 10%;
+}
+
+.tableResidentialInHamlet {
+    width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.flex_second {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 50px;
+}
+
+.titleStatic {
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+.chartStatic {
+    margin-left: 15%;
+    width: 100%;
+}

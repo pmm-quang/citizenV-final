@@ -29,3 +29,26 @@
     margin-left: auto;
     margin-right: auto;
 }
+
+.returnShow {
+    margin-left: 50px;
+}
+
+
+#detailed-resident-info-header {
+    display: flex;
+    margin: 10px;
+}
+
+#detailed-resident-info-title {
+    margin: 0 0 0 20px;
+}
+
+.detailed-resident-info-table {
+    border: 4px solid aqua;
+    margin-left: 20px;
+}
+
+.detailed-resident-info-table .row-head {
+    width: 15vw;
+}

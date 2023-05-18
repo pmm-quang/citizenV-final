@@ -23,7 +23,7 @@ function Login() {
       password: password
     })
     if (response.data !== null) {
-      navigate('/citizen')
+      navigate('/home')
       setShow(false)
     }
     else setShow(true)
