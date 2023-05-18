@@ -1,0 +1,31 @@
+.flex_citizen_first {
+    align-items: center;
+    border-right: 2px solid black;
+    width: 40%;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.flex_citizen_second {
+    align-items: center;
+    width: 100%;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.titleCitizen {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.countCitizen {
+    margin-top: 20px;
+    font-size: 50px;
+    font-weight: 600;
+}
+
+.tableResidentialInHamlet {
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
+}

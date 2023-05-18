@@ -24,7 +24,7 @@ function Province() {
 
     const fetchFullProvince = async (page) => {
         try {
-            const response = await axios('http://localhost:8080/api/v1/province/page/' + page + "/");
+            const response = await axios('http://localhost:8080/api/v1/province/?page=' + page);
             setProvinces(response.data.provinces);
             console.log(provinces)
             setNumberPage(response.data.totalPages)

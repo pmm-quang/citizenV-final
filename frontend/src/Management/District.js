@@ -11,7 +11,7 @@ import Modal from 'react-bootstrap/Modal';
 function District() {
     const role_acc = JSON.parse(localStorage.getItem("user"));
     const user = role_acc.username;
-
+    
     const [districts, setDistricts] = useState([]);
     const [show, setShow] = useState(false);
     const [showEdit, setShowEdit] = useState(false);

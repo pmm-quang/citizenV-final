@@ -112,7 +112,7 @@ public class CitizenServiceImpl implements CitizenService {
         District foundDistrict = districtRepo.findByCode(districtCode).orElseThrow(
                 () -> new ResourceNotFoundException("District", "DistrictCode", districtCode)
         );
-        Page<Citizen> citizensPage = repo.findAllByWardCode(districtCode, 2, PageRequest.of(page - 1, 15));
+        Page<Citizen> citizensPage = repo.findAllByDistrictCode(districtCode, 2, PageRequest.of(page - 1, 15));
         return getStringObjectMap(page, citizensPage);
     }
 

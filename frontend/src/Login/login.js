@@ -18,18 +18,16 @@ function Login() {
   const [show, setShow] = useState(false)
 
   const AcceptLogin = async () => {
-    console.log(username + " " + password);
     const response = await axios.post("http://localhost:8080/api/v1/auth/login", {
       username: username,
       password: password
     })
     if (response.data !== null) {
-      navigate('/')
+      navigate('/citizen')
       setShow(false)
     }
     else setShow(true)
     localStorage.setItem("user", JSON.stringify(response.data))
-    console.log(localStorage.getItem("user"))
   }
 
   return (
