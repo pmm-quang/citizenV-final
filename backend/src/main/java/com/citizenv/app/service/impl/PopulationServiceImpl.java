@@ -1,12 +1,15 @@
 package com.citizenv.app.service.impl;
 
-import com.citizenv.app.entity.Address;
-import com.citizenv.app.entity.custom.Population;
+import com.citizenv.app.entity.*;
+import com.citizenv.app.payload.population.DivisionGeneralPopulationDto;
+import com.citizenv.app.payload.population.PopulationDto;
 import com.citizenv.app.repository.AddressRepository;
 import com.citizenv.app.repository.CitizenRepository;
 import com.citizenv.app.service.PopulationService;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +22,8 @@ public class PopulationServiceImpl implements PopulationService {
     final
     AddressRepository addressRepository;
 
+    StringBuilder sb = new StringBuilder();
+
     public PopulationServiceImpl(CitizenRepository citizenRepository, AddressRepository addressRepository) {
         this.citizenRepository = citizenRepository;
         this.addressRepository = addressRepository;
@@ -30,81 +35,81 @@ public class PopulationServiceImpl implements PopulationService {
     }
 
     @Override
-    public List<Population> getProvincePopulations() {
+    public List<DivisionGeneralPopulationDto> getProvincePopulations() {
         List<Address> addressesForPopulationCount = addressRepository.findByAddressType_Id(2);
-        List<Population> result = new ArrayList<>();
-        for (Address current :
+        List<DivisionGeneralPopulationDto> result = new ArrayList<>();
+        for (Address currentAddress :
                 addressesForPopulationCount) {
-            String currentName = current.getHamlet().getWard().getDistrict().getProvince().getName();
-            result.stream().filter(population -> population.getName().equals(currentName)).findFirst().ifPresentOrElse(currentPopulation -> currentPopulation.increasePopulation(1L), () -> result.add(new Population(currentName, 1L)));
+            Province currentProvince = currentAddress.getHamlet().getWard().getDistrict().getProvince();
+            result.stream().filter(population -> population.getCode().equals(currentProvince.getCode())).findFirst().ifPresentOrElse(currentPopulation -> currentPopulation.increasePopulation(1L), () -> result.add(new DivisionGeneralPopulationDto(currentProvince.getCode(), currentProvince.getName())));
         }
         return result;
     }
 
     @Override
-    public List<Population> getDistrictPopulationsByProvince(String provinceCode) {
+    public List<DivisionGeneralPopulationDto> getDistrictPopulationsByProvince(String provinceCode) {
         List<Address> addressesForPopulationCount = addressRepository.findByAddressType_Id(2);
-        List<Population> result = new ArrayList<>();
-        for (Address current :
+        List<DivisionGeneralPopulationDto> result = new ArrayList<>();
+        for (Address currentAddress :
                 addressesForPopulationCount) {
-            if (current.getHamlet().getWard().getDistrict().getProvince().getCode().equals(provinceCode)) {
-                String currentName = current.getHamlet().getWard().getDistrict().getName();
-                result.stream().filter(population -> population.getName().equals(currentName)).findFirst().ifPresentOrElse(currentPopulation -> currentPopulation.increasePopulation(1L), () -> result.add(new Population(currentName, 1L)));
+            if (currentAddress.getHamlet().getWard().getDistrict().getProvince().getCode().equals(provinceCode)) {
+                District currentDistrict = currentAddress.getHamlet().getWard().getDistrict();
+                result.stream().filter(population -> population.getCode().equals(currentDistrict.getCode())).findFirst().ifPresentOrElse(currentPopulation -> currentPopulation.increasePopulation(1L), () -> result.add(new DivisionGeneralPopulationDto(currentDistrict.getCode(), currentDistrict.getName())));
             }
         }
         return result;
     }
 
     @Override
-    public List<Population> getWardPopulationsByDistrict(String districtCode) {
+    public List<DivisionGeneralPopulationDto> getWardPopulationsByDistrict(String districtCode) {
         List<Address> addressesForPopulationCount = addressRepository.findByAddressType_Id(2);
-        List<Population> result = new ArrayList<>();
-        for (Address current :
+        List<DivisionGeneralPopulationDto> result = new ArrayList<>();
+        for (Address currentAddress :
                 addressesForPopulationCount) {
-            if (current.getHamlet().getWard().getDistrict().getCode().equals(districtCode)) {
-                String currentName = current.getHamlet().getWard().getName();
-                result.stream().filter(population -> population.getName().equals(currentName)).findFirst().ifPresentOrElse(currentPopulation -> currentPopulation.increasePopulation(1L), () -> result.add(new Population(currentName, 1L)));
+            if (currentAddress.getHamlet().getWard().getDistrict().getCode().equals(districtCode)) {
+                Ward currentWard = currentAddress.getHamlet().getWard();
+                result.stream().filter(population -> population.getCode().equals(currentWard.getCode())).findFirst().ifPresentOrElse(currentPopulation -> currentPopulation.increasePopulation(1L), () -> result.add(new DivisionGeneralPopulationDto(currentWard.getCode(), currentWard.getName())));
             }
         }
         return result;
     }
 
     @Override
-    public List<Population> getHamletPopulationsByWard(String wardCode) {
+    public List<DivisionGeneralPopulationDto> getHamletPopulationsByWard(String wardCode) {
         List<Address> addressesForPopulationCount = addressRepository.findByAddressType_Id(2);
-        List<Population> result = new ArrayList<>();
-        for (Address current :
+        List<DivisionGeneralPopulationDto> result = new ArrayList<>();
+        for (Address currentAddress :
                 addressesForPopulationCount) {
-            if (current.getHamlet().getWard().getCode().equals(wardCode)) {
-                String currentName = current.getHamlet().getName();
-                result.stream().filter(population -> population.getName().equals(currentName)).findFirst().ifPresentOrElse(currentPopulation -> currentPopulation.increasePopulation(1L), () -> result.add(new Population(currentName, 1L)));
+            if (currentAddress.getHamlet().getWard().getCode().equals(wardCode)) {
+                Hamlet currentHamlet = currentAddress.getHamlet();
+                result.stream().filter(population -> population.getCode().equals(currentHamlet.getCode())).findFirst().ifPresentOrElse(currentPopulation -> currentPopulation.increasePopulation(1L), () -> result.add(new DivisionGeneralPopulationDto(currentHamlet.getCode(), currentHamlet.getName())));
             }
         }
         return result;
     }
 
     @Override
-    public List<Population> getPopulationsBySex() {
+    public List<PopulationDto> getPopulationsBySex() {
         List<Address> addressesForPopulationCount = addressRepository.findByAddressType_Id(2);
-        List<Population> result = new ArrayList<>();
-        for (Address current :
+        List<PopulationDto> result = new ArrayList<>();
+        for (Address currentAddress :
                 addressesForPopulationCount) {
-            String currentName = current.getCitizen().getSex();
-            result.stream().filter(population -> population.getName().equals(currentName)).findFirst().ifPresentOrElse(currentPopulation -> currentPopulation.increasePopulation(1L), () -> result.add(new Population(currentName, 1L)));
+            String currentName = currentAddress.getCitizen().getSex();
+            result.stream().filter(population -> population.getName().equals(currentName)).findFirst().ifPresentOrElse(currentPopulation -> currentPopulation.increasePopulation(1L), () -> result.add(new PopulationDto(currentName)));
         }
         return result;
     }
 
     @Override
-    public List<Population> getPopulationsByAgeGroup() {
+    public List<PopulationDto> getPopulationsByAgeGroup() {
         List<Address> addressesForPopulationCount = addressRepository.findByAddressType_Id(2);
-        List<Population> result = new ArrayList<>();
-        result.add(new Population("Dưới độ tuổi lao động", 0L));
-        result.add(new Population("Trong độ tuổi lao động", 0L));
-        result.add(new Population("Trên độ tuổi lao động", 0L));
-        for (Address current :
+        List<PopulationDto> result = new ArrayList<>();
+        result.add(new PopulationDto("Dưới độ tuổi lao động"));
+        result.add(new PopulationDto("Trong độ tuổi lao động"));
+        result.add(new PopulationDto("Trên độ tuổi lao động"));
+        for (Address currentAddress :
                 addressesForPopulationCount) {
-            Integer currentValue = current.getCitizen().getAge();
+            Integer currentValue = currentAddress.getCitizen().getAge();
             if (currentValue >= 0 && currentValue <= 14) {
                 result.get(0).increasePopulation(1L);
             }
@@ -119,14 +124,40 @@ public class PopulationServiceImpl implements PopulationService {
     }
 
     @Override
-    public List<Population> getRegionPopulations() {
+    public List<PopulationDto> getRegionPopulations() {
         List<Address> addressesForPopulationCount = addressRepository.findByAddressType_Id(2);
-        List<Population> result = new ArrayList<>();
-        for (Address current :
+        List<PopulationDto> result = new ArrayList<>();
+        for (Address currentAddress :
                 addressesForPopulationCount) {
-            String currentName = current.getHamlet().getWard().getDistrict().getProvince().getAdministrativeRegion().getName();
-            result.stream().filter(population -> population.getName().equals(currentName)).findFirst().ifPresentOrElse(currentPopulation -> currentPopulation.increasePopulation(1L), () -> result.add(new Population(currentName, 1L)));
+            String currentName = currentAddress.getHamlet().getWard().getDistrict().getProvince().getAdministrativeRegion().getName();
+            result.stream().filter(population -> population.getName().equals(currentName)).findFirst().ifPresentOrElse(currentPopulation -> currentPopulation.increasePopulation(1L), () -> result.add(new PopulationDto(currentName)));
         }
         return result;
+    }
+
+    @Override
+    public List<PopulationDto> getPopulationsByCitizenProperty(String citizenProperty) {
+        List<Address> addressesForPopulationCount = addressRepository.findByAddressType_Id(2);
+        try {
+            sb.setLength(0);
+            Method method;
+            method = Citizen.class.getDeclaredMethod(sb.append("get").append(citizenProperty.substring(0, 1).toUpperCase()).append(citizenProperty.substring(1)).toString());
+            List<PopulationDto> result = new ArrayList<>();
+            for (Address currentAddress :
+                    addressesForPopulationCount) {
+                Citizen currentCitizen = currentAddress.getCitizen();
+                Object currentName = method.invoke(currentCitizen);
+                result.stream().filter(population -> population.getName().equals(currentName.toString())).findFirst().ifPresentOrElse(currentPopulation -> currentPopulation.increasePopulation(1L), () -> result.add(new PopulationDto(currentName.toString())));
+            }
+            return result;
+        } catch (SecurityException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
+    }
+
+    @Override
+    public List<DivisionGeneralPopulationDto> getProvincePopulationsByCitizenProperty(String property) {
+        return null;
     }
 }

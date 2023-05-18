@@ -15,6 +15,9 @@ import java.util.List;
 public interface AddressRepository extends JpaRepository<Address, Integer> {
     @Query("select a from Address a where a.addressType.id = ?1")
     List<Address> findByAddressType_Id(@NonNull Integer id);
+
+    @Query("select a from Address a where a.addressType.id = ?1 and a.hamlet.code like CONCAT(?2, '%') ")
+    List<Address> findByAddressType_IdAndDivisionCode(@NonNull Integer id, @NonNull String code);
     long countByAddressType_Id(@NonNull Integer id);
     List<Address> findAllByCitizen(Citizen citizen);
     List<Address> findAllByHamlet(Hamlet hamlet);

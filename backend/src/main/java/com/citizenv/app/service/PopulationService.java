@@ -1,19 +1,24 @@
 package com.citizenv.app.service;
 
-import com.citizenv.app.entity.custom.Population;
+import com.citizenv.app.payload.population.DivisionGeneralPopulationDto;
+import com.citizenv.app.payload.population.PopulationDto;
 
 import java.util.List;
 
 public interface PopulationService {
     Long getCountryPopulation();
-    List<Population> getProvincePopulations();
-    List<Population> getDistrictPopulationsByProvince(String provinceCode);
-    List<Population> getWardPopulationsByDistrict(String districtCode);
-    List<Population> getHamletPopulationsByWard(String wardCode);
+    List<DivisionGeneralPopulationDto> getProvincePopulations();
+    List<DivisionGeneralPopulationDto> getDistrictPopulationsByProvince(String provinceCode);
+    List<DivisionGeneralPopulationDto> getWardPopulationsByDistrict(String districtCode);
+    List<DivisionGeneralPopulationDto> getHamletPopulationsByWard(String wardCode);
 
-    List<Population> getPopulationsBySex();
+    List<PopulationDto> getPopulationsBySex();
 
-    List<Population> getPopulationsByAgeGroup();
+    List<PopulationDto> getPopulationsByAgeGroup();
 
-    List<Population> getRegionPopulations();
+    List<PopulationDto> getRegionPopulations();
+
+    List<PopulationDto> getPopulationsByCitizenProperty(String citizenProperty);
+
+    List<DivisionGeneralPopulationDto> getProvincePopulationsByCitizenProperty(String property);
 }

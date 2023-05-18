@@ -53,6 +53,8 @@ public class HamletController {
         HamletDto hamletDto = service.updateHamlet(hamletCode, hamlet);
         return ResponseEntity.ok().body(hamletDto);
     }
+
+    /*Script to add more hamlets to Hanoi. Dangerous.*/
     @GetMapping("/no/")
     public void getNo() {
         service.nono();

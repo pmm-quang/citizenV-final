@@ -33,7 +33,9 @@ public class HamletServiceImpl implements HamletService {
     @Autowired
     private ModelMapper mapper;
 
+
     private StringBuilder sb = new StringBuilder();
+
 
     @Override
     public List<HamletDto> getAll() {
@@ -187,5 +189,6 @@ public class HamletServiceImpl implements HamletService {
             }
         }
     }
+
 }
 

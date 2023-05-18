@@ -1,5 +1,6 @@
 package com.citizenv.app.entity;
 
+import com.citizenv.app.component.Utils;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -61,6 +62,14 @@ public class Citizen {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<Association> associations;
+
+    public Religion getReligion() {
+        return religion == null ? new Religion(0, Utils.RELIGION_NONE) : religion;
+    }
+
+    public String getOtherNationality() {
+        return otherNationality == null ? "" : otherNationality;
+    }
 
 //    @Override
 //    public boolean equals(Object o) {

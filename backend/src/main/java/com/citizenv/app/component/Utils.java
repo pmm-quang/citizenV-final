@@ -13,6 +13,7 @@ public class Utils {
     public static final Long B1 = 4L;
     public static final Long B2 = 5L;
     public static final Long EDITOR = 6L;
+    public static final String RELIGION_NONE = "Không";
 
     interface EnumInterface<K, V> {
         V getValue();

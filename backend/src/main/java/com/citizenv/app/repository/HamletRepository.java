@@ -4,6 +4,7 @@ import com.citizenv.app.entity.AdministrativeUnit;
 import com.citizenv.app.entity.Hamlet;
 import com.citizenv.app.entity.Ward;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
