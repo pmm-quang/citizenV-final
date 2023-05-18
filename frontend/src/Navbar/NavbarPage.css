@@ -136,3 +136,9 @@ div {
         font-weight: 600;
     }
 }
+
+.iconAccount {
+    margin-right: 10px;
+    height: 20px;
+    width: 20px;
+}

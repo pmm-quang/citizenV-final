@@ -62,7 +62,6 @@ function District() {
                     <Form>
                         <Form.Group className="mb-3">
                             <Form.Label>Tên Quận/Huyện/Thị xã (*)</Form.Label>
-                            <Form.Label>Tên quận/huyện/thị xã (*)</Form.Label>
                             <Form.Control
                                 type="text"
                                 autoFocus
@@ -81,7 +80,7 @@ function District() {
                             className="mb-3"
                         >
                             <Form.Label>Đơn vị</Form.Label>
-                            <Form.Select><option value={1}>1. Thành phố trực thuộc tỉnh</option><option value={2}>2. Quận</option><option value={3}>3.Huyện</option><option value={4}>4. Thị xã</option></Form.Select>
+                            <Form.Select><option value={1}>1. Thành phố trực thuộc tỉnh</option><option value={2}>2. Quận</option><option value={3}>3. Huyện</option><option value={4}>4. Thị xã</option></Form.Select>
                         </Form.Group>
                     </Form>
                 </Modal.Body>

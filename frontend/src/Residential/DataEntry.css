@@ -6,6 +6,12 @@
     margin-top: 10px;
 }
 
+.titleInformation {
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 20px
+}
+
 .flex {
     flex: 300px
 }
