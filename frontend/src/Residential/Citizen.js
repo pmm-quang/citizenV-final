@@ -16,6 +16,10 @@ function Citizen() {
     const user = role_acc.username;
     const role = role_acc.roles[0].authority;
 
+    const [index, setIndex] = useState(0);
+    const [defaultindex, setDefaultIndex] = useState(0)
+    const [showButton, setShowButton ] = useState(false);
+    const [code, setCode] = useState(0)
     const [countCitizen, setCountCitizen] = useState();
     const [showDetail, setShowDetail] = useState(false);
     const [division, setDivision] = useState();
@@ -40,24 +44,32 @@ function Citizen() {
     const [address1, setAddress1] = useState()
     const [address2, setAddress2] = useState()
     const [address3, setAddress3] = useState()
-
     let totalPopulation;
 
     const CountCitizen = async () => {
+        let role_name
+        if (role !== 'A1') role_name = role_acc.division.administrativeUnit.shortName + " " + role_acc.division.name;
         if (role === 'A1') {
             GetPopulationInCountry()
         } else if (role === 'A2') {
             GetPopulationInProvince(user)
+            setDivision(role_name)
         } else if (role === 'A3') {
             GetPopulationInDistrict(user)
+            setDivision(role_name)
         } else if (role === 'EDITOR') {
             GetPopulationInWard(user)
+            setDivision(role_name)
+        } else if (role === 'B2') {
+            GetPopulationInHalmet(user, 1)
+            setDivision(role_name)
         }
-        GetPopulationInHalmet(user, 1)
 
     }
 
     const GetPopulationInCountry = async () => {
+        setIndex(1)
+        setDefaultIndex(1)
         const response = await axios('http://localhost:8080/api/v1/statistics/population');
         setCountCitizen(response.data)
         setDivision("Toàn quốc")
@@ -67,7 +79,8 @@ function Citizen() {
     }
 
     const GetPopulationInProvince = async (code) => {
-        setDivision(role_acc.division.administrativeUnit.shortName + " " + role_acc.division.name)
+        setIndex(2)
+        setDefaultIndex(2)
         const response_population = await axios('http://localhost:8080/api/v1/statistics/population/district/' + code)
         totalPopulation = 0;
         setDistrict(response_population.data)
@@ -79,7 +92,8 @@ function Citizen() {
     }
 
     const GetPopulationInDistrict = async (code) => {
-        setDivision(role_acc.division.administrativeUnit.shortName + " " + role_acc.division.name)
+        setIndex(3)
+        setDefaultIndex(3)
         const response_population = await axios('http://localhost:8080/api/v1/statistics/population/ward/' + code)
         totalPopulation = 0;
         setWard(response_population.data)
@@ -91,8 +105,8 @@ function Citizen() {
     }
 
     const GetPopulationInWard = async (code) => {
-        console.log(role_acc)
-        setDivision(role_acc.division.administrativeUnit.shortName + " " + role_acc.division.name)
+        setIndex(4)
+        setDefaultIndex(4)
         const response_population = await axios('http://localhost:8080/api/v1/statistics/population/hamlet/' + code)
         totalPopulation = 0;
         setHamlet(response_population.data)
@@ -104,13 +118,39 @@ function Citizen() {
     }
 
     const GetPopulationInHalmet = async (code, page) => {
+        setIndex(5)
+        setDefaultIndex(5)
         console.log(role_acc)
-        setDivision(role_acc.division.administrativeUnit.shortName + " " + role_acc.division.name)
         const response_population = await axios('http://localhost:8080/api/v1/citizen/hamlet/' + code + '?page=' + page)
         setHamlet(response_population.data.citizens)
         setCitizens(response_population.data.citizens)
         setNumberPage(response_population.data.totalPages)
         setCountCitizen(response_population.data.totalElements)
+    }
+
+    const BackToClickData = async () => {
+        setCode(code.substring(0, code.length - 2))
+        if (user !== 'tw' && (code.length === user.length + 2)) {
+            setShowButton(false)
+        } else if (user === 'tw' && code.length === 2) {
+            setShowButton(false)
+        }
+        if (code.length - 2 === 6) {
+            GetPopulationInWard(code.substring(0, code.length - 2))
+            const response = await axios('http://localhost:8080/api/v1/ward/' + code.substring(0, code.length - 2))
+            setDivision(response.data.name)
+        }
+        else if (code.length - 2 === 4) {
+            GetPopulationInDistrict(code.substring(0, code.length - 2))
+            const response = await axios('http://localhost:8080/api/v1/district/' + code.substring(0, code.length - 2))
+            setDivision(response.data.name)
+        }
+        else if (code.length - 2=== 2) {
+            GetPopulationInProvince(code.substring(0, code.length - 2))
+            const response = await axios('http://localhost:8080/api/v1/province/' + code.substring(0, code.length - 2))
+            setDivision(response.data.name)
+        }
+        else if (code.length - 2 === 0) GetPopulationInCountry()
     }
 
     const Pagination = () => {
@@ -143,7 +183,8 @@ function Citizen() {
     }, [])
 
     const listCitizens = citizens.map((post, index) =>
-        <tr key={index}>
+        <tr key={index} onClick={() => { GetDataOnClick(post.code, post.name) }}>
+            <td>{post.code}</td>
             <td>{post.name}</td>
             <td>{post.population}</td>
         </tr>
@@ -173,20 +214,38 @@ function Citizen() {
             setSex(response.data.sex)
             setAddress1(response.data.addresses[0].hamlet.administrativeUnit.fullName + " " + response.data.addresses[0].hamlet.name + ", " + response.data.addresses[0].hamlet.ward.name + ", " + response.data.addresses[0].hamlet.ward.district.name + ", " + response.data.addresses[0].hamlet.ward.district.province.name)
             setAddress2(response.data.addresses[1].hamlet.administrativeUnit.fullName + " " + response.data.addresses[1].hamlet.name + ", " + response.data.addresses[1].hamlet.ward.name + ", " + response.data.addresses[1].hamlet.ward.district.name + ", " + response.data.addresses[1].hamlet.ward.district.province.name)
-            if (response.data.addresses.length === 3) setAddress3(response.data.addresses[2].hamlet.administrativeUnit.fullName + " " + response.data.addresses[2].hamlet.name + ", " + response.data.addresses[1].hamlet.ward.name + ", " + response.data.addresses[2].hamlet.ward.district.name + ", " + response.data.addresses[2].hamlet.ward.district.province.name)
+            if (response.data.addresses.length === 3) setAddress3(response.data.addresses[2].hamlet.administrativeUnit.fullName + " " + response.data.addresses[2].hamlet.name + ", " + response.data.addresses[2].hamlet.ward.name + ", " + response.data.addresses[2].hamlet.ward.district.name + ", " + response.data.addresses[2].hamlet.ward.district.province.name)
             else setAddress3(null)
             setShowDetail(true);
             console.log(response.data.addresses)
+            setShowButton(false)
         } catch (err) {
             console.error(err);
         }
     };
 
+    const GetDataOnClick = (code, name) => {
+        setCode(code)
+        setDivision(name)
+        if (index === 1) GetPopulationInProvince(code);
+        else if (index === 2) GetPopulationInDistrict(code);
+        else if (index === 3) GetPopulationInWard(code);
+        else if (index === 4) GetPopulationInHalmet(code, 1);
+        setShowButton(true)
+    }
+
+    const BackToDetailInformation = () => {
+        setShowDetail(false)
+        if (code.length !== user.length) {
+            setShowButton(true)
+        }
+    }
+
     const DetailInformation = () => {
         return (
             <div className="detailed-resident-info">
                 <div id="detailed-resident-info-header">
-                    <Button className="returnButton" onClick={() => { setShowDetail(false) }}><BsArrowLeft /></Button>
+                    <Button className="returnButton" onClick={() => {BackToDetailInformation()}}><BsArrowLeft /></Button>
                     <h2 id="detailed-resident-info-title">Thông tin chi tiết</h2>
                 </div>
                 <Table bordered hover className="tableInfo">
@@ -237,7 +296,7 @@ function Citizen() {
                         </tr>
                         <tr>
                             <th className="row-head">Quốc tịch khác</th>
-                            <th className="row-data">{(otherNationality === null) ? "Không có" : otherNationality}</th>
+                            <th className="row-data">{(otherNationality === "") ? "Không có" : otherNationality}</th>
                         </tr>
                     </tbody>
                 </Table>
@@ -252,6 +311,7 @@ function Citizen() {
                     <Table striped bordered hover size="sm" className="tableResidential">
                         <thead>
                             <tr>
+                                <th>Mã đơn vị</th>
                                 <th>Tên đơn vị</th>
                                 <th>Tổng dân số</th>
                             </tr>
@@ -298,10 +358,13 @@ function Citizen() {
                     <img src={citizen} className='logoCitizen' />
                 </div>
                 <div className="flex_citizen_second">
-                    {(role === 'B2' && (!showDetail)) ? <TableResidentialInHalmet /> : ((role === 'B2' && (showDetail) ? <DetailInformation /> : null))}
-                    {(role !== 'B2') ? <TableResidential /> : null}
+                    <div id="detailed-resident-info-header">
+                        {(showButton) ? <Button className="returnShow" onClick={() => {BackToClickData()}}><BsArrowLeft /> Trở về</Button> : null}
+                    </div>
+                    {((index === 5) && (!showDetail)) ? <TableResidentialInHalmet /> : ((index === 5) && (showDetail) ? <DetailInformation /> : null)}
+                    {(index !== 5) ? <TableResidential /> : null}
                 </div>
-                {(role === 'B2' && (!showDetail)) ? <Pagination /> : null}
+                {(index === 5 && (!showDetail)) ? <Pagination /> : null}
             </div>
         </div>
     );

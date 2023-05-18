@@ -30,6 +30,10 @@
     margin-right: auto;
 }
 
+.returnShow {
+    margin-left: 50px;
+}
+
 
 #detailed-resident-info-header {
     display: flex;

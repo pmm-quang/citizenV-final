@@ -8,6 +8,7 @@ import Account from './Management/Account';
 import Ward from './Management/Ward';
 import Citizen from './Residential/Citizen' 
 import District from './Management/District';
+import Statis from './Statis/BasicStatis'
 
 function App() {
   return (
@@ -21,6 +22,8 @@ function App() {
         <Route path='/district' element={<District />} />
         <Route path='/citizeninput' element={<DataEntry />} />
         <Route path='/account' element={<Account />} />
+        <Route path='/statis' element = {<Statis />} />
+        <Route path='/home' element = {<Home />} />
       </Routes>
     </BrowserRouter>
   );
