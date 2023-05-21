@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,15 +18,22 @@ import java.util.Map;
 @RestController
 @RequestMapping("api/v1/province")
 public class ProvinceController {
-    @Autowired
-    ProvinceService provinceService;
+    private final ProvinceService provinceService;
 
+    public ProvinceController(ProvinceService provinceService) {
+        this.provinceService = provinceService;
+    }
+
+
+    //    @PreAuthorize("hasAuthority('READ')")
+//    @Secured("ROLE_A1")
     @GetMapping("/")
     public ResponseEntity<List<ProvinceDto>> getAll() {
         List<ProvinceDto> provinceDtoList = provinceService.getAll();
         return new ResponseEntity<List<ProvinceDto>>(provinceDtoList, HttpStatus.OK);
     }
 
+    @Secured("ROLE_A1")
     @GetMapping(value = "/", params = "page")
     public ResponseEntity<Map<String, Object>> getAll(@RequestParam int page) {
         Map<String, Object> provinceDtoPaginationList = provinceService.getAll(page);
@@ -37,32 +46,35 @@ public class ProvinceController {
         return new ResponseEntity<>(provinceDto, HttpStatus.OK);
     }
 
-    @GetMapping("/administrativeUnitId/{admUnitId}")
+    @GetMapping("/by-administrative-unit/{admUnitId}")
     public ResponseEntity<Object> getAllByAdministrativeUnitId(@PathVariable int admUnitId) {
         List<ProvinceDto> list = provinceService.getAllByAdministrativeUnitId(admUnitId);
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-    @GetMapping("/administrativeRegionId/{admRegionId}")
+    @GetMapping("/by-administrative-region/{admRegionId}")
     public ResponseEntity<Object> getAllByAdministrativeRegionId(@PathVariable int admRegionId) {
         List<ProvinceDto> list = provinceService.getAllByAdministrativeRegionId(admRegionId);
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-    @PostMapping("/")
+    @PreAuthorize("hasAuthority('WRITE')")
+    @PostMapping("/save")
     public ResponseEntity<Object> create(@RequestBody ProvinceDto provinceDto) {
          ProvinceDto newProvince = provinceService.createProvince(provinceDto);
          return new ResponseEntity<>(newProvince, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{provinceCode}")
+    @PreAuthorize("hasAuthority('WRITE')")
+    @PutMapping("save/{provinceCode}")
     public ResponseEntity<ProvinceDto> update(@PathVariable String provinceCode, @RequestBody ProvinceDto province) {
         ProvinceDto newProvince = provinceService.updateProvince(provinceCode, province);
         return new ResponseEntity<>(newProvince, HttpStatus.OK);
     }
 
 
-    @DeleteMapping("/{provinceId}")
+    @PreAuthorize("hasAuthority('WRITE')")
+    @DeleteMapping("/delete/{provinceId}")
     public ResponseEntity<String> deleteById(@PathVariable Long provinceId) {
             return new ResponseEntity<>(provinceService.deleteById(provinceId), HttpStatus.OK);
     }

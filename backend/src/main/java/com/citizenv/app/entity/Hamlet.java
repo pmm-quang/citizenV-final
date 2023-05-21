@@ -13,12 +13,12 @@ import java.util.List;
 public class Hamlet extends AdministrativeDivision {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ward_id")
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
+//    @ToString.Exclude
+//    @EqualsAndHashCode.Exclude
     private Ward ward;
 
     @OneToMany(mappedBy = "hamlet", fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
+//    @ToString.Exclude
+//    @EqualsAndHashCode.Exclude
     private List<Address> addresses;
 }

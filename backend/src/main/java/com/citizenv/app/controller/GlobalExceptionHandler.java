@@ -4,15 +4,16 @@ import com.citizenv.app.exception.InvalidException;
 import com.citizenv.app.exception.ResourceFoundException;
 import com.citizenv.app.exception.ResourceNotFoundException;
 import com.citizenv.app.payload.error.ErrorResponse;
-import org.apache.tomcat.websocket.AuthenticationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-@CrossOrigin(origins = {"http://localhost:3000/", "http://localhost:3001/"})
+//@CrossOrigin(origins = {"http://localhost:3000/", "http://localhost:3001/"})
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler({ ResourceNotFoundException.class, ResourceFoundException.class })
@@ -20,11 +21,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(500).body(e.getMessage());
     }
 
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<String> handleUnwantedException(Exception e) {
-//        e.printStackTrace();
-//        return ResponseEntity.status(500).body("Unknown error (General exception)");
-//    }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<String> invalidUserOrPassword(Exception e) {
@@ -35,5 +31,17 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> invalidException(Exception e) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         return ResponseEntity.badRequest().body(errorResponse);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> accessDenied(Exception e) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.FORBIDDEN.value(), e.getMessage());
+        return ResponseEntity.status(403).body(errorResponse);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleUnwantedException(Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(500).body("Unknown error (General exception)");
     }
 }

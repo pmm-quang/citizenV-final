@@ -1,15 +1,23 @@
 package com.citizenv.app.controller;
 
+import com.citizenv.app.entity.AdministrativeDivision;
+import com.citizenv.app.entity.User;
+import com.citizenv.app.exception.InvalidException;
 import com.citizenv.app.payload.ProvinceDto;
 import com.citizenv.app.payload.WardDto;
 import com.citizenv.app.payload.custom.CustomHamletRequest;
 import com.citizenv.app.payload.custom.CustomWardRequest;
+import com.citizenv.app.secirity.CustomUserDetail;
 import com.citizenv.app.service.WardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -17,12 +25,18 @@ import java.util.List;
 @RestController
 @RequestMapping("api/v1/ward")
 public class WardController {
-    @Autowired
+    final
     WardService wardService;
+
+    public WardController(WardService wardService) {
+        this.wardService = wardService;
+    }
 
     @GetMapping("/")
     public ResponseEntity<List<WardDto>> getAll() {
-        List<WardDto> wardDtoList = wardService.getAll();
+        CustomUserDetail userDetail = getUserDetail();
+        List<WardDto> wardDtoList = wardService.getAll(userDetail);
+        System.out.println(wardDtoList.size());
         return new ResponseEntity<List<WardDto>>(wardDtoList, HttpStatus.OK);
     }
 
@@ -32,37 +46,61 @@ public class WardController {
         return new ResponseEntity<>(wardDto, HttpStatus.OK);
     }
 
-    @GetMapping("/districtCode/{districtCode}")
+    @GetMapping("/by-district/{districtCode}")
     public ResponseEntity<Object> getAllByDistrictCode(@PathVariable String districtCode) {
-        try {
-            List<WardDto> wardDtos = wardService.getByDistrictCode(districtCode);
-            return new ResponseEntity<>(wardDtos, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        List<WardDto> list = wardService.getByDistrictCode(districtCode);
+        return ResponseEntity.ok().body(list);
     }
 
-    @GetMapping("/administrativeUnitID/{admUnitID}")
-    public ResponseEntity<Object> getAllByAdministrativeUnitID(@PathVariable int admUnitID) {
-        try {
-            List<WardDto> wardDtos = wardService.getByAdministrativeUnitId(admUnitID);
-            return new ResponseEntity<>(wardDtos, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    @GetMapping("/by-district")
+    public ResponseEntity<List<WardDto>> getAllByDistrictCode() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetail userDetail = (CustomUserDetail) authentication.getPrincipal();
+        String districtCode = userDetail.getUser().getDivision().getCode();
+        List<WardDto> list = wardService.getByDistrictCode(districtCode);
+        return ResponseEntity.ok().body(list);
+    }
+
+    @GetMapping("/by-administrative-unit/{admUnitID}")
+    public ResponseEntity<List<WardDto>> getAllByAdministrativeUnitID(@PathVariable int admUnitID) {
+        List<WardDto> list= wardService.getByAdministrativeUnitId(admUnitID);
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
 
+    @PreAuthorize("hasAuthority('WRITE')")
     @PostMapping("/save")
-    public ResponseEntity<Object> createWard(@RequestBody CustomWardRequest ward) {
+    public ResponseEntity<WardDto> createWard(@RequestBody CustomWardRequest ward) {
+        CustomUserDetail userDetail = getUserDetail();
+        String divisionCodeOfUserDetail = userDetail.getUser().getDivision().getCode();
+        String districtCode = ward.getDistrictCode();
+        if (ward.getCode() != null) {
+            if (divisionCodeOfUserDetail == null || ward.getCode().indexOf(divisionCodeOfUserDetail) != 0) {
+                throw new InvalidException("Khong co quyen tao ward voi ma nay");
+            }
+        }
         WardDto wardDto = wardService.createWard(ward);
        return ResponseEntity.status(201).body(wardDto);
     }
 
+    @PreAuthorize("hasAuthority('WRITE')")
     @PutMapping("/save/{wardCode}/")
-    public ResponseEntity<Object> updateWard(@PathVariable String wardCode,
+    public ResponseEntity<WardDto> updateWard(@PathVariable String wardCode,
                                               @RequestBody CustomWardRequest ward) {
+        CustomUserDetail userDetail = getUserDetail();
+        String divisionCodeOfUserDetail = userDetail.getUser().getDivision().getCode();
+        String districtCode = ward.getDistrictCode();
+        if (wardCode != null) {
+            if (divisionCodeOfUserDetail == null || ward.getCode().indexOf(divisionCodeOfUserDetail) != 0) {
+                throw new InvalidException("Khong co quyen chinh sua ward voi ma nay");
+            }
+        }
        WardDto wardDto = wardService.updateWard(wardCode, ward);
        return ResponseEntity.ok().body(wardDto);
+    }
+
+    private CustomUserDetail getUserDetail() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (CustomUserDetail) authentication.getPrincipal();
     }
 }

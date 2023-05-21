@@ -10,12 +10,15 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = {"http://localhost:3000/", "http://localhost:3001/"})
+//@CrossOrigin(origins = {"http://localhost:3000/", "http://localhost:3001/"})
 @RestController
 @RequestMapping("api/v1/ethnicity")
 public class EthnicityController {
-    @Autowired
-    private EthnicityService ethnicityService;
+    private final EthnicityService ethnicityService;
+
+    public EthnicityController(EthnicityService ethnicityService) {
+        this.ethnicityService = ethnicityService;
+    }
 
     @GetMapping("/")//OK
     public ResponseEntity<List<EthnicityDto>> getAll() {

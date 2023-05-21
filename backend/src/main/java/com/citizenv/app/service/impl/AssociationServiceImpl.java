@@ -16,12 +16,15 @@ import java.util.stream.Collectors;
 
 @Service
 public class AssociationServiceImpl implements AssociationService {
-    @Autowired
-    private AssociationRepository associationRepository;
-    @Autowired
-    private AssociationTypeRepository associationTypeRepository;
-    @Autowired
-    private ModelMapper mapper;
+    private final AssociationRepository associationRepository;
+    private final AssociationTypeRepository associationTypeRepository;
+    private final ModelMapper mapper;
+
+    public AssociationServiceImpl(AssociationRepository associationRepository, AssociationTypeRepository associationTypeRepository, ModelMapper mapper) {
+        this.associationRepository = associationRepository;
+        this.associationTypeRepository = associationTypeRepository;
+        this.mapper = mapper;
+    }
 
     @Override
     public List<AssociationDto> getAllAssociation() {

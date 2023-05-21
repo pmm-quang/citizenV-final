@@ -16,7 +16,5 @@ public class Ward extends AdministrativeDivision {
     private District district;
 
     @OneToMany(mappedBy = "ward", fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private List<Hamlet> hamlets;
 }

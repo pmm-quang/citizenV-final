@@ -15,11 +15,14 @@ import java.util.stream.Collectors;
 
 @Service
 public class AdministrativeUnitServiceImpl implements AdministrativeUnitService {
-    @Autowired
-    private ModelMapper mapper;
+    private final ModelMapper mapper;
 
-    @Autowired
-    private AdministrativeUnitRepository repository;
+    private final AdministrativeUnitRepository repository;
+
+    public AdministrativeUnitServiceImpl(ModelMapper mapper, AdministrativeUnitRepository repository) {
+        this.mapper = mapper;
+        this.repository = repository;
+    }
 
     public List<AdministrativeUnitDto> getAll() {
         List<AdministrativeUnit> entities = repository.findAll();

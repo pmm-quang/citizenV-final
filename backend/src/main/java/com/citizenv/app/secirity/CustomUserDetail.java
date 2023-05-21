@@ -1,17 +1,15 @@
 package com.citizenv.app.secirity;
 
+import com.citizenv.app.entity.Permission;
 import com.citizenv.app.entity.Role;
 import com.citizenv.app.entity.User;
-import com.citizenv.app.entity.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @AllArgsConstructor
@@ -19,11 +17,15 @@ public class CustomUserDetail implements UserDetails {
     private User user;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Set<GrantedAuthority> authority = new HashSet<>();
-        for (UserRole role: user.getUserRoles()) {
-            authority.add(new SimpleGrantedAuthority(role.getRole().getName()));
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        for (Role role: user.getRoles()) {
+            List<Permission> permissions = role.getPermissions();
+            for (Permission permission: permissions) {
+                authorities.add(new SimpleGrantedAuthority(permission.getPermission()));
+            }
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getRole()));
         }
-        return authority;
+        return authorities;
     }
 
 
@@ -55,6 +57,6 @@ public class CustomUserDetail implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return user.getIsActive();
+        return true;
     }
 }

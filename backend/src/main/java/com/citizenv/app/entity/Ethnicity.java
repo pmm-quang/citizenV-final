@@ -21,8 +21,8 @@ public class Ethnicity {
     private String name;
 
     @OneToMany(mappedBy = "ethnicity", cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
+//    @ToString.Exclude
+//    @EqualsAndHashCode.Exclude
     private List<Citizen> citizens;
 
     @Override

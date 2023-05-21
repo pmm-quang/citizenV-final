@@ -2,21 +2,29 @@ package com.citizenv.app.controller;
 
 import com.citizenv.app.payload.CitizenDto;
 import com.citizenv.app.payload.custom.CustomCitizenRequest;
-import com.citizenv.app.service.impl.CitizenServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.citizenv.app.secirity.CustomUserDetail;
+import com.citizenv.app.service.CitizenService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
-@CrossOrigin(origins = {"http://localhost:3000/", "http://localhost:3001/"})
+//@CrossOrigin(origins = {"http://localhost:3000/", "http://localhost:3001/"})
 @RestController
 @RequestMapping("api/v1/citizen")
 public class CitizenController {
-    @Autowired
-    CitizenServiceImpl citizenService;
+//    @Autowired
+    private final CitizenService citizenService;
+
+    public CitizenController(CitizenService citizenService) {
+        this.citizenService = citizenService;
+    }
 
     @GetMapping("/")
     public ResponseEntity<List<CitizenDto>> getAll() {
@@ -36,60 +44,76 @@ public class CitizenController {
         return new ResponseEntity<>(citizenDto, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/hamlet/{hamletCode}", params = "page")
+    @GetMapping(value = "/by-hamlet/{hamletCode}", params = "page")
     public ResponseEntity<Map<String, Object>> getAllByHamletCode(@PathVariable String hamletCode, @RequestParam int page) {
-        Map<String, Object> list = citizenService.getAllByHamletCode(hamletCode, page);
-        return new ResponseEntity<>(list, HttpStatus.OK);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetail userDetail = (CustomUserDetail) authentication.getPrincipal();
+        String divisionCode = userDetail.getUser().getDivision().getCode();
+        if (hamletCode.indexOf(divisionCode) == 0) {
+            Map<String, Object> list = citizenService.getAllByHamletCode(hamletCode, page);
+            return new ResponseEntity<>(list, HttpStatus.OK);
+        } else {
+            throw new AccessDeniedException("Khong co quyen try cap");
+        }
     }
 
-    @GetMapping(value = "/ward/{wardCode}", params = "page")
+    @GetMapping(value = "/by-ward/{wardCode}", params = "page")
     public ResponseEntity<Map<String, Object>> getAllByWardCode(@PathVariable String wardCode, @RequestParam int page) {
         Map<String, Object> list = citizenService.getAllByWardCode(wardCode, page);
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/district/{districtCode}", params = "page")
+    @GetMapping(value = "/by-district/{districtCode}", params = "page")
     public ResponseEntity<Map<String, Object>> getAllByDistrictCode(@PathVariable String districtCode, @RequestParam int page) {
         Map<String, Object> list = citizenService.getAllByDistrictCode(districtCode, page);
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/province/{provinceCode}", params = "page")
-    public ResponseEntity<Map<String, Object>> getAllByProvinceCode(@PathVariable String provinceCode, @RequestParam int page) {
-        Map<String, Object> list = citizenService.getAllByProvinceCode(provinceCode, page);
-        return new ResponseEntity<>(list, HttpStatus.OK);
-    }
+//    @GetMapping(value = "/by-province/{provinceCode}", params = "page")
+//    public ResponseEntity<Map<String, Object>> getAllByProvinceCode(@PathVariable String provinceCode, @RequestParam int page) {
+//        Map<String, Object> list = citizenService.getAllByProvinceCode(provinceCode, page);
+//        return new ResponseEntity<>(list, HttpStatus.OK);
+//    }
 
-    @GetMapping("/hamlet/{hamletCode}")
-    public ResponseEntity<List<CitizenDto>> getAllByHamletCode(@PathVariable String hamletCode) {
-        List<CitizenDto> list = citizenService.getAllByHamletCode(hamletCode);
-        return new ResponseEntity<>(list, HttpStatus.OK);
-    }
+//    @GetMapping("/by-hamlet/{hamletCode}")
+//    public ResponseEntity<List<CitizenDto>> getAllByHamletCode(@PathVariable String hamletCode) {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        CustomUserDetail userDetail = (CustomUserDetail) authentication.getPrincipal();
+//        String divisionCode = userDetail.getUser().getDivision().getCode();
+//        if (hamletCode.indexOf(divisionCode) == 0) {
+//            List<CitizenDto> list = citizenService.getAllByHamletCode(hamletCode);
+//            return new ResponseEntity<>(list, HttpStatus.OK);
+//        } else {
+//            throw new AccessDeniedException("Khong co quyen truy cap");
+//        }
+//    }
 
-    @GetMapping("/ward/{wardCode}")
-    public ResponseEntity<List<CitizenDto>> getAllByWardCode(@PathVariable String wardCode) {
-        List<CitizenDto> list = citizenService.getAllByWardCode(wardCode);
-        return new ResponseEntity<>(list, HttpStatus.OK);
-    }
+//    @GetMapping("/by-ward/{wardCode}")
+//    public ResponseEntity<List<CitizenDto>> getAllByWardCode(@PathVariable String wardCode) {
+//        List<CitizenDto> list = citizenService.getAllByWardCode(wardCode);
+//        return new ResponseEntity<>(list, HttpStatus.OK);
+//    }
 
-    @GetMapping("/district/{districtCode}")
-    public ResponseEntity<List<CitizenDto>> getAllByDistrictCode(@PathVariable String districtCode) {
-        List<CitizenDto> list = citizenService.getAllByDistrictCode(districtCode);
-        return new ResponseEntity<>(list, HttpStatus.OK);
-    }
+//    @GetMapping("/by-district/{districtCode}")
+//    public ResponseEntity<List<CitizenDto>> getAllByDistrictCode(@PathVariable String districtCode) {
+//        List<CitizenDto> list = citizenService.getAllByDistrictCode(districtCode);
+//        return new ResponseEntity<>(list, HttpStatus.OK);
+//    }
 
-    @GetMapping("/province/{provinceCode}")
-    public ResponseEntity<List<CitizenDto>> getAllByProvinceCode(@PathVariable String provinceCode) {
-        List<CitizenDto> list = citizenService.getAllByProvinceCode(provinceCode);
-        return new ResponseEntity<>(list, HttpStatus.OK);
-    }
+//    @GetMapping("/by-province/{provinceCode}")
+//    public ResponseEntity<List<CitizenDto>> getAllByProvinceCode(@PathVariable String provinceCode) {
+//        List<CitizenDto> list = citizenService.getAllByProvinceCode(provinceCode);
+//        return new ResponseEntity<>(list, HttpStatus.OK);
+//    }
 
+    @PreAuthorize("hasAnyAuthority('WRITE')")
     @PostMapping("/save")
     public ResponseEntity<CitizenDto> createCitizen(@RequestBody CustomCitizenRequest citizen) {
         CitizenDto citizenDto = citizenService.createCitizen(citizen);
         return new ResponseEntity<>(citizenDto, HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasAnyAuthority('WRITE')")
     @PutMapping("/save/{citizenId}")
     public ResponseEntity<CitizenDto> updateCitizen(@PathVariable String citizenId, @RequestBody CustomCitizenRequest citizen) {
         CitizenDto citizenDto = citizenService.updateCitizen(citizenId, citizen);

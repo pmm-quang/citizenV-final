@@ -1,6 +1,7 @@
 package com.citizenv.app.service.impl;
 
 import com.citizenv.app.component.Utils;
+import com.citizenv.app.entity.AdministrativeDivision;
 import com.citizenv.app.entity.AdministrativeUnit;
 import com.citizenv.app.entity.District;
 import com.citizenv.app.entity.Ward;
@@ -12,12 +13,14 @@ import com.citizenv.app.payload.custom.CustomWardRequest;
 import com.citizenv.app.repository.AdministrativeUnitRepository;
 import com.citizenv.app.repository.DistrictRepository;
 import com.citizenv.app.repository.WardRepository;
+import com.citizenv.app.secirity.CustomUserDetail;
 import com.citizenv.app.service.WardService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,21 +29,40 @@ import java.util.stream.Collectors;
 @Transactional
 @Service
 public class WardServiceImpl implements WardService {
-    @Autowired
-    private ModelMapper mapper;
+    private final ModelMapper mapper;
 
-    @Autowired
-    private WardRepository repo;
+    private final WardRepository repo;
 
-    @Autowired
-    private DistrictRepository districtRepo;
+    private final DistrictRepository districtRepo;
 
-    @Autowired
-    private AdministrativeUnitRepository admUnitRepo;
+    private final AdministrativeUnitRepository admUnitRepo;
+
+    public WardServiceImpl(ModelMapper mapper, WardRepository repo, DistrictRepository districtRepo, AdministrativeUnitRepository admUnitRepo) {
+        this.mapper = mapper;
+        this.repo = repo;
+        this.districtRepo = districtRepo;
+        this.admUnitRepo = admUnitRepo;
+    }
 
     @Override
     public List<WardDto> getAll() {
         List<Ward> entities = repo.findAll();
+        return entities.stream().map(l-> mapper.map(l, WardDto.class)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<WardDto> getAll(CustomUserDetail userDetail) {
+        AdministrativeDivision division = userDetail.getUser().getDivision();
+        List<Ward> entities = new ArrayList<>();
+        if (division == null) {
+            entities.addAll(repo.findAll());
+        } else {
+            String divisionCode = division.getCode();
+            switch (divisionCode.length()){
+                case 2: entities.addAll(repo.findAllByProvince_Code(divisionCode)); break;
+                case 4: entities.addAll(repo.findAllByDistrict_Code(divisionCode)); break;
+            }
+        }
         return entities.stream().map(l-> mapper.map(l, WardDto.class)).collect(Collectors.toList());
     }
 
@@ -60,6 +82,11 @@ public class WardServiceImpl implements WardService {
         List<Ward> list = repo.findAllByDistrict(foundDistrict);
         List<WardDto> dtoList = list.stream().map(ward -> mapper.map(ward, WardDto.class)).collect(Collectors.toList());
         return dtoList;
+    }
+
+    @Override
+    public List<WardDto> getByProvinceCode(String provinceCode) {
+        return null;
     }
 
     @Override

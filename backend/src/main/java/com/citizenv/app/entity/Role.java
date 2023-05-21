@@ -17,14 +17,20 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    @Column(unique = true, nullable = false)
+    private String role;
 
     private String description;
 
-    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private List<UserRole> userRoles;
+    @ManyToMany(mappedBy = "roles")
+    private List<User> users;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "roles_permissions"
+            , joinColumns = @JoinColumn(name = "role_id")
+            , inverseJoinColumns = @JoinColumn(name = "permission_id"))
+    private List<Permission> permissions;
+
 
 //    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
 //    @ToString.Exclude

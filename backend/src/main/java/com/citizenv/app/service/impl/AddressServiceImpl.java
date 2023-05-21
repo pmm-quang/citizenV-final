@@ -21,16 +21,19 @@ import java.util.stream.Collectors;
 
 @Service
 public class AddressServiceImpl implements AddressService {
-    @Autowired
-    private AddressTypeRepository addressTypeRepository;
-    @Autowired
-    private AddressRepository repository;
-    @Autowired
-    private CitizenRepository citizenRepository;
-    @Autowired
-    private HamletRepository hamletRepository;
-    @Autowired
-    private ModelMapper mapper;
+    private final AddressTypeRepository addressTypeRepository;
+    private final AddressRepository repository;
+    private final CitizenRepository citizenRepository;
+    private final HamletRepository hamletRepository;
+    private final ModelMapper mapper;
+
+    public AddressServiceImpl(AddressTypeRepository addressTypeRepository, AddressRepository repository, CitizenRepository citizenRepository, HamletRepository hamletRepository, ModelMapper mapper) {
+        this.addressTypeRepository = addressTypeRepository;
+        this.repository = repository;
+        this.citizenRepository = citizenRepository;
+        this.hamletRepository = hamletRepository;
+        this.mapper = mapper;
+    }
 
     @Override
     public List<AddressDto> getAll() {

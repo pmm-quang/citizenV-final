@@ -3,6 +3,7 @@ package com.citizenv.app.entity;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.time.LocalTime;
 
 @Entity
@@ -22,10 +23,14 @@ public class Declaration {
 //    private User proceedUser;
 
     @Column(name = "start_time", columnDefinition = "DATETIME")
-    private LocalTime startTime;
+    private Timestamp startTime;
 
     @Column(name = "end_time", columnDefinition = "DATETIME")
-    private LocalTime endTime;
+    private Timestamp endTime;
 
     private String status;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 }

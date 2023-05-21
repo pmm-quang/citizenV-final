@@ -9,13 +9,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = {"http://localhost:3000/", "http://localhost:3001/"})
+//@CrossOrigin(origins = {"http://localhost:3000/", "http://localhost:3001/"})
 @RestController
 @RequestMapping("/api/v1/administrativeRegion/")
 public class AdministrativeRegionController {
 
-    @Autowired
-    private AdministrativeRegionService service;
+    private final AdministrativeRegionService service;
+
+    public AdministrativeRegionController(AdministrativeRegionService service) {
+        this.service = service;
+    }
 
     @GetMapping("/")
     public ResponseEntity<List<AdministrativeRegionDto>> getAll() {

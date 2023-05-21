@@ -19,8 +19,8 @@ public class Province extends AdministrativeDivision {
     private AdministrativeRegion administrativeRegion;
 
     @OneToMany(mappedBy = "province", fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
+//    @ToString.Exclude
+//    @EqualsAndHashCode.Exclude
     private List<District> districts;
 
     private String administrativeCode;

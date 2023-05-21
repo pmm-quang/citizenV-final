@@ -11,10 +11,8 @@ import com.citizenv.app.payload.custom.CustomAddress;
 import com.citizenv.app.payload.custom.CustomCitizenRequest;
 import com.citizenv.app.repository.*;
 import com.citizenv.app.service.CitizenService;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Session;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -34,27 +32,42 @@ public class CitizenServiceImpl implements CitizenService {
 
     Logger logger = LogManager.getRootLogger();
 
-    @Autowired
-    private CitizenRepository repo;
-    @Autowired
-    private DistrictRepository districtRepo;
-    @Autowired
-    private ProvinceRepository provinceRepo;
-    @Autowired
-    private WardRepository wardRepo;
-    @Autowired
-    private HamletRepository hamletRepo;
-    @Autowired
-    private AddressRepository addressRepo;
-    @Autowired
-    private EthnicityRepository ethnicityRepo;
-    @Autowired
-    private ReligionRepository religionRepo;
-    @Autowired
-    private AssociationRepository associationRepo;
-    @Autowired
-    private AddressTypeRepository addressTypeRepo;
+//    @Autowired
+    private final CitizenRepository repo;
+//    @Autowired
+    private final DistrictRepository districtRepo;
+//    @Autowired
+    private final ProvinceRepository provinceRepo;
+//    @Autowired
+    private final WardRepository wardRepo;
+//    @Autowired
+    private final HamletRepository hamletRepo;
+//    @Autowired
+    private final AddressRepository addressRepo;
+//    @Autowired
+    private final EthnicityRepository ethnicityRepo;
+//    @Autowired
+    private final ReligionRepository religionRepo;
+//    @Autowired
+    private final AssociationRepository associationRepo;
+//    @Autowired
+    private final AddressTypeRepository addressTypeRepo;
 
+    public CitizenServiceImpl(CitizenRepository repo, DistrictRepository districtRepo, ProvinceRepository provinceRepo
+            , WardRepository wardRepo, HamletRepository hamletRepo, AddressRepository addressRepo
+            , EthnicityRepository ethnicityRepo, ReligionRepository religionRepo, AssociationRepository associationRepo
+            , AddressTypeRepository addressTypeRepo) {
+        this.repo = repo;
+        this.districtRepo = districtRepo;
+        this.provinceRepo = provinceRepo;
+        this.wardRepo = wardRepo;
+        this.hamletRepo = hamletRepo;
+        this.addressRepo = addressRepo;
+        this.ethnicityRepo = ethnicityRepo;
+        this.religionRepo = religionRepo;
+        this.associationRepo = associationRepo;
+        this.addressTypeRepo = addressTypeRepo;
+    }
 
     public List<CitizenDto> getAll() {
         List<Citizen> entities = repo.findAll();
@@ -171,14 +184,14 @@ public class CitizenServiceImpl implements CitizenService {
         newCitizen.setAddresses(addresses);
 
         List<Association> associations = new ArrayList<>();
-        for (AssociationDto as : citizen.getAssociations()) {
-            String name = as.getAssociatedCitizenName();
-            String nationalId = as.getAssociatedCitizenNationalId();
-            Association association = mapper.map(as, Association.class);
-            association.setCitizen(newCitizen);
-            associations.add(association);
+        if (citizen.getAssociations() != null) {
+            for (AssociationDto as : citizen.getAssociations()) {
+                Association association = mapper.map(as, Association.class);
+                association.setCitizen(newCitizen);
+                associations.add(association);
+            }
+            newCitizen.setAssociations(associations);
         }
-        newCitizen.setAssociations(associations);
         Citizen createCitizen = repo.save(newCitizen);
         return mapper.map(createCitizen, CitizenDto.class);
     }
@@ -225,32 +238,34 @@ public class CitizenServiceImpl implements CitizenService {
         //update Association
         List<Association> associations = new ArrayList<>();
         for (AssociationDto as: citizen.getAssociations()) {
-            Association association = new Association();
-            AssociationType associationType = mapper.map(as.getAssociationType(), AssociationType.class);
-            association.setId(as.getId());
-            association.setAssociatedCitizenNationalId(as.getAssociatedCitizenNationalId());
-            association.setAssociatedCitizenName(as.getAssociatedCitizenName());
-            association.setAssociationType(associationType);
+//            Association association = new Association();
+//            AssociationType associationType = mapper.map(as.getAssociationType(), AssociationType.class);
+//            association.setId(as.getId());
+//            association.setAssociatedCitizenNationalId(as.getAssociatedCitizenNationalId());
+//            association.setAssociatedCitizenName(as.getAssociatedCitizenName());
+//            association.setAssociationType(associationType);
+//            associations.add(association);
+            Association association = mapper.map(as, Association.class);
             associations.add(association);
+
         }
         List<Integer> associationsOfOriginal = foundCitizen.getAssociations().stream().map(Association::getId).collect(Collectors.toList());
         List<Integer> associationsOfNew = associations.stream().map(Association::getId).collect(Collectors.toList());
         associationsOfOriginal.removeAll(associationsOfNew);
         if (associationsOfOriginal.size() > 0) {
-            List<Association> associationList = foundCitizen.getAssociations();
             Iterator<Association> iterator = foundCitizen.getAssociations().iterator();
-
             while (iterator.hasNext()) {
                 Association as = iterator.next();
-
                 if (associationsOfOriginal.contains(as.getId())) {
 //                    as.setCitizen(null);
                     iterator.remove();
-                    associationRepo.deleteById(as.getId());
+//                    associationRepo.deleteById(as.getId());
                 }
             }
-            // associationRepo.deleteById(id);
         }
+//        List<Association> associationList = foundCitizen.getAssociations();
+//        associationList.removeIf(as -> associationsOfOriginal.contains(as.getId()));
+        associationRepo.deleteAllById(associationsOfOriginal);
 
         foundCitizen.setNationalId(c.getNationalId());
         foundCitizen.setName(c.getName());

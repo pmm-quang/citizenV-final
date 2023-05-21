@@ -16,11 +16,14 @@ import java.util.stream.Collectors;
 
 @Service
 public class AdministrativeRegionServiceImpl implements AdministrativeRegionService {
-    @Autowired
-    private ModelMapper mapper;
+    private final ModelMapper mapper;
 
-    @Autowired
-    private AdministrativeRegionRepository repository;
+    private final AdministrativeRegionRepository repository;
+
+    public AdministrativeRegionServiceImpl(ModelMapper mapper, AdministrativeRegionRepository repository) {
+        this.mapper = mapper;
+        this.repository = repository;
+    }
 
     public List<AdministrativeRegionDto> getAll() {
         List<AdministrativeRegion> entities = repository.findAll();

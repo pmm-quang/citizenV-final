@@ -22,8 +22,6 @@ public class Religion {
     private String name;
 
     @OneToMany(mappedBy = "religion", cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private List<Citizen> citizens;
 
     public Religion(int i, String religion) {
