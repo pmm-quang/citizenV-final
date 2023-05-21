@@ -1,12 +1,12 @@
 import Login from './Login/login';
 import FindResidential from './Residential/FindResidential'
 import Province from './Management/Province';
-import DataEntry from './Residential/DataEntry';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './Home';
 import Account from './Management/Account';
 import Ward from './Management/Ward';
 import Citizen from './Residential/Citizen' 
+import CitizenInput from './Residential/CitizenInput' 
 import District from './Management/District';
 import Statis from './Statis/BasicStatis'
 
@@ -20,7 +20,7 @@ function App() {
         <Route path='/findresidential' element={<FindResidential />} />
         <Route path='/province' element={<Province />} />
         <Route path='/district' element={<District />} />
-        <Route path='/citizeninput' element={<DataEntry />} />
+        <Route path='/citizeninput' element={<CitizenInput />} />
         <Route path='/account' element={<Account />} />
         <Route path='/statis' element = {<Statis />} />
         <Route path='/home' element = {<Home />} />

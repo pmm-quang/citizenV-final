@@ -11,14 +11,15 @@
 }
 
 .selectOption {
-    float: right;
+    margin-left: 20px;
+    margin-top: 10px;
     display: flex;
     align-items: center;
 }
 
 .flexStatic {
     display: flex;
-    margin-top: 50px;
+    margin-top: 20px;
     margin-left: 10%;
 }
 
@@ -44,4 +45,8 @@
 .chartStatic {
     margin-left: 15%;
     width: 100%;
+}
+
+.chart{
+    width: 400px;
 }
