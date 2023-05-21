@@ -1,0 +1,60 @@
+.pagelistButton {
+    margin-top: 20px;
+    display: block;
+}
+
+.listButton {
+    margin-top: 20px;
+    display: block;
+}
+
+.optionButton {
+    display: inline-block;
+    margin-left: 20px;
+}
+
+.optionButtonSelect, .optionButtonSelect:hover {
+    display: inline-block;
+    background-color: red;
+    border: 2px solid black;
+    color: white;
+    font-weight: bold;
+    margin-left: 20px;
+}
+
+.listForm {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.titlePage {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.formFlex {
+    flex: 400px;
+    margin-left: 30px;
+}
+
+.inputForm {
+    width: 90%;
+}
+
+.titleFlex {
+    text-align: center;
+    margin-right: 5%;
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.noteInputbyfile {
+    font-weight: bold;
+    font-size: 14px;
+    margin-top: 10px;
+}

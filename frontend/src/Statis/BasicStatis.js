@@ -17,16 +17,21 @@ function BasicStatis() {
     const [dataStatic, setDataStatic] = useState([]);
     const [dataChart, setDataChart] = useState({
         labels: [],
-            datasets: [
-                {
-                    label: 'Tổng dân số',
-                    data: [],
-                },
-            ],
+        datasets: [
+            {
+                label: 'Tổng dân số',
+                data: [],
+            },
+        ],
     });
 
     const GetDataStatic = async (code) => {
-        const response = await axios.get("http://localhost:8080/api/v1/statistics/population/citizen?property=" + code)
+        let response;
+        if (code === 'region') {
+            response = await axios.get("http://localhost:8080/api/v1/statistics/population/region")
+        } else {
+            response = await axios.get("http://localhost:8080/api/v1/statistics/population/citizen?property=" + code)
+        }
         setOption(code)
         setDataStatic(response.data)
         setDataChart({
@@ -56,6 +61,7 @@ function BasicStatis() {
                     <option value={'ethnicity'}>Dân tộc</option>
                     <option value={'religion'}>Tôn giáo</option>
                     <option value={'maritalStatus'}>Tình trạng hôn nhân</option>
+                    <option value={'region'}>Dân cư theo vùng</option>
                 </Form.Select>
             </div>
         )
@@ -92,12 +98,13 @@ function BasicStatis() {
             <div className="flexStatic">
                 <div>
                     <div className="chartStatic">
-                        <div className='titleStatic'>BIỂU ĐỒ THỂ HIỆN CƠ CẤU</div>
-                        <Pie data={dataChart} className='chart'/>
+                        {(option === undefined) ? null : <div className='titleStatic'>BIỂU ĐỒ THỂ HIỆN CƠ CẤU</div>}
+                        {(option !== 'region') ? <Pie data={dataChart} className='chart' /> : null}
+                        {(option === 'region') ? <Bar data={dataChart} className='chart' /> : null}
                     </div>
                 </div>
                 <div className='flex_second'>
-                    <div className='titleStatic'>BẢNG THỐNG KÊ TỔNG DÂN SỐ</div>
+                    {(option === undefined) ? null : <div className='titleStatic'>BẢNG THỐNG KÊ TỔNG DÂN SỐ</div>}
                     {(option === undefined) ? null : <TableStatic />}
                 </div>
             </div>

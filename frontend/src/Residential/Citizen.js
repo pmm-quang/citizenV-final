@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 import Table from 'react-bootstrap/Table';
 import axios from 'axios';
 import { BsChevronRight, BsChevronDoubleRight, BsChevronDoubleLeft, BsChevronLeft } from 'react-icons/bs'
+import { AiFillCaretRight, AiFillCaretDown } from 'react-icons/ai'
 
 
 function Citizen() {
@@ -16,9 +17,13 @@ function Citizen() {
     const user = role_acc.username;
     const role = role_acc.roles[0].authority;
 
+    const [codeProvinceUnit, setCodeProvinceUnit] = useState();
+    const [codeDistrictUnit, setCodeDistrictUnit] = useState();
+    const [codeWardUnit, setCodeWardUnit] = useState();
+    const [codeHamletUnit, setCodeHamletUnit] = useState();
     const [index, setIndex] = useState(0);
     const [defaultindex, setDefaultIndex] = useState(0)
-    const [showButton, setShowButton ] = useState(false);
+    const [showButton, setShowButton] = useState(false);
     const [code, setCode] = useState(0)
     const [countCitizen, setCountCitizen] = useState();
     const [showDetail, setShowDetail] = useState(false);
@@ -27,6 +32,11 @@ function Citizen() {
     const [district, setDistrict] = useState([]);
     const [ward, setWard] = useState([]);
     const [hamlet, setHamlet] = useState([]);
+    const [divisionUnit, setDivisionUnit] = useState();
+    const [provinceUnit, setProvinceUnit] = useState([]);
+    const [districtUnit, setDistrictUnit] = useState([]);
+    const [wardUnit, setWardUnit] = useState([]);
+    const [hamletUnit, setHamletUnit] = useState([]);
     const [show, setShow] = useState(false);
     const [citizens, setCitizens] = useState([])
     const [page, setPage] = useState(1);
@@ -64,7 +74,6 @@ function Citizen() {
             GetPopulationInHalmet(user, 1)
             setDivision(role_name)
         }
-
     }
 
     const GetPopulationInCountry = async () => {
@@ -76,6 +85,7 @@ function Citizen() {
         const response_population = await axios('http://localhost:8080/api/v1/statistics/population/province')
         setProvince(response_population.data)
         setCitizens(response_population.data)
+        setProvinceUnit(response_population.data)
     }
 
     const GetPopulationInProvince = async (code) => {
@@ -89,6 +99,7 @@ function Citizen() {
             totalPopulation += response_population.data[i].population
         }
         setCountCitizen(totalPopulation)
+        setDistrictUnit(response_population.data)
     }
 
     const GetPopulationInDistrict = async (code) => {
@@ -102,6 +113,7 @@ function Citizen() {
             totalPopulation += response_population.data[i].population
         }
         setCountCitizen(totalPopulation)
+        setWardUnit(response_population.data)
     }
 
     const GetPopulationInWard = async (code) => {
@@ -115,6 +127,7 @@ function Citizen() {
             totalPopulation += response_population.data[i].population
         }
         setCountCitizen(totalPopulation)
+        setHamletUnit(response_population.data)
     }
 
     const GetPopulationInHalmet = async (code, page) => {
@@ -128,30 +141,52 @@ function Citizen() {
         setCountCitizen(response_population.data.totalElements)
     }
 
-    const BackToClickData = async () => {
-        setCode(code.substring(0, code.length - 2))
-        if (user !== 'tw' && (code.length === user.length + 2)) {
-            setShowButton(false)
-        } else if (user === 'tw' && code.length === 2) {
-            setShowButton(false)
-        }
-        if (code.length - 2 === 6) {
-            GetPopulationInWard(code.substring(0, code.length - 2))
-            const response = await axios('http://localhost:8080/api/v1/ward/' + code.substring(0, code.length - 2))
-            setDivision(response.data.name)
-        }
-        else if (code.length - 2 === 4) {
-            GetPopulationInDistrict(code.substring(0, code.length - 2))
-            const response = await axios('http://localhost:8080/api/v1/district/' + code.substring(0, code.length - 2))
-            setDivision(response.data.name)
-        }
-        else if (code.length - 2=== 2) {
-            GetPopulationInProvince(code.substring(0, code.length - 2))
-            const response = await axios('http://localhost:8080/api/v1/province/' + code.substring(0, code.length - 2))
-            setDivision(response.data.name)
-        }
-        else if (code.length - 2 === 0) GetPopulationInCountry()
-    }
+    const listHamletUnits = hamletUnit.map((division, index) =>
+        <div key={index} className="district">{(String(codeHamletUnit) === division.code) ? <AiFillCaretDown /> : <AiFillCaretRight onClick={() => {
+            GetPopulationInHalmet(division.code, 1)
+            setCodeHamletUnit(division.code)
+            setDivision(division.name)
+        }} />} {division.code + ". " + division.name}</div>
+    );
+
+    const listWardUnits = wardUnit.map((division, index) =>
+        <div key={index} className="unit">{(String(codeWardUnit) === division.code) ? <AiFillCaretDown onClick={() => {
+            setCodeWardUnit('')
+            setHamletUnit([])
+        }} /> : <AiFillCaretRight onClick={() => {
+            GetPopulationInWard(division.code)
+            setCodeWardUnit(division.code)
+            setDivision(division.name)
+        }} />} {division.code + ". " + division.name}{<div className="listUnits">{(String(codeWardUnit) === division.code) ? listHamletUnits : null}</div>}</div>
+    );
+
+    const listDistrictUnits = districtUnit.map((division, index) =>
+        <div key={index} className="unit">{(String(codeDistrictUnit) === division.code) ? <AiFillCaretDown onClick={() => { 
+            setCodeDistrictUnit('')
+            setCodeWardUnit('')
+            setWardUnit([])
+            setHamletUnit([])
+        }} /> : <AiFillCaretRight onClick={() => {
+            GetPopulationInDistrict(division.code)
+            setCodeDistrictUnit(division.code)
+            setDivision(division.name)
+        }} />} {division.code + ". " + division.name}{<div className="listUnits">{(String(codeDistrictUnit) === division.code) ? listWardUnits : null}</div>}</div>
+    );
+
+    const listProvinceUnits = provinceUnit.map((division, index) =>
+        <div key={index} className="province">{(String(codeProvinceUnit) === division.code) ? <AiFillCaretDown onClick={() => { 
+            setCodeProvinceUnit('') 
+            setCodeDistrictUnit('')
+            setCodeWardUnit('')
+            setWardUnit([])
+            setHamletUnit([])
+            setDistrictUnit([])
+        }} /> : <AiFillCaretRight onClick={() => {
+            GetPopulationInProvince(division.code)
+            setCodeProvinceUnit(division.code)
+            setDivision(division.name)
+        }} />} {division.code + ". " + division.name}{<div className="listUnits">{(String(codeProvinceUnit) === division.code) ? listDistrictUnits : null}</div>}</div>
+    );
 
     const Pagination = () => {
         return (
@@ -182,8 +217,9 @@ function Citizen() {
         CountCitizen();
     }, [])
 
+
     const listCitizens = citizens.map((post, index) =>
-        <tr key={index} onClick={() => { GetDataOnClick(post.code, post.name) }}>
+        <tr key={index}>
             <td>{post.code}</td>
             <td>{post.name}</td>
             <td>{post.population}</td>
@@ -245,7 +281,7 @@ function Citizen() {
         return (
             <div className="detailed-resident-info">
                 <div id="detailed-resident-info-header">
-                    <Button className="returnButton" onClick={() => {BackToDetailInformation()}}><BsArrowLeft /></Button>
+                    <Button className="returnButton" onClick={() => { BackToDetailInformation() }}><BsArrowLeft /></Button>
                     <h2 id="detailed-resident-info-title">Thông tin chi tiết</h2>
                 </div>
                 <Table bordered hover className="tableInfo">
@@ -329,7 +365,7 @@ function Citizen() {
         return (
             <div>
                 <div>
-                    <Table striped bordered hover size="sm" className="tableResidentialInHamlet">
+                    <Table striped bordered hover size="sm" className="tableResidentialHamlet">
                         <thead>
                             <tr>
                                 <th>CMMD/CCCD</th>
@@ -347,24 +383,36 @@ function Citizen() {
         )
     }
 
+    const TreeUnits = () => {
+        return (
+            <div className="flex_citizen">
+                <div className="title">Đơn vị hành chính cấp dưới</div>
+                <div className='listProvinces'>
+                    {(role === 'A1') ? listProvinceUnits : null}
+                    {(role === 'A2') ? listDistrictUnits : null}
+                    {(role === 'A3') ? listWardUnits : null}
+                    {(role === 'EDITOR') ? listHamletUnits : null}
+                </div>
+
+            </div>
+        )
+    }
     return (
         <div>
             <NavbarPage />
             <div className="d-flex justify-content-between">
-                <div className="flex_citizen_first">
-                    <div className="titleCitizen">TỔNG DÂN SỐ</div>
-                    <div className="titleCitizen">Khu vực: {division}</div>
-                    <div className="countCitizen">{countCitizen}</div>
-                    <img src={citizen} className='logoCitizen' />
-                </div>
+                {(role !== 'B2') ? <TreeUnits /> : null}
                 <div className="flex_citizen_second">
-                    <div id="detailed-resident-info-header">
-                        {(showButton) ? <Button className="returnShow" onClick={() => {BackToClickData()}}><BsArrowLeft /> Trở về</Button> : null}
-                    </div>
                     {((index === 5) && (!showDetail)) ? <TableResidentialInHalmet /> : ((index === 5) && (showDetail) ? <DetailInformation /> : null)}
                     {(index !== 5) ? <TableResidential /> : null}
                 </div>
                 {(index === 5 && (!showDetail)) ? <Pagination /> : null}
+                {(!showDetail) ? <div className="flex_citizen_3">
+                    <div className="titleCitizen">TỔNG DÂN SỐ</div>
+                    <div className="titleCitizen">Khu vực: {division}</div>
+                    <div className="countCitizen">{countCitizen}</div>
+                    <img src={citizen} className='logoCitizen' />
+                </div> : null}
             </div>
         </div>
     );
