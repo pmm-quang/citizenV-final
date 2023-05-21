@@ -14,6 +14,10 @@ public class Utils {
     public static final Long B2 = 5L;
     public static final Long EDITOR = 6L;
     public static final String RELIGION_NONE = "Không";
+    public static final String AGE_GROUP_UNDER_LEGAL_WORKING_AGE = "Dưới độ tuổi lao động";
+    public static final String AGE_GROUP_IN_LEGAL_WORKING_AGE = "Trong độ tuổi lao động";
+    public static final String AGE_GROUP_OVER_LEGAL_WORKING_AGE = "Trên độ tuổi lao động";
+
 
     interface EnumInterface<K, V> {
         V getValue();

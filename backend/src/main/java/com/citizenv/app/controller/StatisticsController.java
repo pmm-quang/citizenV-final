@@ -1,12 +1,12 @@
 package com.citizenv.app.controller;
 
-import com.citizenv.app.payload.population.DivisionGeneralPopulationDto;
-import com.citizenv.app.payload.population.PopulationDto;
-import com.citizenv.app.service.PopulationService;
+import com.citizenv.app.payload.population.*;
+import com.citizenv.app.service.StatisticsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @CrossOrigin(origins = {"http://localhost:3000/", "http://localhost:3001/"})
@@ -14,9 +14,9 @@ import java.util.List;
 @RequestMapping("api/v1/statistics")
 public class StatisticsController {
 
-    private final PopulationService populationService;
+    private final StatisticsService populationService;
 
-    public StatisticsController(PopulationService populationService) {
+    public StatisticsController(StatisticsService populationService) {
         this.populationService = populationService;
     }
 
@@ -27,56 +27,74 @@ public class StatisticsController {
     }
 
     @GetMapping("/population/region")
-    public ResponseEntity<List<PopulationDto>> getRegionPopulations() {
-        List<PopulationDto> population = populationService.getRegionPopulations();
+    public ResponseEntity<List<PopulationDto>> getRegionPopulationList() {
+        List<PopulationDto> population = populationService.getRegionPopulationList();
         return new ResponseEntity<>(population, HttpStatus.OK);
     }
 
     @GetMapping("/population/province")
-    public ResponseEntity<List<DivisionGeneralPopulationDto>> getProvincePopulations() {
-        List<DivisionGeneralPopulationDto> population = populationService.getProvincePopulations();
+    public ResponseEntity<List<DivisionGeneralPopulationDto>> getProvincePopulationList() {
+        List<DivisionGeneralPopulationDto> population = populationService.getProvincePopulationList();
         return new ResponseEntity<>(population, HttpStatus.OK);
     }
 
     @GetMapping("/population/district/{provinceCode}")
-    public ResponseEntity<List<DivisionGeneralPopulationDto>> getDistrictPopulationsByProvince(@PathVariable String provinceCode) {
-        List<DivisionGeneralPopulationDto> population = populationService.getDistrictPopulationsByProvince(provinceCode);
+    public ResponseEntity<List<DivisionGeneralPopulationDto>> getDistrictPopulationListByProvince(@PathVariable String provinceCode) {
+        List<DivisionGeneralPopulationDto> population = populationService.getDistrictPopulationListByProvince(provinceCode);
         return new ResponseEntity<>(population, HttpStatus.OK);
     }
 
     @GetMapping("/population/ward/{districtCode}")
-    public ResponseEntity<List<DivisionGeneralPopulationDto>> getWardPopulationsByDistrict(@PathVariable String districtCode) {
-        List<DivisionGeneralPopulationDto> population = populationService.getWardPopulationsByDistrict(districtCode);
+    public ResponseEntity<List<DivisionGeneralPopulationDto>> getWardPopulationListByDistrict(@PathVariable String districtCode) {
+        List<DivisionGeneralPopulationDto> population = populationService.getWardPopulationListByDistrict(districtCode);
         return new ResponseEntity<>(population, HttpStatus.OK);
     }
 
     @GetMapping("/population/hamlet/{wardCode}")
-    public ResponseEntity<List<DivisionGeneralPopulationDto>> getHamletPopulationsByWard(@PathVariable String wardCode) {
-        List<DivisionGeneralPopulationDto> population = populationService.getHamletPopulationsByWard(wardCode);
-        return new ResponseEntity<>(population, HttpStatus.OK);
-    }
-
-    @GetMapping("/population/citizen/sex")
-    public ResponseEntity<List<PopulationDto>> getPopulationsBySex() {
-        List<PopulationDto> population = populationService.getPopulationsBySex();
+    public ResponseEntity<List<DivisionGeneralPopulationDto>> getHamletPopulationListByWard(@PathVariable String wardCode) {
+        List<DivisionGeneralPopulationDto> population = populationService.getHamletPopulationListByWard(wardCode);
         return new ResponseEntity<>(population, HttpStatus.OK);
     }
 
     @GetMapping("/population/citizen/age-group")
-    public ResponseEntity<List<PopulationDto>> getPopulationsByAgeGroup() {
-        List<PopulationDto> population = populationService.getPopulationsByAgeGroup();
+    public ResponseEntity<AgeGroupDto> getPopulationListByAgeGroup() {
+        AgeGroupDto population = populationService.getPopulationListByAgeGroup(LocalDate.now().getYear());
         return new ResponseEntity<>(population, HttpStatus.OK);
     }
 
     @GetMapping(value = "/population/citizen", params = "property")
-    public ResponseEntity<List<PopulationDto>> getPopulationsByCitizenProperty(@RequestParam String property) {
-        List<PopulationDto> population = populationService.getPopulationsByCitizenProperty(property);
+    public ResponseEntity<List<PopulationDto>> getPopulationListByCitizenProperty(@RequestParam String property) {
+        List<PopulationDto> population = populationService.getPopulationListByCitizenProperty(property);
         return new ResponseEntity<>(population, HttpStatus.OK);
     }
 
     @GetMapping(value = "/population/province/citizen", params = "property")
-    public ResponseEntity<List<DivisionGeneralPopulationDto>> getProvincePopulationsByCitizenProperty(@RequestParam String property) {
-        List<DivisionGeneralPopulationDto> population = populationService.getProvincePopulationsByCitizenProperty(property);
+    public ResponseEntity<List<DivisionPopulationByCitizenPropertyDto>> getProvincePopulationListByCitizenProperty(@RequestParam String property) {
+        List<DivisionPopulationByCitizenPropertyDto> population = populationService.getProvincePopulationListByCitizenProperty(property);
+        return new ResponseEntity<>(population, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/population/district/citizen", params = "property")
+    public ResponseEntity<List<DivisionPopulationByCitizenPropertyDto>> getDistrictPopulationListByCitizenProperty(@RequestParam String property) {
+        List<DivisionPopulationByCitizenPropertyDto> population = populationService.getProvincePopulationListByCitizenProperty(property);
+        return new ResponseEntity<>(population, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/population/citizen/age-group", params = {"startYear", "endYear"})
+    public ResponseEntity<List<AgeGroupDto>> getPopulationListByAgeGroup(@RequestParam Integer startYear, @RequestParam Integer endYear) {
+        List<AgeGroupDto> population = populationService.getPopulationListByAgeGroup(startYear, endYear);
+        return new ResponseEntity<>(population, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/population/citizen/age-group", params = "year")
+    public ResponseEntity<AgeGroupDto> getPopulationListByAgeGroup(Integer year) {
+        AgeGroupDto population = populationService.getPopulationListByAgeGroup(year);
+        return new ResponseEntity<>(population, HttpStatus.OK);
+    }
+
+    @GetMapping("/avg-age/province")
+    public ResponseEntity<List<AverageAgeDto>> getProvinceAverageAgeList() {
+        List<AverageAgeDto> population = populationService.getProvinceAverageAgeList();
         return new ResponseEntity<>(population, HttpStatus.OK);
     }
 }
