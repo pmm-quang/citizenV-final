@@ -142,7 +142,7 @@ function Citizen() {
     }
 
     const listHamletUnits = hamletUnit.map((division, index) =>
-        <div key={index} className="district">{(String(codeHamletUnit) === division.code) ? <AiFillCaretDown /> : <AiFillCaretRight onClick={() => {
+        <div key={index} className="district" style = {{color: (String(codeHamletUnit) === division.code)? 'red' : 'black'}}>{(String(codeHamletUnit) === division.code) ? <AiFillCaretDown /> : <AiFillCaretRight onClick={() => {
             GetPopulationInHalmet(division.code, 1)
             setCodeHamletUnit(division.code)
             setDivision(division.name)
@@ -150,7 +150,7 @@ function Citizen() {
     );
 
     const listWardUnits = wardUnit.map((division, index) =>
-        <div key={index} className="unit">{(String(codeWardUnit) === division.code) ? <AiFillCaretDown onClick={() => {
+        <div key={index} className="unit" style = {{color: (String(codeWardUnit) === division.code)? 'red' : 'black'}}>{(String(codeWardUnit) === division.code) ? <AiFillCaretDown onClick={() => {
             setCodeWardUnit('')
             setHamletUnit([])
         }} /> : <AiFillCaretRight onClick={() => {
@@ -161,7 +161,7 @@ function Citizen() {
     );
 
     const listDistrictUnits = districtUnit.map((division, index) =>
-        <div key={index} className="unit">{(String(codeDistrictUnit) === division.code) ? <AiFillCaretDown onClick={() => { 
+        <div key={index} className="unit" style = {{color: (String(codeDistrictUnit) === division.code)? 'red' : 'black'}}>{(String(codeDistrictUnit) === division.code) ? <AiFillCaretDown onClick={() => { 
             setCodeDistrictUnit('')
             setCodeWardUnit('')
             setWardUnit([])
@@ -174,7 +174,7 @@ function Citizen() {
     );
 
     const listProvinceUnits = provinceUnit.map((division, index) =>
-        <div key={index} className="province">{(String(codeProvinceUnit) === division.code) ? <AiFillCaretDown onClick={() => { 
+        <div key={index} className="province" style = {{color: (String(codeProvinceUnit) === division.code)? 'red' : 'black'}}>{(String(codeProvinceUnit) === division.code) ? <AiFillCaretDown onClick={() => { 
             setCodeProvinceUnit('') 
             setCodeDistrictUnit('')
             setCodeWardUnit('')
@@ -185,7 +185,7 @@ function Citizen() {
             GetPopulationInProvince(division.code)
             setCodeProvinceUnit(division.code)
             setDivision(division.name)
-        }} />} {division.code + ". " + division.name}{<div className="listUnits">{(String(codeProvinceUnit) === division.code) ? listDistrictUnits : null}</div>}</div>
+        }}/>} {division.code + ". " + division.name}{<div className="listUnits">{(String(codeProvinceUnit) === division.code) ? listDistrictUnits : null}</div>}</div>
     );
 
     const Pagination = () => {
