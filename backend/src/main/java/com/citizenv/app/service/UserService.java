@@ -10,6 +10,7 @@ public interface UserService {
     List<UserDto> getAll(CustomUserDetail userDetail);
     UserDto getById(String userId);
     UserDto createUser(CustomUserDetail userDetail, UserDto userDto);
+    UserDto createUser(UserDto userDto);
     UserDto updateUser(String username, UserDto userDto);
 
     UserDto changePassword(String userDetailUsername, String username, String newPassword);

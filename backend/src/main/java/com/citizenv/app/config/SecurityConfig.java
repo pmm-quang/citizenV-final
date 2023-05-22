@@ -57,12 +57,12 @@ public class SecurityConfig {
 //                .antMatchers("**/user/change-password/**").hasAnyRole("A1", "A2", "A3", "B1", "B2")
 //                .anyRequest().authenticated()
                 .anyRequest().permitAll()
-                .and().httpBasic()
-                .and()
-                .logout()
-                .logoutUrl("/logout")
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID");
+                .and().httpBasic();
+//                .and()
+//                .logout()
+//                .logoutUrl("/logout")
+//                .invalidateHttpSession(true)
+//                .deleteCookies("JSESSIONID");
         return http.build();
     }
 }

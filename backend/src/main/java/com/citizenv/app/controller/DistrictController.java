@@ -44,24 +44,28 @@ public class DistrictController {
         List<DistrictDto> list = districtService.getAllByProvinceCode(provinceCode);
         return ResponseEntity.ok().body(list);
     }
-    @Secured("ROLE_A1")
-    @GetMapping("/by-province")
-    public ResponseEntity<List<DistrictDto>> getAllByProvinceCode() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            CustomUserDetail customUserDetail = (CustomUserDetail) authentication.getPrincipal();
-            String provinceCode = customUserDetail.getUser().getDivision().getCode();
-            List<DistrictDto> list = districtService.getAllByProvinceCode(provinceCode);
-            return ResponseEntity.ok().body(list);
-    }
 
-    @PreAuthorize("hasAuthority('WRITE')")
+    /**
+     * Lấy ra toàn bộ district mà user quản lý
+     */
+//    @Secured("ROLE_A1")
+//    @GetMapping("/by-province")
+//    public ResponseEntity<List<DistrictDto>> getAllByProvinceCode() {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//            CustomUserDetail customUserDetail = (CustomUserDetail) authentication.getPrincipal();
+//            String provinceCode = customUserDetail.getUser().getDivision().getCode();
+//            List<DistrictDto> list = districtService.getAllByProvinceCode(provinceCode);
+//            return ResponseEntity.ok().body(list);
+//    }
+
+//    @PreAuthorize("hasAuthority('WRITE')")
     @PostMapping("/save")
     public ResponseEntity<DistrictDto> createDistrict(@RequestBody DistrictDto district) {
         DistrictDto districtDto = districtService.createDistrict(district);
         return new ResponseEntity<>(districtDto, HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasAuthority('WRITE')")
+//    @PreAuthorize("hasAuthority('WRITE')")
     @PutMapping("/save/{districtCode}")
     public ResponseEntity<DistrictDto> updateDistrict(@PathVariable String districtCode,
                                                       @RequestBody DistrictDto district) {

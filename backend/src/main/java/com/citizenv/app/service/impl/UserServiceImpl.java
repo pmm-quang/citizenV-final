@@ -155,6 +155,55 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserDto createUser(UserDto userDto) {
+        String newUsername = userDto.getUsername();
+        AdministrativeDivisionDto divisionOfNewUser = userDto.getDivision();
+        boolean checkAuth = true;
+
+        if (divisionOfNewUser == null || newUsername == null) {
+            throw new InvalidException("Chua nhap du thong tin can thiet");
+        }
+        String divisionCodeOfNewUser = divisionOfNewUser.getCode();
+        if (newUsername.equals(divisionOfNewUser.getCode())) {
+            repository.findByUsername(newUsername).ifPresent(user1 -> {
+                throw new ResourceFoundException("User", "username",newUsername);
+            });
+            AdministrativeDivision division = divisionRepo.findByCode(divisionOfNewUser.getCode()).orElseThrow(
+                    () -> new ResourceNotFoundException("division", "divisionCode", divisionOfNewUser.getCode())
+            );
+            User newUser = new User();
+            newUser.setUsername(newUsername);
+            newUser.setPassword(encoder.encode(userDto.getPassword()));
+            newUser.setDivision(division);
+            newUser.setIsActive(true);
+            Long roleId = 0L;
+            switch (newUsername.length()) {
+                case 2: roleId = Utils.A2;break;
+                case 4: roleId = Utils.A3; break;
+                case 6: roleId = Utils.B1;break;
+                case 8: roleId = Utils.B2; break;
+            }
+            Long finalRoleId = roleId;
+            Role role = roleRepo.findById(finalRoleId).orElseThrow(
+                    () -> new ResourceNotFoundException("Role", "roleId", String.valueOf(finalRoleId))
+            );
+            List<Role> roles = new ArrayList<>();
+            roles.add(role);
+            newUser.setRoles(roles);
+            Declaration declaration = new Declaration();
+            declaration.setStatus("Chưa");
+            User createUser = repository.save(newUser);
+            createUser.setDeclaration(declaration); // Thiết lập quan hệ giữa User và Declaration
+            User savedUser = repository.save(createUser); // Lưu lại đối tượng User để cập nhật quan hệ với Declaration
+            declaration.setUser(savedUser); // Thiết lập quan hệ giữa Declaration và User
+            declarationRepo.save(declaration);
+            return mapper.map(createUser, UserDto.class);
+        } else {
+            throw  new InvalidException("username va ma don vi khong trung khop");
+        }
+    }
+
+    @Override
     public UserDto updateUser(String username, UserDto userDto) {
         return null;
     }

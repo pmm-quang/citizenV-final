@@ -24,30 +24,32 @@ public class UserController {
 
     @GetMapping("/")
     public ResponseEntity<List<UserDto>> getAll() {
-        CustomUserDetail userDetail = getUserDetail();
-        List<UserDto> userDtoList = userService.getAll(userDetail);
+//        CustomUserDetail userDetail = getUserDetail();
+//        List<UserDto> userDtoList = userService.getAll(userDetail);
+        List<UserDto> userDtoList = userService.getAll();
         return new ResponseEntity<>(userDtoList, HttpStatus.OK);
     }
 
     @GetMapping("/{userId}")
     public ResponseEntity<UserDto> getById(@PathVariable String userId) {
-        CustomUserDetail userDetail = getUserDetail();
+//        CustomUserDetail userDetail = getUserDetail();
         UserDto userDto = userService.getById(userId);
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 
-    @PutMapping("/change-password/{username}")
-    public ResponseEntity<UserDto> changePassword(@PathVariable String username, @RequestBody String newPassword ) {
-        CustomUserDetail userDetail = getUserDetail();
-        String userDetailUsername = userDetail.getUsername();
-        UserDto userDto = userService.changePassword(userDetailUsername, username, newPassword);
-        return ResponseEntity.ok(userDto);
-    }
+//    @PutMapping("/change-password/{username}")
+//    public ResponseEntity<UserDto> changePassword(@PathVariable String username, @RequestBody String newPassword ) {
+//        CustomUserDetail userDetail = getUserDetail();
+//        String userDetailUsername = userDetail.getUsername();
+//        UserDto userDto = userService.changePassword(userDetailUsername, username, newPassword);
+//        return ResponseEntity.ok(userDto);
+//    }
 
     @PostMapping("/save")
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto user) {
-        CustomUserDetail userDetail = getUserDetail();
-        UserDto userDto = userService.createUser(userDetail, user);
+//        CustomUserDetail userDetail = getUserDetail();
+//        UserDto userDto = userService.createUser(userDetail, user);
+        UserDto userDto = userService.createUser(user);
         return ResponseEntity.status(201).body(userDto);
 
     }
@@ -69,9 +71,9 @@ public class UserController {
 //        return new ResponseEntity<>(userService.deleteById(userId), HttpStatus.OK);
 //    }
 
-    private CustomUserDetail getUserDetail() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        CustomUserDetail userDetail = (CustomUserDetail) authentication.getPrincipal();
-        return userDetail;
-    }
+//    private CustomUserDetail getUserDetail() {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        CustomUserDetail userDetail = (CustomUserDetail) authentication.getPrincipal();
+//        return userDetail;
+//    }
 }

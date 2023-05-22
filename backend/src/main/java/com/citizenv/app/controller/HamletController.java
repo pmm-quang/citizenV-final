@@ -44,14 +44,14 @@ public class HamletController {
     }
 
 //    @Secured("ROLE_B1")
-    @GetMapping("/by-ward")
-    public ResponseEntity<List<HamletDto>> getAllByWardCode() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        CustomUserDetail userDetail = (CustomUserDetail) authentication.getPrincipal();
-        String wardCode = userDetail.getUser().getDivision().getCode();
-        List<HamletDto> list = service.getAllByWardCode(wardCode);
-        return ResponseEntity.ok(list);
-    }
+//    @GetMapping("/by-ward")
+//    public ResponseEntity<List<HamletDto>> getAllByWardCode() {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        CustomUserDetail userDetail = (CustomUserDetail) authentication.getPrincipal();
+//        String wardCode = userDetail.getUser().getDivision().getCode();
+//        List<HamletDto> list = service.getAllByWardCode(wardCode);
+//        return ResponseEntity.ok(list);
+//    }
 
     @GetMapping("/by-administrative-unit/{admUnitID}")
     public ResponseEntity<List<HamletDto>> getAllByAdministrativeUnitId(@PathVariable int admUnitID) {

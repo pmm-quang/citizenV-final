@@ -58,14 +58,14 @@ public class ProvinceController {
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAuthority('WRITE')")
+//    @PreAuthorize("hasAuthority('WRITE')")
     @PostMapping("/save")
     public ResponseEntity<Object> create(@RequestBody ProvinceDto provinceDto) {
          ProvinceDto newProvince = provinceService.createProvince(provinceDto);
          return new ResponseEntity<>(newProvince, HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasAuthority('WRITE')")
+//    @PreAuthorize("hasAuthority('WRITE')")
     @PutMapping("save/{provinceCode}")
     public ResponseEntity<ProvinceDto> update(@PathVariable String provinceCode, @RequestBody ProvinceDto province) {
         ProvinceDto newProvince = provinceService.updateProvince(provinceCode, province);
@@ -73,7 +73,7 @@ public class ProvinceController {
     }
 
 
-    @PreAuthorize("hasAuthority('WRITE')")
+//    @PreAuthorize("hasAuthority('WRITE')")
     @DeleteMapping("/delete/{provinceId}")
     public ResponseEntity<String> deleteById(@PathVariable Long provinceId) {
             return new ResponseEntity<>(provinceService.deleteById(provinceId), HttpStatus.OK);

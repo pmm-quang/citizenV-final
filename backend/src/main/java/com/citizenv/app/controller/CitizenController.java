@@ -46,15 +46,15 @@ public class CitizenController {
 
     @GetMapping(value = "/by-hamlet/{hamletCode}", params = "page")
     public ResponseEntity<Map<String, Object>> getAllByHamletCode(@PathVariable String hamletCode, @RequestParam int page) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        CustomUserDetail userDetail = (CustomUserDetail) authentication.getPrincipal();
-        String divisionCode = userDetail.getUser().getDivision().getCode();
-        if (hamletCode.indexOf(divisionCode) == 0) {
-            Map<String, Object> list = citizenService.getAllByHamletCode(hamletCode, page);
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        CustomUserDetail userDetail = (CustomUserDetail) authentication.getPrincipal();
+//        String divisionCode = userDetail.getUser().getDivision().getCode();
+//        if (hamletCode.indexOf(divisionCode) == 0) {
+           Map<String, Object> list = citizenService.getAllByHamletCode(hamletCode, page);
             return new ResponseEntity<>(list, HttpStatus.OK);
-        } else {
-            throw new AccessDeniedException("Khong co quyen try cap");
-        }
+//        } else {
+//            throw new AccessDeniedException("Khong co quyen try cap");
+//        }
     }
 
     @GetMapping(value = "/by-ward/{wardCode}", params = "page")
@@ -106,38 +106,18 @@ public class CitizenController {
 //        return new ResponseEntity<>(list, HttpStatus.OK);
 //    }
 
-    @PreAuthorize("hasAnyAuthority('WRITE')")
+//    @PreAuthorize("hasAnyAuthority('WRITE')")
     @PostMapping("/save")
     public ResponseEntity<CitizenDto> createCitizen(@RequestBody CustomCitizenRequest citizen) {
         CitizenDto citizenDto = citizenService.createCitizen(citizen);
         return new ResponseEntity<>(citizenDto, HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasAnyAuthority('WRITE')")
+//    @PreAuthorize("hasAnyAuthority('WRITE')")
     @PutMapping("/save/{citizenId}")
     public ResponseEntity<CitizenDto> updateCitizen(@PathVariable String citizenId, @RequestBody CustomCitizenRequest citizen) {
         CitizenDto citizenDto = citizenService.updateCitizen(citizenId, citizen);
         return new ResponseEntity<>(citizenDto, HttpStatus.OK);
     }
 
-/**
-    @PostMapping("/")
-    public ResponseEntity<CitizenDto> create(@RequestBody Map<String, Object> citizenJSONInfo) {
-        CitizenDto newCitizen = citizenService.createCitizen(citizenJSONInfo);
-        return new ResponseEntity<>(newCitizen, HttpStatus.CREATED);
-    }
-
-    @PutMapping("/{citizenId}")
-    public ResponseEntity<CitizenDto> update(@PathVariable String citizenId, @RequestBody Map<String, Object> citizenJSONInfo) throws NoSuchMethodException, ParseException {
-        CitizenDto newCitizen = citizenService.updateCitizen(citizenId, citizenJSONInfo);
-        return new ResponseEntity<>(newCitizen, HttpStatus.OK);
-    }
-
-    @DeleteMapping("/{citizenId}")
-    public ResponseEntity<String> deleteById(@PathVariable String citizenId) {
-        return new ResponseEntity<>(citizenService.deleteById(citizenId), HttpStatus.OK);
-    }
-
-
-    **/
 }
