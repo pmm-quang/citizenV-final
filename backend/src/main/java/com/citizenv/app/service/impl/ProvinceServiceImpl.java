@@ -105,6 +105,7 @@ public class ProvinceServiceImpl implements ProvinceService {
             throw new ResourceFoundException("Province", "ProvinceCode", provinceCode);
         });
 
+
         Map<String, Object> map = validate(province);
         Province newProvince = mapper.map(province, Province.class);
         newProvince.setAdministrativeUnit((AdministrativeUnit) map.get("admUnit"));
@@ -154,6 +155,12 @@ public class ProvinceServiceImpl implements ProvinceService {
         AdministrativeRegion admRegion = administrativeRegionRepository.findById(admRegionId)
                 .orElseThrow(() -> new ResourceNotFoundException("AdministrativeRegion", "AdministrativeRegionId", String.valueOf(admRegionId)));
 
+        List<Province> list = repository.findAll();
+        for (Province p: list) {
+            if (p.getName().equals(province.getName())) {
+                throw new InvalidException("Ten don vi da ton tai");
+            }
+        }
 //        if(!Utils.validateName(province.getName())) {
 //            throw new InvalidException("Ten khong dung dinh dang");
 //        }

@@ -5,8 +5,9 @@ import com.citizenv.app.payload.UserDto;
 import com.citizenv.app.payload.login.LoginRequest;
 import com.citizenv.app.payload.login.LoginResponse;
 import com.citizenv.app.secirity.CustomUserDetail;
+import com.citizenv.app.secirity.jwt.JwtFilter;
+import com.citizenv.app.secirity.jwt.JwtTokenProvider;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,19 +27,22 @@ import java.util.Map;
 public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final ModelMapper mapper;
+    private final JwtTokenProvider tokenProvider;
 
-    public AuthController(AuthenticationManager authenticationManager, ModelMapper mapper) {
+    public AuthController(AuthenticationManager authenticationManager, ModelMapper mapper, JwtFilter jwtFilter, JwtTokenProvider tokenProvider) {
         this.authenticationManager = authenticationManager;
         this.mapper = mapper;
+        this.tokenProvider = tokenProvider;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
         CustomUserDetail userDetail = (CustomUserDetail) authentication.getPrincipal();
+        String jwt = tokenProvider.generateToken(userDetail);
         UserDto userDto = mapper.map(userDetail.getUser(), UserDto.class);
         AdministrativeDivisionDto division = userDto.getDivision();
         String role = null;
@@ -57,7 +61,10 @@ public class AuthController {
         info.setUsername(userDetail.getUsername());
         info.setRole(role);
         info.setDivision(division);
-        return new ResponseEntity<>(info, HttpStatus.OK);
+        Map<String, Object> map = new HashMap<>();
+        map.put("info", info);
+        map.put("accessToken", jwt);
+        return new ResponseEntity<>(map, HttpStatus.OK);
     }
 
 }
