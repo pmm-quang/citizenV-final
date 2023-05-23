@@ -19,6 +19,8 @@ public class CitizenDto {
     private EthnicityDto ethnicity;
     private String otherNationality;
     private ReligionDto religion;
+    private String job;
+    private String educationalLevel;
     private List<AddressDto> addresses;
     private List<AssociationDto> associations;
 }

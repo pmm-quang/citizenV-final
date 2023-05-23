@@ -1,12 +1,14 @@
 package com.citizenv.app.service;
 
 import com.citizenv.app.payload.population.*;
+import com.citizenv.app.payload.request.DivisionPopulationRequest;
 
 import java.util.List;
+import java.util.Map;
 
 public interface StatisticsService {
     Long getCountryPopulation();
-    List<DivisionGeneralPopulationDto> getProvincePopulationList();
+    List<DivisionGeneralPopulationDto> getProvincePopulationList(DivisionPopulationRequest request);
     List<DivisionGeneralPopulationDto> getDistrictPopulationListByProvince(String provinceCode);
     List<DivisionGeneralPopulationDto> getWardPopulationListByDistrict(String districtCode);
     List<DivisionGeneralPopulationDto> getHamletPopulationListByWard(String wardCode);
@@ -22,4 +24,8 @@ public interface StatisticsService {
     List<AverageAgeDto> getProvinceAverageAgeList();
 
     List<AgeGroupDto> getPopulationListByAgeGroup(Integer startYear, Integer endYear);
+
+    List<PopulationDto> getUrbanAndRuralAreaPopulation();
+
+    List<PopulationDto> getPopulation(Map<String, Object> body);
 }

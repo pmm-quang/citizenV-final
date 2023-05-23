@@ -1,6 +1,7 @@
 package com.citizenv.app.controller;
 
 import com.citizenv.app.payload.population.*;
+import com.citizenv.app.payload.request.DivisionPopulationRequest;
 import com.citizenv.app.service.StatisticsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin(origins = {"http://localhost:3000/", "http://localhost:3001/"})
 @RestController
@@ -26,15 +28,27 @@ public class StatisticsController {
         return new ResponseEntity<>(population, HttpStatus.OK);
     }
 
+    @GetMapping("/population/ex")
+    public ResponseEntity<List<PopulationDto>> getPopulation(@RequestBody Map<String, Object> body) {
+        List<PopulationDto> population = populationService.getPopulation(body);
+        return new ResponseEntity<>(population, HttpStatus.OK);
+    }
+
     @GetMapping("/population/region")
     public ResponseEntity<List<PopulationDto>> getRegionPopulationList() {
         List<PopulationDto> population = populationService.getRegionPopulationList();
         return new ResponseEntity<>(population, HttpStatus.OK);
     }
 
+    @GetMapping("/population/urban-rural")
+    public ResponseEntity<List<PopulationDto>> getUrbanAndRuralAreaPopulation() {
+        List<PopulationDto> population = populationService.getUrbanAndRuralAreaPopulation();
+        return new ResponseEntity<>(population, HttpStatus.OK);
+    }
+
     @GetMapping("/population/province")
-    public ResponseEntity<List<DivisionGeneralPopulationDto>> getProvincePopulationList() {
-        List<DivisionGeneralPopulationDto> population = populationService.getProvincePopulationList();
+    public ResponseEntity<List<DivisionGeneralPopulationDto>> getProvincePopulationList(@RequestBody DivisionPopulationRequest request) {
+        List<DivisionGeneralPopulationDto> population = populationService.getProvincePopulationList(request);
         return new ResponseEntity<>(population, HttpStatus.OK);
     }
 

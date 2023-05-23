@@ -53,6 +53,10 @@ public class Citizen {
     @JoinColumn(name = "religion_id")
     private Religion religion;
 
+    private String job;
+
+    private String educationalLevel;
+
     @OneToMany(mappedBy = "citizen", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 //    @ToString.Exclude
 //    @EqualsAndHashCode.Exclude
@@ -71,6 +75,13 @@ public class Citizen {
         return otherNationality == null ? "" : otherNationality;
     }
 
+    public String getJob() {
+        return job == null ? "Thất nghiệp" : job;
+    }
+
+    public String getEducationalLevel() {
+        return educationalLevel == null ? "Không" : educationalLevel;
+    }
 //    @Override
 //    public boolean equals(Object o) {
 //        if (this == o) return true;

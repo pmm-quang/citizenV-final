@@ -17,7 +17,8 @@ public class Utils {
     public static final String AGE_GROUP_UNDER_LEGAL_WORKING_AGE = "Dưới độ tuổi lao động";
     public static final String AGE_GROUP_IN_LEGAL_WORKING_AGE = "Trong độ tuổi lao động";
     public static final String AGE_GROUP_OVER_LEGAL_WORKING_AGE = "Trên độ tuổi lao động";
-
+    public static final String URBAN_AREA = "Thành thị";
+    public static final String RURAL_AREA = "Nông thôn";
 
     interface EnumInterface<K, V> {
         V getValue();
@@ -73,6 +74,10 @@ public class Utils {
         public static boolean containsKey(Integer value) {
             return Stream.of(AdministrativeUnitsLv2.values())
                     .anyMatch(p -> p.getValue().equals(value));
+        }
+
+        public static boolean isUrbanArea(Integer i) {
+            return !i.equals(DISTRICT.id);
         }
     }
 

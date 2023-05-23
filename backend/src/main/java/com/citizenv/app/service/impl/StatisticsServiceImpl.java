@@ -2,9 +2,12 @@ package com.citizenv.app.service.impl;
 
 import com.citizenv.app.component.Utils;
 import com.citizenv.app.entity.*;
+import com.citizenv.app.exception.ResourceNotFoundException;
 import com.citizenv.app.payload.population.*;
+import com.citizenv.app.payload.request.DivisionPopulationRequest;
 import com.citizenv.app.repository.AddressRepository;
 import com.citizenv.app.repository.CitizenRepository;
+import com.citizenv.app.repository.ProvinceRepository;
 import com.citizenv.app.service.StatisticsService;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -28,10 +31,13 @@ public class StatisticsServiceImpl implements StatisticsService {
     AddressRepository addressRepository;
 
     StringBuilder sb = new StringBuilder();
+    private final ProvinceRepository provinceRepository;
 
-    public StatisticsServiceImpl(CitizenRepository citizenRepository, AddressRepository addressRepository) {
+    public StatisticsServiceImpl(CitizenRepository citizenRepository, AddressRepository addressRepository,
+                                 ProvinceRepository provinceRepository) {
         this.citizenRepository = citizenRepository;
         this.addressRepository = addressRepository;
+        this.provinceRepository = provinceRepository;
     }
 
     @Cacheable("addressesForPopulationCount")
@@ -45,13 +51,35 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public List<DivisionGeneralPopulationDto> getProvincePopulationList() {
+    public List<DivisionGeneralPopulationDto> getProvincePopulationList(DivisionPopulationRequest request) {
         List<Address> addressesForPopulationCount = getAddressesForPopulationCount();
         List<DivisionGeneralPopulationDto> result = new ArrayList<>();
-        for (Address currentAddress :
-                addressesForPopulationCount) {
-            Province currentProvince = currentAddress.getHamlet().getWard().getDistrict().getProvince();
-            result.stream().filter(population -> population.getCode().equals(currentProvince.getCode())).findFirst().ifPresentOrElse(currentPopulation -> currentPopulation.increasePopulation(1L), () -> result.add(new DivisionGeneralPopulationDto(currentProvince.getCode(), currentProvince.getName())));
+        if (request.getCodes() == null) {
+            for (Address currentAddress :
+                    addressesForPopulationCount) {
+                Province currentProvince = currentAddress.getHamlet().getWard().getDistrict().getProvince();
+                result.stream().filter(population -> population.getCode().equals(currentProvince.getCode())).findFirst().ifPresentOrElse(currentPopulation -> currentPopulation.increasePopulation(1L), () -> result.add(new DivisionGeneralPopulationDto(currentProvince.getCode(), currentProvince.getName())));
+            }
+        } else {
+            // Tạo 1 List result chứa các DTO với code được cho trong request, vd: ["01", "02"]
+            for (String requestCode :
+                    request.getCodes()) {
+                Province foundProvince = provinceRepository.findByCode(requestCode).orElseThrow(
+                        () -> new ResourceNotFoundException("Province", "ProvinceCode", requestCode));
+                result.add(new DivisionGeneralPopulationDto(requestCode, foundProvince.getName()));
+            }
+            for (String requestProperty :
+                    request.getProperties()) {
+
+            }
+            // Với mỗi bản ghi Address tìm được thì tìm code của Address trong List result trên và tăng số đếm lên 1
+            for (Address currentAddress :
+                    addressesForPopulationCount) {
+                Province currentProvince = currentAddress.getHamlet().getWard().getDistrict().getProvince();
+                if (request.getCodes().contains(currentProvince.getCode())) {
+                    result.stream().filter(population -> population.getCode().equals(currentProvince.getCode())).findFirst().ifPresent(currentResultDto -> currentResultDto.increasePopulation(1L));
+                }
+            }
         }
         return result;
     }
@@ -128,7 +156,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         for (Address currentAddress :
                 addressesForPopulationCount) {
             String currentName = currentAddress.getHamlet().getWard().getDistrict().getProvince().getAdministrativeRegion().getName();
-            result.stream().filter(population -> population.getName().equals(currentName)).findFirst().ifPresentOrElse(currentPopulation -> currentPopulation.increasePopulation(1L), () -> result.add(new PopulationDto(currentName)));
+            result.stream().filter(population -> population.getName().equals(currentName)).findFirst().ifPresentOrElse(currentPopulation -> currentPopulation.increasePopulation(1L), () -> result.add(new PopulationDto(currentName, 1L)));
         }
         return result;
     }
@@ -145,7 +173,7 @@ public class StatisticsServiceImpl implements StatisticsService {
                     addressesForPopulationCount) {
                 Citizen currentCitizen = currentAddress.getCitizen();
                 Object currentName = method.invoke(currentCitizen);
-                result.stream().filter(population -> population.getName().equals(currentName.toString())).findFirst().ifPresentOrElse(currentPopulation -> currentPopulation.increasePopulation(1L), () -> result.add(new PopulationDto(currentName.toString())));
+                result.stream().filter(population -> population.getName().equals(currentName.toString())).findFirst().ifPresentOrElse(currentPopulation -> currentPopulation.increasePopulation(1L), () -> result.add(new PopulationDto(currentName.toString(), 1L)));
             }
             return result;
         } catch (SecurityException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
@@ -167,7 +195,7 @@ public class StatisticsServiceImpl implements StatisticsService {
                 Citizen currentCitizen = currentAddress.getCitizen();
                 Object currentName = method.invoke(currentCitizen);
                 Province currentProvince = currentAddress.getHamlet().getWard().getDistrict().getProvince();
-                result.stream().filter(population -> population.getCode().equals(currentProvince.getCode())).findFirst().ifPresentOrElse(divisionPopulationByCitizenPropertyDto -> divisionPopulationByCitizenPropertyDto.getDetails().stream().filter(populationByCitizenPropertyDto -> populationByCitizenPropertyDto.getName().equals(currentName.toString())).findFirst().ifPresentOrElse(currentPopulationByCitizenPropertyDto -> currentPopulationByCitizenPropertyDto.increasePopulation(1L), () -> divisionPopulationByCitizenPropertyDto.getDetails().add(new PopulationDto(currentName.toString()))), () -> result.add(new DivisionPopulationByCitizenPropertyDto(currentProvince.getCode(), currentProvince.getName(), property, new ArrayList<>(List.of(new PopulationDto(currentName.toString()))))));
+                result.stream().filter(population -> population.getCode().equals(currentProvince.getCode())).findFirst().ifPresentOrElse(divisionPopulationByCitizenPropertyDto -> divisionPopulationByCitizenPropertyDto.getDetails().stream().filter(populationByCitizenPropertyDto -> populationByCitizenPropertyDto.getName().equals(currentName.toString())).findFirst().ifPresentOrElse(currentPopulationByCitizenPropertyDto -> currentPopulationByCitizenPropertyDto.increasePopulation(1L), () -> divisionPopulationByCitizenPropertyDto.getDetails().add(new PopulationDto(currentName.toString(), 1L))), () -> result.add(new DivisionPopulationByCitizenPropertyDto(currentProvince.getCode(), currentProvince.getName(), property, new ArrayList<>(List.of(new PopulationDto(currentName.toString(), 1L))))));
             }
             return result;
         } catch (SecurityException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
@@ -208,5 +236,25 @@ public class StatisticsServiceImpl implements StatisticsService {
             result.add(getPopulationListByAgeGroup(i));
         }
         return result;
+    }
+
+    @Override
+    public List<PopulationDto> getUrbanAndRuralAreaPopulation() {
+        List<Address> addressesForPopulationCount = getAddressesForPopulationCount();
+        List<PopulationDto> result = new ArrayList<>();
+        result.add(new PopulationDto(Utils.URBAN_AREA));
+        result.add(new PopulationDto(Utils.RURAL_AREA));
+        for (Address currentAddress :
+                addressesForPopulationCount) {
+            Integer currentDistrictAdmUnitId = currentAddress.getHamlet().getWard().getDistrict().getAdministrativeUnit().getId();
+            result.get(Utils.AdministrativeUnitsLv2.isUrbanArea(currentDistrictAdmUnitId) ? 0 : 1).increasePopulation(1L);
+        }
+        return result;
+
+    }
+
+    @Override
+    public List<PopulationDto> getPopulation(Map<String, Object> body) {
+        return null;
     }
 }
