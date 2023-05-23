@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 //@CrossOrigin(origins = {"http://localhost:3000/", "http://localhost:3001/"})
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class  GlobalExceptionHandler {
     @ExceptionHandler({ ResourceNotFoundException.class, ResourceFoundException.class })
     public ResponseEntity<String> handleResourceException(Exception e) {
         return ResponseEntity.status(500).body(e.getMessage());
@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(InvalidException.class)
-    public ResponseEntity<ErrorResponse> invalidException(Exception e) {
+    public ResponseEntity<ErrorResponse> validateException(Exception e) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         return ResponseEntity.badRequest().body(errorResponse);
     }

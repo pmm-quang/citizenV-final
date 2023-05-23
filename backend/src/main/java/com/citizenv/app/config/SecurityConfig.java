@@ -1,10 +1,10 @@
 package com.citizenv.app.config;
 
 import com.citizenv.app.secirity.CustomUserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.citizenv.app.secirity.jwt.JwtFilter;
+import com.citizenv.app.secirity.jwt.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -13,15 +13,25 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-
-import javax.servlet.FilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig {
-    @Autowired
-    private CustomUserService service;
+    private final CustomUserService service;
+
+    private final JwtTokenProvider tokenProvider;
+
+    public SecurityConfig(CustomUserService service, JwtTokenProvider tokenProvider) {
+        this.service = service;
+        this.tokenProvider = tokenProvider;
+    }
+
+    @Bean
+    public JwtFilter authenticationJwtTokenFilter() {
+        return new JwtFilter(tokenProvider, service);
+    }
 
     @Bean
     public PasswordEncoder encoder() {
@@ -46,7 +56,7 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeRequests()
 //                .antMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
-//                .antMatchers("/api/v1/auth/login").permitAll()
+                .antMatchers("/api/v1/auth/login").permitAll()
 //                .antMatchers(HttpMethod.GET, "/api/v1/province/**").hasAuthority("READ")
 //                .antMatchers( "**/province/save", "**/province/save/**").hasRole("A1")
 //                .antMatchers("**/district/save", "**/district/save/**", "**/district/by-province").hasRole("A2")
@@ -55,9 +65,10 @@ public class SecurityConfig {
 //                .antMatchers("**/citizen/save","**/citizen/save/**").hasAnyRole("B1", "B2")
 //                .antMatchers("**/user/save").hasAnyRole("A1", "A2", "A3", "B1")
 //                .antMatchers("**/user/change-password/**").hasAnyRole("A1", "A2", "A3", "B1", "B2")
-//                .anyRequest().authenticated()
-                .anyRequest().permitAll()
+                .anyRequest().authenticated()
+//                .anyRequest().permitAll()
                 .and().httpBasic();
+        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 //                .and()
 //                .logout()
 //                .logoutUrl("/logout")
