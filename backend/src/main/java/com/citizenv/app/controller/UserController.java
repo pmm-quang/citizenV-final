@@ -1,6 +1,7 @@
 package com.citizenv.app.controller;
 import com.citizenv.app.payload.UserDto;
 import com.citizenv.app.secirity.CustomUserDetail;
+import com.citizenv.app.secirity.SecurityUtils;
 import com.citizenv.app.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +25,10 @@ public class UserController {
 
     @GetMapping("/")
     public ResponseEntity<List<UserDto>> getAll() {
-//        CustomUserDetail userDetail = getUserDetail();
-//        List<UserDto> userDtoList = userService.getAll(userDetail);
-        List<UserDto> userDtoList = userService.getAll();
+        CustomUserDetail userDetail = getUserDetail();
+        List<UserDto> userDtoList = userService.getAll(userDetail);
+        System.out.println(SecurityUtils.getCurrentUserLogin());
+//        List<UserDto> userDtoList = userService.getAll();
         return new ResponseEntity<>(userDtoList, HttpStatus.OK);
     }
 
@@ -71,9 +73,9 @@ public class UserController {
 //        return new ResponseEntity<>(userService.deleteById(userId), HttpStatus.OK);
 //    }
 
-//    private CustomUserDetail getUserDetail() {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        CustomUserDetail userDetail = (CustomUserDetail) authentication.getPrincipal();
-//        return userDetail;
-//    }
+    private CustomUserDetail getUserDetail() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetail userDetail = (CustomUserDetail) authentication.getPrincipal();
+        return userDetail;
+    }
 }

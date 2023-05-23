@@ -6,10 +6,13 @@ import com.citizenv.app.secirity.jwt.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -21,16 +24,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private final CustomUserService service;
 
-    private final JwtTokenProvider tokenProvider;
+//    private final JwtTokenProvider tokenProvider;
 
-    public SecurityConfig(CustomUserService service, JwtTokenProvider tokenProvider) {
+    public SecurityConfig(CustomUserService service) {
         this.service = service;
-        this.tokenProvider = tokenProvider;
+//        this.tokenProvider = tokenProvider;
     }
 
     @Bean
     public JwtFilter authenticationJwtTokenFilter() {
-        return new JwtFilter(tokenProvider, service);
+        return new JwtFilter();
     }
 
     @Bean
@@ -39,21 +42,28 @@ public class SecurityConfig {
     }
 
 
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(service);
+        authProvider.setPasswordEncoder(encoder());
+        return authProvider;
+    }
+
 
     @Bean
-    public AuthenticationManager authManager(HttpSecurity http)
+    public AuthenticationManager authManager(AuthenticationConfiguration configuration)
             throws Exception {
-        return http.getSharedObject(AuthenticationManagerBuilder.class)
-                .userDetailsService(service)
-                .passwordEncoder(encoder())
-                .and()
-                .build();
+        return configuration.getAuthenticationManager();
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .cors().and()
                 .csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
                 .authorizeRequests()
 //                .antMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
                 .antMatchers("/api/v1/auth/login").permitAll()
@@ -65,9 +75,9 @@ public class SecurityConfig {
 //                .antMatchers("**/citizen/save","**/citizen/save/**").hasAnyRole("B1", "B2")
 //                .antMatchers("**/user/save").hasAnyRole("A1", "A2", "A3", "B1")
 //                .antMatchers("**/user/change-password/**").hasAnyRole("A1", "A2", "A3", "B1", "B2")
-                .anyRequest().authenticated()
+                .anyRequest().authenticated();
 //                .anyRequest().permitAll()
-                .and().httpBasic();
+        http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 //                .and()
 //                .logout()

@@ -5,6 +5,7 @@ import com.citizenv.app.entity.Role;
 import com.citizenv.app.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,11 +16,15 @@ import java.util.*;
 @AllArgsConstructor
 public class CustomUserDetail implements UserDetails {
     private User user;
+
+    @Autowired
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
         for (Role role: user.getRoles()) {
+            authorities.add(new SimpleGrantedAuthority(role.getRole()));
             List<Permission> permissions = role.getPermissions();
+
             for (Permission permission: permissions) {
                 authorities.add(new SimpleGrantedAuthority(permission.getPermission()));
             }
