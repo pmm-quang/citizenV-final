@@ -59,6 +59,16 @@ function CitizenInput() {
     const [nameDistrictAddress2, setNameDistrictAddress2] = useState("")
     const [nameWardAddress2, setNameWardAddress2] = useState("")
     const [nameHamletAddress2, setNameHamletAddress2] = useState("")
+    const [declaration, setDeclaration] = useState()
+
+    const GetDecleration = async () => {
+        try {
+            const response = await axios("http://localhost:8080/api/v1/user/" + user)
+            setDeclaration(response.data.declaration)
+        } catch (err) {
+            console.error(err);
+        }
+    }
 
     const fetchNameAddress = async () => {
         try {
@@ -105,7 +115,7 @@ function CitizenInput() {
 
     const fetchWard = async (code, index) => {
         try {
-            const response = await axios('http://localhost:8080/api/v1/ward/districtCode/' + code);
+            const response = await axios('http://localhost:8080/api/v1/ward/by-district/' + code);
             if (index === 1) setWardsAddress1(response.data);
             else if (index === 3) setWardsAddress3(response.data);
         } catch (err) {
@@ -116,7 +126,7 @@ function CitizenInput() {
 
     const fetchDistrict = async (code, index) => {
         try {
-            const response = await axios('http://localhost:8080/api/v1/district/provinceCode/' + code);
+            const response = await axios('http://localhost:8080/api/v1/district/by-province/' + code);
             if (index === 1) setDistrictsAddress1(response.data);
             else if (index === 3) setDistrictsAddress3(response.data);
         } catch (err) {
@@ -126,7 +136,7 @@ function CitizenInput() {
 
     const fetchHamlet = async (code, index) => {
         try {
-            const response = await axios('http://localhost:8080/api/v1/hamlet/wardCode/' + code);
+            const response = await axios('http://localhost:8080/api/v1/hamlet/by-ward/' + code);
             if (index === 1) setHamletsAddress1(response.data);
             else if (index === 3) setHamletsAddress3(response.data);
             console.log(response.data)
@@ -140,6 +150,7 @@ function CitizenInput() {
         fetchEthnicity();
         fetchReigion();
         fetchNameAddress();
+        GetDecleration()
     }, [])
 
 
@@ -554,8 +565,8 @@ function CitizenInput() {
                     <Modal.Title className='titleModal'>NHẬP DỮ LIỆU TỪ FILE</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <input type="file" accept=".xlsx, .xls, .csv"/>
-                    <div className = "noteInputbyfile">Lưu ý: Chỉ chấp nhận các định dạng: ".xlsx", ".xls", ".csv"</div>
+                    <input type="file" accept=".xlsx, .xls, .csv" />
+                    <div className="noteInputbyfile">Lưu ý: Chỉ chấp nhận các định dạng: ".xlsx", ".xls", ".csv"</div>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => {
@@ -629,17 +640,25 @@ function CitizenInput() {
         )
     }
 
+    const FormInput = () => {
+        return (
+            <div>
+                <div>
+                    <ListOptionButton />
+                </div>
+                {(page === 1) ? FirstPageFormInput() : null}
+                {(page === 2) ? SecondPageFormInput() : null}
+                {(page === 3) ? ThirdPageFormInput() : null}
+                <ModalNotify />
+                <ModalInputByExcel />
+            </div>
+        )
+    }
+
     return (
         <div>
             <NavbarPage />
-            <div>
-                <ListOptionButton />
-            </div>
-            {(page === 1) ? FirstPageFormInput() : null}
-            {(page === 2) ? SecondPageFormInput() : null}
-            {(page === 3) ? ThirdPageFormInput() : null}
-            <ModalNotify />
-            <ModalInputByExcel />
+            {(declaration === null) ? <div className = "warning">ĐÃ HẾT THỜI GIAN KHAI BÁO<div className = "childWarning">Vui lòng đợi đến đợt khai báo dân số sau</div></div> : <FormInput />}
         </div>
     );
 }

@@ -15,7 +15,7 @@ import { AiFillCaretRight, AiFillCaretDown } from 'react-icons/ai'
 function Citizen() {
     const role_acc = JSON.parse(localStorage.getItem("user"));
     const user = role_acc.username;
-    const role = role_acc.roles[0].authority;
+    const role = role_acc.role;
 
     const [codeProvinceUnit, setCodeProvinceUnit] = useState();
     const [codeDistrictUnit, setCodeDistrictUnit] = useState();
@@ -54,6 +54,7 @@ function Citizen() {
     const [address1, setAddress1] = useState()
     const [address2, setAddress2] = useState()
     const [address3, setAddress3] = useState()
+
     let totalPopulation;
 
     const CountCitizen = async () => {
@@ -134,7 +135,7 @@ function Citizen() {
         setIndex(5)
         setDefaultIndex(5)
         console.log(role_acc)
-        const response_population = await axios('http://localhost:8080/api/v1/citizen/hamlet/' + code + '?page=' + page)
+        const response_population = await axios('http://localhost:8080/api/v1/citizen/by-hamlet/' + code + '?page=' + page)
         setHamlet(response_population.data.citizens)
         setCitizens(response_population.data.citizens)
         setNumberPage(response_population.data.totalPages)

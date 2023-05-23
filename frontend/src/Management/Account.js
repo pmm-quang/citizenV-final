@@ -9,23 +9,23 @@ import Modal from "react-bootstrap/Modal";
 
 function Account() {
   const [selectAll, setSelectAll] = useState(false);
-  const [accountList, setAccountList] = useState([
-    {
-      id: 1,
-      province: "Hà Nội",
-      begin: "12/05/2023",
-      end: "22/05/2023",
-      status: "Chưa khai báo",
-    },
-    {
-      id: 2,
-      province: "Hà Giang",
-      begin: "12/05/2023",
-      end: "22/05/2023",
-      status: "Chưa khai báo",
-    },
-  ]);
+  const [accountList, setAccountList] = useState([]);
+  const [premission, setPremission] = useState(false)
 
+  const role_acc = JSON.parse(localStorage.getItem("user"));
+  const user = role_acc.username;
+
+  const GetAllAccount = async () => {
+    const response = await axios.get("http://localhost:8080/api/v1/user/")
+    setAccountList(response.data)
+  }
+
+  useEffect(() => {
+    GetAllAccount()
+    console.log(accountList)
+  }, [])
+
+  
   const checkAccount = (accountList) => {
     const updatedCheckboxes = accountList.map((checkbox) => ({
       ...checkbox,
@@ -45,7 +45,7 @@ function Account() {
 
   const handleCheckboxChange = (id) => {
     const updatedCheckboxes = accountList.map((checkbox) =>
-      checkbox.id === id
+      checkbox.username === id
         ? { ...checkbox, checked: !checkbox.checked }
         : checkbox
     );
@@ -54,20 +54,22 @@ function Account() {
   };
 
   const tableAccount = accountList.map((account) => (
-    <tr className="top-row" key={account.id} style = {{backgroundColor: account.checked ? 'yellow' : null}}>
+    (account.username === 'tw1' || (user !== 'tw1' && account.username.substring(0, account.username.length - 2) !== user) || (user === 'tw1' && account.username.length !== 2)) ? null : <tr className="top-row" key={account.username} style={{ backgroundColor: account.checked ? 'yellow' : null }}>
       <th className="top-row-checkbox">
         <input
           type="checkbox"
           id="checkbox-all"
           checked={account.checked}
-          onChange={() => handleCheckboxChange(account.id)}
+          onChange={(e) => {
+            handleCheckboxChange(account.username)
+          }}
         ></input>
       </th>
-      <th className="top-row-title">{account.id}</th>
-      <th className="top-row-title">{account.province}</th>
-      <th className="top-row-title">{account.begin}</th>
-      <th className="top-row-title">{account.end}</th>
-      <th className="top-row-title">{account.status}</th>
+      <th className="top-row-title">{account.username}</th>
+      <th className="top-row-title">{account.division.administrativeUnit.shortName + " " + account.division.name}</th>
+      {(account.declaration === null) ? <th className="top-row-title">Chưa khai báo</th> : <th className="top-row-title">{account.declaration.startTime}</th>}
+      {(account.declaration === null) ? <th className="top-row-title">Chưa khai báo</th> : <th className="top-row-title">{account.declaration.endTime}</th>}
+      {(account.isActive) ? <th className="top-row-title" style={{ color: 'green' }}>Đang hoạt động</th> : <th className="top-row-title" style={{ color: 'red' }}>Đã khóa</th>}
     </tr>
   ));
 
@@ -88,7 +90,7 @@ function Account() {
                   ></input>
                 </th>
                 <th className="top-row-title">Mã</th>
-                <th className="top-row-title">Tỉnh/Thành phố</th>
+                <th className="top-row-title">Đơn vị hành chính</th>
                 <th className="top-row-title">Thời điểm bắt đầu khai báo</th>
                 <th className="top-row-title">Thời điểm kết thúc khai báo</th>
                 <th className="top-row-title">Trạng thái</th>
@@ -101,7 +103,7 @@ function Account() {
         <div className="account-option-list">
           <Button className="account-option">Thêm tài khoản</Button>
           <Button className="account-option">Xem lịch sử</Button>
-          <Button className="account-option">Cấp quyền khai báo</Button>
+          {(premission) ? <Button className="account-option">Cấp quyền khai báo</Button> : null}
         </div>
       </div>
     </div>

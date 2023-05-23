@@ -9,7 +9,7 @@ import {BsPersonCircle} from 'react-icons/bs'
 
 function NavbarPage() {
   const role_acc = JSON.parse(localStorage.getItem("user"));
-  const author = role_acc.roles[0].authority;
+  const author = role_acc.role;
 
   let navigate = useNavigate();
   return (
@@ -29,8 +29,8 @@ function NavbarPage() {
       <div className="listOptions">
         {(author === 'A1') ? <div className='option' style={{ marginLeft: '115px' }} onClick={() => { navigate("/province") }}>Quản lý tỉnh, thành phố</div> : null}
         {(author === 'A2') ? <div className='option' style={{ marginLeft: '115px' }} onClick={() => { navigate("/district") }}>Quản lý quận, huyện, thị xã</div> : null}
-        {(author === 'A3') ? <div className='option' style={{ marginLeft: '115px' }} onClick={() => { navigate("/district") }}>Quản lý xã, phường, thị trấn</div> : null}
-        {(author === 'EDITOR') ? <div className='option' style={{ marginLeft: '115px' }} onClick={() => { navigate("/district") }}>Quản lý tổ dân phố, thôn, xóm</div> : null}
+        {(author === 'A3') ? <div className='option' style={{ marginLeft: '115px' }} onClick={() => { navigate("/ward") }}>Quản lý xã, phường, thị trấn</div> : null}
+        {(author === 'B1') ? <div className='option' style={{ marginLeft: '115px' }} onClick={() => { navigate("/hamlet") }}>Quản lý tổ dân phố, thôn, xóm</div> : null}
         {(author !== 'B2') ? <div className='option' onClick={() => { navigate("/account") }}>Quản lý tài khoản</div> : null}
         {(author === 'B2') ? <div className='option' style={{ marginLeft: '115px' }} onClick={() => { navigate("/citizen") }}>Thông tin dân cư</div> : null}
         {(author !== 'B2') ? <div className='option' onClick={() => { navigate("/citizen") }}>Thông tin dân cư</div> : null}

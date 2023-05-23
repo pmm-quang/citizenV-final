@@ -9,6 +9,7 @@ import Citizen from './Residential/Citizen'
 import CitizenInput from './Residential/CitizenInput' 
 import District from './Management/District';
 import Statis from './Statis/BasicStatis'
+import Hamlet from './Management/Hamlet';
 
 function App() {
   return (
@@ -20,6 +21,8 @@ function App() {
         <Route path='/findresidential' element={<FindResidential />} />
         <Route path='/province' element={<Province />} />
         <Route path='/district' element={<District />} />
+        <Route path='/ward' element={<Ward />} />
+        <Route path='/hamlet' element={<Hamlet />} />
         <Route path='/citizeninput' element={<CitizenInput />} />
         <Route path='/account' element={<Account />} />
         <Route path='/statis' element = {<Statis />} />

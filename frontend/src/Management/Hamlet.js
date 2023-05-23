@@ -9,83 +9,79 @@ import axios from 'axios';
 import Modal from 'react-bootstrap/Modal';
 import { BiCheckCircle } from 'react-icons/bi'
 
-function District() {
+function Hamlet() {
     const role_acc = JSON.parse(localStorage.getItem("user"));
     const user = role_acc.username;
 
     const [showWarning, setShowWarning] = useState(false)
-    const [districts, setDistricts] = useState([]);
+    const [hamlets, setHamlets] = useState([]);
     const [show, setShow] = useState(false);
     const [showEdit, setShowEdit] = useState(false);
-    const [province, setProvince] = useState('');
-    const [nameDistrict, setNameDistrict] = useState('');
-    const [idDistrict, setIdDistrict] = useState('');
-    const [idUnitDistrict, setIdUnitDistrict] = useState('');
+    const [defaultIdHamlet, setDefaultIdHamlet] = useState()
+    const [nameHamlet, setNameHamlet] = useState('');
+    const [idHamlet, setIdHamlet] = useState('');
+    const [idUnitHamlet, setIdUnitHamlet] = useState('');
     const [checkedId, setCheckedId] = useState(-1);
     const [showWarningCreate, setWarningCreate] = useState(false);
 
 
-    const fetchFullDistrict = async () => {
+    const fetchFullHamlet = async () => {
         try {
-            const response = await axios('http://localhost:8080/api/v1/district/by-province/' + user);
-            setDistricts(response.data);
+            const response = await axios('http://localhost:8080/api/v1/hamlet/by-ward/' + user);
+            setHamlets(response.data);
         } catch (err) {
             console.error(err);
         }
     };
 
-    const fetchDetaildistrict = async (code) => {
+    const fetchDetailHamlet = async (code) => {
+        setShowWarning(false)
         try {
-            const response = await axios('http://localhost:8080/api/v1/district/' + code);
-            setIdDistrict(response.data.code)
-            setNameDistrict(response.data.name)
-            setIdUnitDistrict(response.data.administrativeUnit.id)
-            setProvince(response.data.province)
+            const response = await axios('http://localhost:8080/api/v1/hamlet/' + code);
+            setIdHamlet(response.data.code)
+            setDefaultIdHamlet(response.data.code)
+            setNameHamlet(response.data.name)
+            setIdUnitHamlet(response.data.administrativeUnit.id)
             setShowEdit(true)
         } catch (err) {
             console.error(err);
         }
     };
 
-    const EditDistrict = async (code) => {
-        const district = {
-            code: idDistrict,
-            name: nameDistrict,
-            administrativeUnit: {},
-            province: province
+    const EditHamlet = async () => {
+        const hamlet = {
+            code: idHamlet,
+            name: nameHamlet,
+            wardCode: user,
+            administrativeUnitId: idUnitHamlet
         }
-        const response = await axios.get("http://localhost:8080/api/v1/administrativeUnit/" + idUnitDistrict)
-        district.administrativeUnit = response.data
-        console.log(district)
+        console.log(hamlet)
         try {
-            await axios.put("http://localhost:8080/api/v1/district/save/" + idDistrict, district)
+            await axios.put("http://localhost:8080/api/v1/hamlet/save/" + defaultIdHamlet, hamlet)
             setShowWarning(false)
             setShowEdit(false)
-            const response = await axios('http://localhost:8080/api/v1/district/by-province/' + user);
-            setDistricts(response.data);
+            const response = await axios('http://localhost:8080/api/v1/hamlet/by-ward/' + user);
+            setHamlets(response.data);
         } catch {
             setShowWarning(true)
         }
     }
 
-    const CreateNewDistrict = async (code) => {
-        const district = {
-            code: idDistrict,
-            name: nameDistrict,
-            administrativeUnit: {},
-            province: {}
+    const CreateNewHamlet = async (code) => {
+        const hamlet = {
+            code: idHamlet,
+            name: nameHamlet,
+            wardCode: user,
+            administrativeUnitId: Number(idUnitHamlet)
         }
-        if (checkedId === 1 && idDistrict !== '' && idUnitDistrict !== '') {
+        console.log(hamlet)
+        if (checkedId === 1 && idHamlet !== '' && idUnitHamlet !== '') {
             try {
-                const respons_administrativeUnit = await axios.get("http://localhost:8080/api/v1/administrativeUnit/" + idUnitDistrict)
-                district.administrativeUnit = respons_administrativeUnit.data
-                const respons_province = await axios.get("http://localhost:8080/api/v1/province/" + user)
-                district.province = respons_province.data
-                await axios.post("http://localhost:8080/api/v1/district/save", district)
+                await axios.post("http://localhost:8080/api/v1/hamlet/save", hamlet)
                 setWarningCreate(true)
                 setShowEdit(false)
-                const response = await axios('http://localhost:8080/api/v1/district/by-province/' + user);
-                setDistricts(response.data);
+                const response = await axios('http://localhost:8080/api/v1/hamlet/by-ward/' + user);
+                setHamlets(response.data);
                 setShow(false)
             } catch {
                 setShowWarning(true)
@@ -96,12 +92,12 @@ function District() {
         }
     }
 
-    const CheckedIdNewDistrict = async () => {
+    const CheckedIdNewHamlet = async () => {
         setCheckedId(0)
-        if (idDistrict.substring(0, 2) !== user || idDistrict.length < 4) setCheckedId(3)
+        if (idHamlet.substring(0, 6) !== user || idHamlet.length < 8) setCheckedId(3)
         else {
             try {
-                const response = await axios.get("http://localhost:8080/api/v1/district/" + idDistrict)
+                const response = await axios.get("http://localhost:8080/api/v1/hamlet/" + idHamlet)
                 setCheckedId(2)
             } catch {
                 setCheckedId(1)
@@ -110,36 +106,36 @@ function District() {
     }
 
     useEffect(() => {
-        fetchFullDistrict();
+        fetchFullHamlet();
     }, [])
 
-    const formatData = (districts) => {
-        return districts.map((item) => ({ ...item, isActive: false }))
+    const formatData = (wards) => {
+        return hamlets.map((item) => ({ ...item, isActive: false }))
     }
 
-    const CreateDistrict = () => {
+    const CreateHamlet = () => {
         setShow(true)
-        setIdDistrict()
-        setNameDistrict()
-        setIdUnitDistrict()
+        setIdHamlet()
+        setNameHamlet()
+        setIdUnitHamlet()
         setCheckedId(-1)
     }
 
-    const ModalDistrict = () => {
+    const ModalHamlet = () => {
         return (
             <Modal show={show}>
                 <Modal.Header className='headerModal'>
-                    <Modal.Title className='titleModal'>Khai báo Quận/Huyện/Thị xã</Modal.Title>
+                    <Modal.Title className='titleModal'>Khai báo Xóm/Thôn/Bản/Tổ dân phố</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
                         <Form.Group className="mb-3">
-                            <Form.Label>Tên Quận/Huyện/Thị xã (*)</Form.Label>
+                            <Form.Label>Tên Xóm/Thôn/Bản/Tổ dân phố (*)</Form.Label>
                             <Form.Control
                                 type="text"
-                                value={nameDistrict}
+                                value={nameHamlet}
                                 onChange={(e) => {
-                                    setNameDistrict(e.target.value)
+                                    setNameHamlet(e.target.value)
                                     setWarningCreate(false)
                                 }
                                 }
@@ -148,18 +144,18 @@ function District() {
                         <Form.Group
                             className="mb-3"
                         >
-                            <Form.Label>Cấp mã cho Quận/Huyện/Thị xã (**)</Form.Label>
+                            <Form.Label>Cấp mã cho Xóm/Thôn/Bản/Tổ dân phố (**)</Form.Label>
                             <Form.Control
                                 type="text"
-                                value={idDistrict}
+                                value={idHamlet}
                                 onChange={(e) => {
-                                    setIdDistrict(e.target.value)
+                                    setIdHamlet(e.target.value)
                                     setCheckedId(0)
                                     setWarningCreate(false)
                                     if (e.target.value.length === 0) setCheckedId(-1)
                                 }}
                             />
-                            {(checkedId === 0) ? <div className='checked' onClick={() => CheckedIdNewDistrict()}><BiCheckCircle className="iconChecked" />Kiểm tra</div> : null}
+                            {(checkedId === 0) ? <div className='checked' onClick={() => CheckedIdNewHamlet()}><BiCheckCircle className="iconChecked" />Kiểm tra</div> : null}
                             {(checkedId === 2) ? <div className="warningChecked">Mã của đơn vị hành chính vừa nhập đang bị trùng với một đơn vị hành chính đã có sẵn</div> : null}
                             {(checkedId === 3) ? <div className="warningChecked">Mã của đơn vị hành chính vừa nhập không nằm trong khu vực quản lý</div> : null}
                             {(checkedId === 1) ? <div className="successChecked">Bạn có thể sử dụng mã vừa nhập</div> : null}
@@ -168,9 +164,9 @@ function District() {
                             className="mb-3"
                         >
                             <Form.Label>Đơn vị</Form.Label>
-                            <Form.Select value={idUnitDistrict} onChange={(e) => { 
-                                setIdUnitDistrict(e.target.value) 
-                                setWarningCreate(false)}}><option></option><option value={4}>1. Thành phố trực thuộc tỉnh</option><option value={5}>2. Quận</option><option value={6}>3. Huyện</option><option value={7}>4. Thị xã</option></Form.Select>
+                            <Form.Select value={idUnitHamlet} onChange={(e) => { 
+                                setIdUnitHamlet(e.target.value) 
+                                setWarningCreate(false)}}><option></option><option value={11}>1. Xóm</option><option value={12}>2. Thôn</option><option value={13}>3. Bản</option><option value={14}>4. Tổ dân phố</option></Form.Select>
                         </Form.Group>
                     </Form>
                     {(showWarningCreate) ? <div className="noteWarning"><p>THÊM MỚI KHÔNG THÀNH CÔNG</p></div> : null}
@@ -178,14 +174,14 @@ function District() {
 
                 <Modal.Footer>
                     <div className="note">
-                        <p>(*) Tên quận/huyện/thị xã không được trùng lặp với tên quận/huyện/thị xã đã được khai báo</p>
-                        <p>(**) Mã số của quận/huyện/thị xã không được trùng lặp với mã số của quận/huyện/thị xã đã được khai báo</p>
+                        <p>(*) Tên xóm/thôn/bản/tổ dân phố không được trùng lặp với tên xóm/thôn/bản/tổ dân phố xã đã được khai báo trong đơn vị quản lý</p>
+                        <p>(**) Mã số của xóm/thôn/bản/tổ dân phố không được trùng lặp với mã số của xóm/thôn/bản/tổ dân phố đã được khai báo</p>
                     </div>
                     <Button variant="secondary" onClick={() => { setShow(false) }}>
                         Đóng
                     </Button>
                     <Button variant="primary" onClick={() => {
-                        CreateNewDistrict()
+                        CreateNewHamlet()
                     }}>
                         Lưu
                     </Button>
@@ -194,22 +190,22 @@ function District() {
         )
     }
 
-    const ModalEditDistrict = () => {
+    const ModalEditHamlet = () => {
         return (
             <Modal show={showEdit}>
                 <Modal.Header className='headerModal'>
-                    <Modal.Title className='titleModal'>Cập nhật thông tin của quận/huyện/thị xã</Modal.Title>
+                    <Modal.Title className='titleModal'>Cập nhật thông tin của Xóm/Thôn/Bản/Tổ dân phố</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
                         <Form.Group className="mb-3">
-                            <Form.Label>Tên quận/huyện/thị xã</Form.Label>
+                            <Form.Label>Tên Phường/Xã/Thị trấn</Form.Label>
                             <Form.Control
                                 type="text"
-                                value={nameDistrict}
+                                value={nameHamlet}
                                 onChange={(e) => {
-                                    setNameDistrict(e.target.value)
-                                    setShowWarning(true)
+                                    setNameHamlet(e.target.value)
+                                    setShowWarning(false)
                                 }
                                 }
                             />
@@ -217,14 +213,13 @@ function District() {
                         <Form.Group
                             className="mb-3"
                         >
-                            <Form.Label>Mã Quận/Huyện/Thị xã</Form.Label>
-
+                            <Form.Label>Mã Phường/Xã/Thị trấn</Form.Label>
                             <Form.Control
                                 type="number"
-                                value={idDistrict}
+                                value={idHamlet}
                                 onChange={(e) => {
-                                    setIdDistrict(e.target.value)
-                                    setShowWarning(true)
+                                    setIdHamlet(e.target.value)
+                                    setShowWarning(false)
                                 }}
                             />
                         </Form.Group>
@@ -232,12 +227,12 @@ function District() {
                             className="mb-3"
                         >
                             <Form.Label>Phân loại đơn vị hành chính</Form.Label>
-                            <Form.Select value={idUnitDistrict} onChange={(e) => {
-                                setIdUnitDistrict(e.target.value)
-                                setShowWarning(true)
+                            <Form.Select value={idUnitHamlet} onChange={(e) => {
+                                setIdUnitHamlet(e.target.value)
+                                setShowWarning(false)
                             }}
                             >
-                                <option></option><option value={4}>1. Thành phố trực thuộc tỉnh</option><option value={5}>2. Quận</option><option value={6}>3. Thị xã</option><option value={7}>4. Huyện</option></Form.Select>
+                                <option></option><option value={11}>1. Xóm</option><option value={12}>2. Thôn</option><option value={13}>3. Bản</option><option value={14}>4. Tổ dân phố</option></Form.Select>
                         </Form.Group>
                     </Form>
                     {(showWarning) ? <div className="noteWarning"><p>THAY ĐỔI THÔNG TIN KHÔNG THÀNH CÔNG</p></div> : null}
@@ -245,8 +240,8 @@ function District() {
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => {
                         setShowEdit(false)
-                        districts.map((item) => {
-                            if (item.code === idDistrict) {
+                        hamlets.map((item) => {
+                            if (item.code === idHamlet) {
                                 item.isActive = false;
                             }
                         })
@@ -254,10 +249,10 @@ function District() {
                         Đóng
                     </Button>
                     <Button variant="primary" onClick={() => {
-                        EditDistrict()
+                        EditHamlet()
                         setShowEdit(false)
-                        districts.map((item) => {
-                            if (item.code === idDistrict) {
+                        hamlets.map((item) => {
+                            if (item.code === idHamlet) {
                                 item.isActive = false;
                             }
                         })
@@ -269,9 +264,9 @@ function District() {
         )
     }
 
-    const listDistricts = districts.map((post) =>
+    const listHamlets = hamlets.map((post) =>
         <tr key={post.code} value={post.code} onClick={() => {
-            fetchDetaildistrict(post.code)
+            fetchDetailHamlet(post.code)
             post.isActive = true
         }} className="rowTable" style={{ backgroundColor: (post.isActive) ? "yellow" : "white" }}>
             <td>{post.code}</td>
@@ -293,7 +288,7 @@ function District() {
                             </tr>
                         </thead>
                         <tbody>
-                            {listDistricts}
+                            {listHamlets}
                         </tbody>
                     </Table>
                 </div>
@@ -308,16 +303,16 @@ function District() {
             <Button className="buttonAdd" onClick={() => {
                 setShow(true)
                 setWarningCreate(false)
-                CreateDistrict()
-            }}>+ Khai báo quận/huyện/thị xã</Button>
+                CreateHamlet()
+            }}>+ Khai báo Xóm/Thôn/Bản/Tổ dân phố</Button>
 
             <div>
                 <TableResidential />
-                {(show) ? ModalDistrict() : null}
-                {ModalEditDistrict()}
+                {(show) ? ModalHamlet() : null}
+                {ModalEditHamlet()}
             </div>
         </div>
     );
 }
 
-export default District;
+export default Hamlet;

@@ -8,6 +8,7 @@ import Form from 'react-bootstrap/Form';
 import axios from 'axios';
 import Modal from 'react-bootstrap/Modal';
 import { BsChevronRight, BsChevronDoubleRight, BsChevronDoubleLeft, BsChevronLeft } from 'react-icons/bs'
+import { BiCheckCircle } from 'react-icons/bi'
 
 function Province() {
     const [provinces, setProvinces] = useState([]);
@@ -20,7 +21,14 @@ function Province() {
     const [unitProvince, setUnitProvince] = useState();
     const [page, setPage] = useState(1);
     const [numberPage, setNumberPage] = useState(0);
-    const [administrativeCode, setAdministrativeCode] = useState();
+    const [administrativeCode, setAdministrativeCode] = useState()
+    const [administrativeUnitName, setAdministrativeUnitName] = useState();
+    const [administrativeUnitShortName, setAdministrativeUnitShortName] = useState();
+    const [administrativeRegionName, setAdministrativeRegionName] = useState();
+    const [code, setCode] = useState()
+    const [showWarning, setShowWarning] = useState(false)
+    const [checkedId, setCheckedId] = useState(-1);
+    const [showWarningCreate, setWarningCreate] = useState(0);
 
     const fetchFullProvince = async (page) => {
         try {
@@ -46,9 +54,14 @@ function Province() {
         try {
             const response = await axios('http://localhost:8080/api/v1/province/' + code);
             setIdProvince(response.data.code)
+            setCode(response.data.code)
             setNameProvince(response.data.name)
             setRegionProvince(response.data.administrativeRegion.id)
+            setAdministrativeRegionName(response.data.administrativeRegion.name)
             setUnitProvince(response.data.administrativeUnit.id)
+            setAdministrativeUnitShortName(response.data.administrativeUnit.shortName)
+            setAdministrativeUnitName(response.data.administrativeUnit.fullName)
+            setAdministrativeCode(response.data.administrativeUnit.name)
             console.log(unitProvince)
             setAdministrativeCode(response.data.administrativeCode)
             setShowEdit(true)
@@ -70,6 +83,113 @@ function Province() {
         return provinces.map((item) => ({ ...item, isActive: false }))
     }
 
+    const CreateProvince = () => {
+        setShow(true)
+        setIdProvince('')
+        setNameProvince('')
+        setRegionProvince('')
+        setUnitProvince('')
+        setAdministrativeCode('')
+        setCheckedId(-1)
+    }
+
+    const CreateNewProvince = async () => {
+        const province = {
+            "code": idProvince,
+            "name": nameProvince,
+            "administrativeUnit": {
+                "id": unitProvince,
+                "fullName": administrativeUnitName,
+                "shortName": administrativeUnitShortName
+            },
+            "administrativeRegion": {
+                "id": regionProvince,
+                "name": administrativeRegionName
+            },
+            "administrativeCode": administrativeCode
+        }
+
+        if (String(unitProvince) === '1') {
+            province.administrativeUnit.fullName = "Thành phố trực thuộc trung ương";
+            province.administrativeUnit.shortName = "Thành phố";
+        } else if (String(unitProvince) === '2') {
+            province.administrativeUnit.fullName = "Tỉnh";
+            province.administrativeUnit.shortName = "Tỉnh";
+        }
+        for (let i = 0; i < regions.length; i++) {
+            if (regionProvince === String(regions[i].id)) {
+                province.administrativeRegion.name = regions[i].name
+            }
+        }
+        try {
+            await axios.post("http://localhost:8080/api/v1/province/save", province)
+            const response = await axios('http://localhost:8080/api/v1/province/?page=' + page);
+            setProvinces(response.data.provinces);
+            setShow(false)
+            setWarningCreate(false)
+        }
+        catch {
+            setWarningCreate(true)
+        }
+    }
+
+    const DeleteProvince = async () => {
+        await axios.delete("http://localhost:8080/api/v1/province/delete/" + idProvince)
+        const response = await axios('http://localhost:8080/api/v1/province/?page=' + page);
+        setProvinces(response.data.provinces);
+    }
+
+    const EditProvince = async () => {
+        const province = {
+            "code": idProvince,
+            "name": nameProvince,
+            "administrativeUnit": {
+                "id": unitProvince,
+                "fullName": administrativeUnitName,
+                "shortName": administrativeUnitShortName
+            },
+            "administrativeRegion": {
+                "id": regionProvince,
+                "name": administrativeRegionName
+            },
+            "administrativeCode": administrativeCode
+        }
+
+        if (String(unitProvince) === '1') {
+            province.administrativeUnit.fullName = "Thành phố trực thuộc trung ương";
+            province.administrativeUnit.shortName = "Thành phố";
+        } else if (String(unitProvince) === '2') {
+            province.administrativeUnit.fullName = "Tỉnh";
+            province.administrativeUnit.shortName = "Tỉnh";
+        }
+        for (let i = 0; i < regions.length; i++) {
+            if (regionProvince === String(regions[i].id)) {
+                province.administrativeRegion.name = regions[i].name
+            }
+        }
+
+        try {
+            await axios.put("http://localhost:8080/api/v1/province/save/" + code, province)
+            setShowWarning(false)
+            setShowEdit(false)
+            const response = await axios('http://localhost:8080/api/v1/province/?page=' + page);
+            setProvinces(response.data.provinces);
+        } catch {
+            setShowWarning(true)
+        }
+    }
+
+    const CheckedIdNewProvince = async () => {
+        setCheckedId(0)
+        try {
+            const response = await axios.get("http://localhost:8080/api/v1/province/" + idProvince)
+            setCheckedId(2)
+        } catch {
+            setCheckedId(1)
+        }
+    }
+
+
     const ModalProvince = () => {
         return (
             <Modal show={show}>
@@ -82,7 +202,10 @@ function Province() {
                             <Form.Label>Tên tỉnh/thành phố (*)</Form.Label>
                             <Form.Control
                                 type="text"
-                                autoFocus
+                                value={nameProvince}
+                                onChange={(e) => {
+                                    setNameProvince(e.target.value)
+                                }}
                             />
                         </Form.Group>
                         <Form.Group
@@ -90,33 +213,55 @@ function Province() {
                         >
                             <Form.Label>Cấp mã cho tỉnh/thành phố (**)</Form.Label>
                             <Form.Control
-                                type="number"
-                                autoFocus
+                                type="text"
+                                value={idProvince}
+                                onChange={(e) => {
+                                    setIdProvince(e.target.value)
+                                    setCheckedId(0)
+                                    if(e.target.value.length === 0) setCheckedId(-1)
+                                }}
                             />
+                            {(checkedId === 0) ? <div className='checked' onClick={() => CheckedIdNewProvince()}><BiCheckCircle className="iconChecked" />Kiểm tra trùng lặp</div> : null}
+                            {(checkedId === 2) ? <div className="warningChecked">Mã đơn vị hành chính bạn vừa nhập đang bị trùng với một đơn vị hành chính có sẵn</div> : null}
+                            {(checkedId === 1) ? <div className="successChecked">Bạn có thể sử dụng mã vừa nhập</div> : null}
                         </Form.Group>
                         <Form.Group
                             className="mb-3"
                         >
                             <Form.Label>Đơn vị</Form.Label>
-                            <Form.Select><option value={1}>1. Thành phố trực thuộc trung ương</option><option value={2}>2. Tỉnh</option></Form.Select>
+                            <Form.Select value={unitProvince}
+                                onChange={(e) => { setUnitProvince(e.target.value) }}><option></option><option value={1} >1. Thành phố trực thuộc trung ương</option><option value={2}>2. Tỉnh</option></Form.Select>
                         </Form.Group>
                         <Form.Group
                             className="mb-3"
                         >
                             <Form.Label>Khu vực</Form.Label>
-                            <Form.Select>{listRegionItems}</Form.Select>
+                            <Form.Select value={regionProvince}
+                                onChange={(e) => { setRegionProvince(e.target.value) }}><option></option>{listRegionItems}</Form.Select>
+                        </Form.Group>
+                        <Form.Group
+                            className="mb-3"
+                        >
+                            <Form.Label>Mã hành chính</Form.Label>
+                            <Form.Control type="text" value={administrativeCode}
+                                onChange={(e) => { setAdministrativeCode(e.target.value) }} />
                         </Form.Group>
                     </Form>
+                    {(showWarningCreate) ? <div className="noteWarning"><p>THÊM TỈNH THÀNH PHỐ MỚI KHÔNG THÀNH CÔNG</p></div> : null}
                 </Modal.Body>
                 <Modal.Footer>
                     <div className="note">
                         <p>(*) Tên tỉnh/thành phố không được trùng lặp với tên tỉnh/thành phố đã được khai báo</p>
                         <p>(**) Mã số của tỉnh/thành phố không được trùng lặp với mã số của tỉnh/thành phố đã được khai báo</p>
                     </div>
-                    <Button variant="secondary" onClick={() => { setShow(false) }}>
+                    <Button variant="secondary" onClick={() => {
+                        setShow(false)
+                        setWarningCreate(false)
+                        setCheckedId(-1)
+                    }}>
                         Đóng
                     </Button>
-                    <Button variant="primary" onClick={() => { setShow(false) }}>
+                    <Button variant="primary" onClick={() => { CreateNewProvince() }}>
                         Lưu
                     </Button>
                 </Modal.Footer>
@@ -160,10 +305,9 @@ function Province() {
                             <Form.Label>Tên tỉnh/thành phố</Form.Label>
                             <Form.Control
                                 type="text"
-                                autoFocus
-                                defaultValue={nameProvince}
+                                value={nameProvince}
                                 onChange={(e) => {
-                                
+                                    setNameProvince(e.target.value)
                                 }}
                             />
                         </Form.Group>
@@ -173,10 +317,9 @@ function Province() {
                             <Form.Label>Mã tỉnh/thành phố</Form.Label>
                             <Form.Control
                                 type="number"
-                                autoFocus
-                                defaultValue={idProvince}
+                                value={idProvince}
                                 onChange={(e) => {
-                                   
+                                    setIdProvince(e.target.value)
                                 }}
                             />
                         </Form.Group>
@@ -184,23 +327,32 @@ function Province() {
                             className="mb-3"
                         >
                             <Form.Label>Đơn vị</Form.Label>
-                            <Form.Select defaultValue={unitProvince} onChange={(e) => {
-                             
-                            }}><option value='1'>1. Thành phố trực thuộc trung ương</option><option value='2'>2. Tỉnh</option></Form.Select>
+                            <Form.Select value={unitProvince} onChange={(e) => {
+                                setUnitProvince(e.target.value)
+                            }}><option></option><option value='1'>1. Thành phố trực thuộc trung ương</option><option value='2'>2. Tỉnh</option></Form.Select>
                         </Form.Group>
                         <Form.Group
                             className="mb-3"
                         >
                             <Form.Label>Khu vực</Form.Label>
-                            <Form.Select defaultValue={regionProvince} onChange={(e) => {
-                               
+                            <Form.Select value={regionProvince} onChange={(e) => {
+                                setRegionProvince(e.target.value)
                             }}>{listRegionItems}</Form.Select>
+                        </Form.Group>
+                        <Form.Group
+                            className="mb-3"
+                        >
+                            <Form.Label>Mã hành chính</Form.Label>
+                            <Form.Control type="text" value={administrativeCode}
+                                onChange={(e) => { setAdministrativeCode(e.target.value) }} />
                         </Form.Group>
                     </Form>
                 </Modal.Body>
+                {(showWarning) ? <div className="noteWarning"><p>THAY ĐỔI THÔNG TIN KHÔNG THÀNH CÔNG</p></div> : null}
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => {
                         setShowEdit(false)
+                        setShowWarning(false)
                         provinces.map((item) => {
                             if (item.code === idProvince) {
                                 item.isActive = false;
@@ -209,8 +361,9 @@ function Province() {
                     }}>
                         Đóng
                     </Button>
-                    <Button variant="primary" onClick={() => {
+                    <Button variant="secondary" onClick={() => {
                         setShowEdit(false)
+                        EditProvince()
                         provinces.map((item) => {
                             if (item.code === idProvince) {
                                 item.isActive = false;
@@ -218,6 +371,12 @@ function Province() {
                         })
                     }}>
                         Lưu
+                    </Button>
+                    <Button variant="secondary" onClick={() => {
+                        setShowEdit(false)
+                        DeleteProvince()
+                    }}>
+                        Xóa
                     </Button>
                 </Modal.Footer>
             </Modal>
@@ -262,11 +421,11 @@ function Province() {
     return (
         <div>
             <NavbarPage />
-            <Button className="buttonAdd" onClick={() => { setShow(true) }}>+ Khai báo tỉnh/thành phố</Button>
+            <Button className="buttonAdd" onClick={() => { CreateProvince() }}>+ Khai báo tỉnh/thành phố</Button>
             <div>
                 <TableResidential />
-                {(show) ? <ModalProvince /> : null}
-                <ModalEditProvince />
+                {(show) ? ModalProvince() : null}
+                {ModalEditProvince()}
                 <Pagination />
             </div>
         </div>

@@ -31,7 +31,7 @@ thead {
 td {
     background-color: azure;
     font-size: 14px;
-    font-weight: 400;
+    font-weight: bold;
     height: 1cm;
 }
 
@@ -99,4 +99,42 @@ Label {
 
 .page:hover {
     background-color: #3F72AF;
+}
+
+.noteWarning {
+    text-align: center;
+    font-size: 14px;
+    color: red;
+    font-weight: bold;
+}
+
+.checked {
+    font-size: 13px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.iconChecked {
+    margin-right: 5px;
+    width: 18px;
+    height: 18px
+}
+
+.checked:hover {
+    color: blue;
+    cursor: pointer;
+}
+
+.warningChecked {
+    color: red;
+    font-weight: bold;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.successChecked {
+    color: rgb(5, 164, 50);
+    font-weight: bold;
+    font-size: 14px;
+    margin-top: 5px;
 }
