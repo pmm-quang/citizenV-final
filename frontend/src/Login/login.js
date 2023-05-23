@@ -22,6 +22,7 @@ function Login() {
       username: username,
       password: password
     })
+    console.log(response.data)
     if (response.data !== null) {
       navigate('/home')
       setShow(false)

@@ -8,8 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import {BsPersonCircle} from 'react-icons/bs'
 
 function NavbarPage() {
-  const role_acc = JSON.parse(localStorage.getItem("user"));
-  const author = role_acc.role;
+  const user_account = JSON.parse(localStorage.getItem("user"));
+  const author = user_account.info.role;
 
   let navigate = useNavigate();
   return (
@@ -19,9 +19,9 @@ function NavbarPage() {
         <p className="nameApp">CitizenV</p>
         <div className='formLogout'>
           <BsPersonCircle className='iconAccount'/>
-          {(author === 'A1') ? role_acc.username + " - Trung ương" : null}
-          {(author === 'B2') ? role_acc.username + " - " + role_acc.division.administrativeUnit.shortName + " " + role_acc.division.name : null}
-          {(author !== 'A1' && author !== 'B2') ? role_acc.username + " - " + role_acc.division.name : null}
+          {(author === 'A1') ? user_account.info.username + " - Trung ương" : null}
+          {(author === 'B2') ? user_account.info.username + " - " + user_account.info.division.administrativeUnit.shortName + " " + user_account.info.division.name : null}
+          {(author !== 'A1' && author !== 'B2') ? user_account.info.username + " - " + user_account.info.division.name : null}
           <AiOutlineLogout className='iconLogout' onClick={() => navigate('/login')} />
         </div>
 

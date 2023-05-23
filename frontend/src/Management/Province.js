@@ -11,12 +11,21 @@ import { BsChevronRight, BsChevronDoubleRight, BsChevronDoubleLeft, BsChevronLef
 import { BiCheckCircle } from 'react-icons/bi'
 
 function Province() {
+    const user_account = JSON.parse(localStorage.getItem("user"));
+    const user = user_account.username;
+    const config = {
+        headers: {
+            Authorization: `Bearer ${user_account.accessToken}`
+        },
+    };
+
     const [provinces, setProvinces] = useState([]);
     const [show, setShow] = useState(false);
     const [showEdit, setShowEdit] = useState(false);
     const [regions, setRegions] = useState([]);
     const [nameProvince, setNameProvince] = useState();
     const [idProvince, setIdProvince] = useState();
+    const [defalutIdProvince, setDefaultIdProvince] = useState();
     const [regionProvince, setRegionProvince] = useState();
     const [unitProvince, setUnitProvince] = useState();
     const [page, setPage] = useState(1);
@@ -32,7 +41,7 @@ function Province() {
 
     const fetchFullProvince = async (page) => {
         try {
-            const response = await axios('http://localhost:8080/api/v1/province/?page=' + page);
+            const response = await axios('http://localhost:8080/api/v1/province/?page=' + page, config);
             setProvinces(response.data.provinces);
             console.log(provinces)
             setNumberPage(response.data.totalPages)
@@ -43,7 +52,7 @@ function Province() {
 
     const fetchFullRegions = async () => {
         try {
-            const response = await axios('http://localhost:8080/api/v1/administrativeRegion/');
+            const response = await axios('http://localhost:8080/api/v1/administrativeRegion/', config);
             setRegions(response.data);
         } catch (err) {
             console.error(err);
@@ -52,7 +61,7 @@ function Province() {
 
     const fetchDetailProvince = async (code) => {
         try {
-            const response = await axios('http://localhost:8080/api/v1/province/' + code);
+            const response = await axios('http://localhost:8080/api/v1/province/' + code, config);
             setIdProvince(response.data.code)
             setCode(response.data.code)
             setNameProvince(response.data.name)
@@ -64,6 +73,7 @@ function Province() {
             setAdministrativeCode(response.data.administrativeUnit.name)
             console.log(unitProvince)
             setAdministrativeCode(response.data.administrativeCode)
+            setDefaultIdProvince(response.data.code)
             setShowEdit(true)
         } catch (err) {
             console.error(err);
@@ -122,8 +132,8 @@ function Province() {
             }
         }
         try {
-            await axios.post("http://localhost:8080/api/v1/province/save", province)
-            const response = await axios('http://localhost:8080/api/v1/province/?page=' + page);
+            await axios.post("http://localhost:8080/api/v1/province/save", province, config)
+            const response = await axios('http://localhost:8080/api/v1/province/?page=' + page, config);
             setProvinces(response.data.provinces);
             setShow(false)
             setWarningCreate(false)
@@ -134,8 +144,8 @@ function Province() {
     }
 
     const DeleteProvince = async () => {
-        await axios.delete("http://localhost:8080/api/v1/province/delete/" + idProvince)
-        const response = await axios('http://localhost:8080/api/v1/province/?page=' + page);
+        await axios.delete("http://localhost:8080/api/v1/province/delete/" + idProvince, config)
+        const response = await axios('http://localhost:8080/api/v1/province/?page=' + page, config);
         setProvinces(response.data.provinces);
     }
 
@@ -169,10 +179,10 @@ function Province() {
         }
 
         try {
-            await axios.put("http://localhost:8080/api/v1/province/save/" + code, province)
+            await axios.put("http://localhost:8080/api/v1/province/save/" + defalutIdProvince, province, config)
             setShowWarning(false)
             setShowEdit(false)
-            const response = await axios('http://localhost:8080/api/v1/province/?page=' + page);
+            const response = await axios('http://localhost:8080/api/v1/province/?page=' + page, config);
             setProvinces(response.data.provinces);
         } catch {
             setShowWarning(true)
@@ -182,7 +192,7 @@ function Province() {
     const CheckedIdNewProvince = async () => {
         setCheckedId(0)
         try {
-            const response = await axios.get("http://localhost:8080/api/v1/province/" + idProvince)
+            const response = await axios.get("http://localhost:8080/api/v1/province/" + idProvince, config)
             setCheckedId(2)
         } catch {
             setCheckedId(1)

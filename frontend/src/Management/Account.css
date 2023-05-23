@@ -30,3 +30,10 @@ th, td {
     max-width: 15vw;
     margin-bottom: 3vh;
 }
+
+.noteWarning {
+    text-align: center;
+    font-size: 14px;
+    color: red;
+    font-weight: bold;
+}

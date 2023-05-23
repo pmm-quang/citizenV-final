@@ -10,8 +10,13 @@ import Modal from 'react-bootstrap/Modal';
 import { BiCheckCircle } from 'react-icons/bi'
 
 function Hamlet() {
-    const role_acc = JSON.parse(localStorage.getItem("user"));
-    const user = role_acc.username;
+    const user_account = JSON.parse(localStorage.getItem("user"));
+    const user = user_account.info.username;
+    const config = {
+        headers: {
+            Authorization: `Bearer ${user_account.accessToken}`
+        },
+    };
 
     const [showWarning, setShowWarning] = useState(false)
     const [hamlets, setHamlets] = useState([]);
@@ -24,10 +29,9 @@ function Hamlet() {
     const [checkedId, setCheckedId] = useState(-1);
     const [showWarningCreate, setWarningCreate] = useState(false);
 
-
     const fetchFullHamlet = async () => {
         try {
-            const response = await axios('http://localhost:8080/api/v1/hamlet/by-ward/' + user);
+            const response = await axios('http://localhost:8080/api/v1/hamlet/by-ward/' + user, config);
             setHamlets(response.data);
         } catch (err) {
             console.error(err);
@@ -37,7 +41,7 @@ function Hamlet() {
     const fetchDetailHamlet = async (code) => {
         setShowWarning(false)
         try {
-            const response = await axios('http://localhost:8080/api/v1/hamlet/' + code);
+            const response = await axios('http://localhost:8080/api/v1/hamlet/' + code, config);
             setIdHamlet(response.data.code)
             setDefaultIdHamlet(response.data.code)
             setNameHamlet(response.data.name)
@@ -57,10 +61,10 @@ function Hamlet() {
         }
         console.log(hamlet)
         try {
-            await axios.put("http://localhost:8080/api/v1/hamlet/save/" + defaultIdHamlet, hamlet)
+            await axios.put("http://localhost:8080/api/v1/hamlet/save/" + defaultIdHamlet, hamlet, config)
             setShowWarning(false)
             setShowEdit(false)
-            const response = await axios('http://localhost:8080/api/v1/hamlet/by-ward/' + user);
+            const response = await axios('http://localhost:8080/api/v1/hamlet/by-ward/' + user, config);
             setHamlets(response.data);
         } catch {
             setShowWarning(true)
@@ -77,10 +81,10 @@ function Hamlet() {
         console.log(hamlet)
         if (checkedId === 1 && idHamlet !== '' && idUnitHamlet !== '') {
             try {
-                await axios.post("http://localhost:8080/api/v1/hamlet/save", hamlet)
+                await axios.post("http://localhost:8080/api/v1/hamlet/save", hamlet, config)
                 setWarningCreate(true)
                 setShowEdit(false)
-                const response = await axios('http://localhost:8080/api/v1/hamlet/by-ward/' + user);
+                const response = await axios('http://localhost:8080/api/v1/hamlet/by-ward/' + user, config);
                 setHamlets(response.data);
                 setShow(false)
             } catch {
@@ -97,7 +101,7 @@ function Hamlet() {
         if (idHamlet.substring(0, 6) !== user || idHamlet.length < 8) setCheckedId(3)
         else {
             try {
-                const response = await axios.get("http://localhost:8080/api/v1/hamlet/" + idHamlet)
+                const response = await axios.get("http://localhost:8080/api/v1/hamlet/" + idHamlet, config)
                 setCheckedId(2)
             } catch {
                 setCheckedId(1)

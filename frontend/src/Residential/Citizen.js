@@ -13,9 +13,14 @@ import { AiFillCaretRight, AiFillCaretDown } from 'react-icons/ai'
 
 
 function Citizen() {
-    const role_acc = JSON.parse(localStorage.getItem("user"));
-    const user = role_acc.username;
-    const role = role_acc.role;
+    const user_account = JSON.parse(localStorage.getItem("user"));
+    const user = user_account.info.username;
+    const role = user_account.info.role;
+    const config = {
+        headers: {
+            Authorization: `Bearer ${user_account.accessToken}`
+        },
+    };
 
     const [codeProvinceUnit, setCodeProvinceUnit] = useState();
     const [codeDistrictUnit, setCodeDistrictUnit] = useState();
@@ -59,7 +64,7 @@ function Citizen() {
 
     const CountCitizen = async () => {
         let role_name
-        if (role !== 'A1') role_name = role_acc.division.administrativeUnit.shortName + " " + role_acc.division.name;
+        if (role !== 'A1') role_name = user_account.info.division.administrativeUnit.shortName + " " + user_account.info.division.name;
         if (role === 'A1') {
             GetPopulationInCountry()
         } else if (role === 'A2') {
@@ -68,7 +73,7 @@ function Citizen() {
         } else if (role === 'A3') {
             GetPopulationInDistrict(user)
             setDivision(role_name)
-        } else if (role === 'EDITOR') {
+        } else if (role === 'B1') {
             GetPopulationInWard(user)
             setDivision(role_name)
         } else if (role === 'B2') {
@@ -80,10 +85,10 @@ function Citizen() {
     const GetPopulationInCountry = async () => {
         setIndex(1)
         setDefaultIndex(1)
-        const response = await axios('http://localhost:8080/api/v1/statistics/population');
+        const response = await axios('http://localhost:8080/api/v1/statistics/population', config);
         setCountCitizen(response.data)
         setDivision("Toàn quốc")
-        const response_population = await axios('http://localhost:8080/api/v1/statistics/population/province')
+        const response_population = await axios('http://localhost:8080/api/v1/statistics/population/province', config)
         setProvince(response_population.data)
         setCitizens(response_population.data)
         setProvinceUnit(response_population.data)
@@ -92,7 +97,7 @@ function Citizen() {
     const GetPopulationInProvince = async (code) => {
         setIndex(2)
         setDefaultIndex(2)
-        const response_population = await axios('http://localhost:8080/api/v1/statistics/population/district/' + code)
+        const response_population = await axios('http://localhost:8080/api/v1/statistics/population/district/' + code, config)
         totalPopulation = 0;
         setDistrict(response_population.data)
         setCitizens(response_population.data)
@@ -106,7 +111,7 @@ function Citizen() {
     const GetPopulationInDistrict = async (code) => {
         setIndex(3)
         setDefaultIndex(3)
-        const response_population = await axios('http://localhost:8080/api/v1/statistics/population/ward/' + code)
+        const response_population = await axios('http://localhost:8080/api/v1/statistics/population/ward/' + code, config)
         totalPopulation = 0;
         setWard(response_population.data)
         setCitizens(response_population.data)
@@ -120,7 +125,7 @@ function Citizen() {
     const GetPopulationInWard = async (code) => {
         setIndex(4)
         setDefaultIndex(4)
-        const response_population = await axios('http://localhost:8080/api/v1/statistics/population/hamlet/' + code)
+        const response_population = await axios('http://localhost:8080/api/v1/statistics/population/hamlet/' + code, config)
         totalPopulation = 0;
         setHamlet(response_population.data)
         setCitizens(response_population.data)
@@ -134,8 +139,7 @@ function Citizen() {
     const GetPopulationInHalmet = async (code, page) => {
         setIndex(5)
         setDefaultIndex(5)
-        console.log(role_acc)
-        const response_population = await axios('http://localhost:8080/api/v1/citizen/by-hamlet/' + code + '?page=' + page)
+        const response_population = await axios('http://localhost:8080/api/v1/citizen/by-hamlet/' + code + '?page=' + page, config)
         setHamlet(response_population.data.citizens)
         setCitizens(response_population.data.citizens)
         setNumberPage(response_population.data.totalPages)
@@ -238,7 +242,7 @@ function Citizen() {
 
     const fetchDetailCitizen = async (code) => {
         try {
-            const response = await axios('http://localhost:8080/api/v1/citizen/' + code);
+            const response = await axios('http://localhost:8080/api/v1/citizen/' + code, config);
             setIdCitizen(response.data.nationalId)
             setBloodType(response.data.bloodType)
             setDateOfBirth(response.data.dateOfBirth)
@@ -392,7 +396,7 @@ function Citizen() {
                     {(role === 'A1') ? listProvinceUnits : null}
                     {(role === 'A2') ? listDistrictUnits : null}
                     {(role === 'A3') ? listWardUnits : null}
-                    {(role === 'EDITOR') ? listHamletUnits : null}
+                    {(role === 'B1') ? listHamletUnits : null}
                 </div>
 
             </div>

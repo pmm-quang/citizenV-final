@@ -13,6 +13,15 @@ ChartJS.register(CategoryScale);
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 function BasicStatis() {
+    const user_account = JSON.parse(localStorage.getItem("user"));
+    const user = user_account.info.username;
+    const role = user_account.info.role;
+    const config = {
+        headers: {
+            Authorization: `Bearer ${user_account.accessToken}`
+        },
+    };
+
     const [option, setOption] = useState();
     const [dataStatic, setDataStatic] = useState([]);
     const [dataChart, setDataChart] = useState({
@@ -28,9 +37,9 @@ function BasicStatis() {
     const GetDataStatic = async (code) => {
         let response;
         if (code === 'region') {
-            response = await axios.get("http://localhost:8080/api/v1/statistics/population/region")
+            response = await axios.get("http://localhost:8080/api/v1/statistics/population/region", config )
         } else {
-            response = await axios.get("http://localhost:8080/api/v1/statistics/population/citizen?property=" + code)
+            response = await axios.get("http://localhost:8080/api/v1/statistics/population/citizen?property=" + code, config)
         }
         setOption(code)
         setDataStatic(response.data)

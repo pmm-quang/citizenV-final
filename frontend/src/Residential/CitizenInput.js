@@ -8,8 +8,13 @@ import { useState, useEffect } from 'react';
 import Modal from 'react-bootstrap/Modal';
 
 function CitizenInput() {
-    const role_acc = JSON.parse(localStorage.getItem("user"));
-    const user = role_acc.username;
+    const user_account = JSON.parse(localStorage.getItem("user"));
+    const user = user_account.info.username;
+    const config = {
+        headers: {
+            Authorization: `Bearer ${user_account.accessToken}`
+        },
+    };
 
     const [page, setPage] = useState(1);
     const [showNotify, setShowNotify] = useState(false);
@@ -63,7 +68,7 @@ function CitizenInput() {
 
     const GetDecleration = async () => {
         try {
-            const response = await axios("http://localhost:8080/api/v1/user/" + user)
+            const response = await axios("http://localhost:8080/api/v1/user/" + user, config)
             setDeclaration(response.data.declaration)
         } catch (err) {
             console.error(err);
@@ -72,13 +77,14 @@ function CitizenInput() {
 
     const fetchNameAddress = async () => {
         try {
-            const response_province = await axios("http://localhost:8080/api/v1/province/" + provinceCodeAddress2)
+            const response_province = await axios("http://localhost:8080/api/v1/province/" + provinceCodeAddress2, config)
             setNameProvinceAddress2(response_province.data.name)
-            const response_district = await axios("http://localhost:8080/api/v1/district/" + districtCodeAddress2)
+            const response_district = await axios('http://localhost:8080/api/v1/district/0101', config);
             setNameDistrictAddress2(response_district.data.name)
-            const response_ward = await axios("http://localhost:8080/api/v1/ward/" + wardCodeAddress2)
+            console.log(response_district.data)
+            const response_ward = await axios("http://localhost:8080/api/v1/ward/" + wardCodeAddress2, config)
             setNameWardAddress2(response_ward.data.name)
-            const response_hamlet = await axios("http://localhost:8080/api/v1/hamlet/" + hamletCodeAddress2)
+            const response_hamlet = await axios("http://localhost:8080/api/v1/hamlet/" + hamletCodeAddress2, config)
             setNameHamletAddress2(response_hamlet.data.administrativeUnit.shortName + " " + response_hamlet.data.name)
         } catch (err) {
             console.error(err);
@@ -87,7 +93,7 @@ function CitizenInput() {
 
     const fetchProvince = async () => {
         try {
-            const response = await axios('http://localhost:8080/api/v1/province/');
+            const response = await axios('http://localhost:8080/api/v1/province/', config);
             setProvincesAddress1(response.data);
             setProvincesAddress3(response.data);
         } catch (err) {
@@ -97,7 +103,7 @@ function CitizenInput() {
 
     const fetchEthnicity = async () => {
         try {
-            const response = await axios(' http://localhost:8080/api/v1/ethnicity/');
+            const response = await axios(' http://localhost:8080/api/v1/ethnicity/', config);
             setEthnicitys(response.data);
         } catch (err) {
             console.error(err);
@@ -106,7 +112,7 @@ function CitizenInput() {
 
     const fetchReigion = async () => {
         try {
-            const response = await axios('http://localhost:8080/api/v1/religion/');
+            const response = await axios('http://localhost:8080/api/v1/religion/', config);
             setReligions(response.data);
         } catch (err) {
             console.error(err);
@@ -115,7 +121,7 @@ function CitizenInput() {
 
     const fetchWard = async (code, index) => {
         try {
-            const response = await axios('http://localhost:8080/api/v1/ward/by-district/' + code);
+            const response = await axios('http://localhost:8080/api/v1/ward/by-district/' + code, config);
             if (index === 1) setWardsAddress1(response.data);
             else if (index === 3) setWardsAddress3(response.data);
         } catch (err) {
@@ -126,7 +132,7 @@ function CitizenInput() {
 
     const fetchDistrict = async (code, index) => {
         try {
-            const response = await axios('http://localhost:8080/api/v1/district/by-province/' + code);
+            const response = await axios('http://localhost:8080/api/v1/district/by-province/' + code, config);
             if (index === 1) setDistrictsAddress1(response.data);
             else if (index === 3) setDistrictsAddress3(response.data);
         } catch (err) {
@@ -136,7 +142,7 @@ function CitizenInput() {
 
     const fetchHamlet = async (code, index) => {
         try {
-            const response = await axios('http://localhost:8080/api/v1/hamlet/by-ward/' + code);
+            const response = await axios('http://localhost:8080/api/v1/hamlet/by-ward/' + code, config);
             if (index === 1) setHamletsAddress1(response.data);
             else if (index === 3) setHamletsAddress3(response.data);
             console.log(response.data)
@@ -234,7 +240,7 @@ function CitizenInput() {
             setChecked(false)
         } else {
             setChecked(true)
-            await axios.post("http://localhost:8080/api/v1/citizen/save", citizen)
+            await axios.post("http://localhost:8080/api/v1/citizen/save", citizen, config)
         }
         setShowNotify(true)
     }

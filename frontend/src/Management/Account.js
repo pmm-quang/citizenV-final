@@ -6,26 +6,140 @@ import { useState, useEffect } from "react";
 import Table from "react-bootstrap/Table";
 import axios from "axios";
 import Modal from "react-bootstrap/Modal";
+import { Form } from "react-bootstrap";
 
 function Account() {
   const [selectAll, setSelectAll] = useState(false);
   const [accountList, setAccountList] = useState([]);
   const [premission, setPremission] = useState(false)
+  const [show, setShow] = useState(false)
+  const [provinces, setProvinces] = useState([])
+  const [districts, setDistricts] = useState([])
+  const [wards, setWards] = useState([])
+  const [hamlets, setHamlets] = useState([])
+  const [division, setDivision] = useState([])
+  const [divisionAccount, setDivisionAccount] = useState()
+  const [userAccount, setUserAccount] = useState([])
+  const [password, setPassword] = useState()
+  const [repeatPassword, setRepeatPassword] = useState()
 
-  const role_acc = JSON.parse(localStorage.getItem("user"));
-  const user = role_acc.username;
+  const user_account = JSON.parse(localStorage.getItem("user"));
+  const user = user_account.info.username;
+  const role = user_account.info.role;
+  const config = {
+    headers: {
+      Authorization: `Bearer ${user_account.accessToken}`
+    },
+  };
+
+  const fetchFullProvince = async () => {
+    try {
+      const response = await axios('http://localhost:8080/api/v1/province/', config);
+      setDivision(response.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchFullDistrict = async () => {
+    try {
+      const response = await axios('http://localhost:8080/api/v1/district/by-province/' + user, config);
+      setDivision(response.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchFullWard = async () => {
+    try {
+      const response = await axios('http://localhost:8080/api/v1/ward/by-district/' + user, config);
+      setDivision(response.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchFullHamlet = async () => {
+    try {
+      const response = await axios('http://localhost:8080/api/v1/hamlet/by-ward/' + user, config);
+      setDivision(response.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchDetailProvince = async () => {
+    try {
+      const response = await axios('http://localhost:8080/api/v1/province/'+ userAccount, config);
+      setDivisionAccount(response.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchDetailDistrict = async () => {
+    try {
+      const response = await axios('http://localhost:8080/api/v1/district/' + userAccount, config);
+      console.log(response.data)
+      setDivisionAccount(response.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchDetailWard = async () => {
+    try {
+      const response = await axios('http://localhost:8080/api/v1/ward/' + userAccount, config);
+      setDivisionAccount(response.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchDetailHamlet = async () => {
+    try {
+      const response = await axios('http://localhost:8080/api/v1/hamlet/' + userAccount, config);
+      setDivisionAccount(response.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const GetAllAccount = async () => {
-    const response = await axios.get("http://localhost:8080/api/v1/user/")
+    const response = await axios.get("http://localhost:8080/api/v1/user/", config)
     setAccountList(response.data)
+    console.log(response.data)
+  }
+
+  const CreateNewAccount = async () => {
+    if (role === 'A1') fetchDetailProvince()
+    if (role === 'A2') fetchDetailDistrict()
+    if (role === 'A3') fetchDetailWard()
+    if (role === 'B1') fetchDetailHamlet()
+    
+    const account = {
+      username: userAccount,
+      password: password,
+      isActive: true,
+      roles: null,
+      declaration: null,
+      division: divisionAccount
+    }
+    console.log(account)
   }
 
   useEffect(() => {
     GetAllAccount()
-    console.log(accountList)
+    if (role === 'A1') fetchFullProvince()
+    else if (role === 'A2') fetchFullDistrict()
+    else if (role === 'A3') fetchFullWard()
+    else if (role === 'B1') fetchFullHamlet()
   }, [])
 
-  
+  const listDivision = division.map((post) =>
+    <option key={post.code} value={post.code}>{post.code + ". " + post.administrativeUnit.shortName + " " + post.name}</option>
+  );
+
   const checkAccount = (accountList) => {
     const updatedCheckboxes = accountList.map((checkbox) => ({
       ...checkbox,
@@ -53,8 +167,12 @@ function Account() {
     setSelectAll(updatedCheckboxes.every((checkbox) => checkbox.checked));
   };
 
+  const CreateAccount = () => {
+    setShow(true)
+  }
+
   const tableAccount = accountList.map((account) => (
-    (account.username === 'tw1' || (user !== 'tw1' && account.username.substring(0, account.username.length - 2) !== user) || (user === 'tw1' && account.username.length !== 2)) ? null : <tr className="top-row" key={account.username} style={{ backgroundColor: account.checked ? 'yellow' : null }}>
+    (account.username === 'tw1') ? null : <tr className="top-row" key={account.username} style={{ backgroundColor: account.checked ? 'yellow' : null }}>
       <th className="top-row-checkbox">
         <input
           type="checkbox"
@@ -69,9 +187,55 @@ function Account() {
       <th className="top-row-title">{account.division.administrativeUnit.shortName + " " + account.division.name}</th>
       {(account.declaration === null) ? <th className="top-row-title">Chưa khai báo</th> : <th className="top-row-title">{account.declaration.startTime}</th>}
       {(account.declaration === null) ? <th className="top-row-title">Chưa khai báo</th> : <th className="top-row-title">{account.declaration.endTime}</th>}
-      {(account.isActive) ? <th className="top-row-title" style={{ color: 'green' }}>Đang hoạt động</th> : <th className="top-row-title" style={{ color: 'red' }}>Đã khóa</th>}
+      {(account.isActive) ? <th className="top-row-title" style={{ color: 'green' }}>Đang khai báo</th> : <th className="top-row-title" style={{ color: 'red' }}>Chưa khai báo</th>}
     </tr>
   ));
+
+  const ModalAddAccount = () => {
+    return (
+      <Modal show={show}>
+        <Modal.Header className='headerModal'>
+          <Modal.Title className='titleModal'>THÊM TÀI KHOẢN MỚI</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3">
+              <Form.Label>Tên tỉnh/thành phố (*)</Form.Label>
+              <Form.Select value = {userAccount} onChange={(e) => setUserAccount(e.target.value)}>
+                <option>
+                </option>
+                {listDivision}
+              </Form.Select>
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Tên tài khoản (*)</Form.Label>
+              <Form.Control value = {userAccount} disabled/>
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Mật khẩu (*)</Form.Label>
+              <Form.Control type = "password" value = {password} onChange={(e) => setPassword(e.target.value)}/>
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Nhập lại mật khẩu (*)</Form.Label>
+              <Form.Control type = "password" value = {repeatPassword} onChange={(e) => setRepeatPassword(e.target.value)}/>
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => {
+            setShow(false)
+          }}>
+            Đóng
+          </Button>
+          <Button variant="primary" onClick={() => { 
+            CreateNewAccount()
+          }}>
+            Lưu
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    )
+  }
 
   return (
     <div>
@@ -101,10 +265,11 @@ function Account() {
         </div>
 
         <div className="account-option-list">
-          <Button className="account-option">Thêm tài khoản</Button>
+          <Button className="account-option" onClick={() => CreateAccount()}>Thêm tài khoản</Button>
           <Button className="account-option">Xem lịch sử</Button>
           {(premission) ? <Button className="account-option">Cấp quyền khai báo</Button> : null}
         </div>
+        {(show) ? ModalAddAccount() : null}
       </div>
     </div>
   );
