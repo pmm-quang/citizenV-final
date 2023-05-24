@@ -60,7 +60,7 @@ function BasicStatis() {
         setOption(code)
         setDataStatic(response.data)
         setDataChart({
-            labels: response.data.map(item => item.name),
+            labels: response.data.map(item => (item.name === '') ? "Không có" : item.name),
             datasets: [
                 {
                     label: 'Tổng dân số',
@@ -105,7 +105,7 @@ function BasicStatis() {
 
     const listStatics = dataStatic.map((post, index) =>
         <tr key={index}>
-            <td>{post.name}</td>
+            <td>{(post.name === '') ? "Không có" : post.name}</td>
             <td>{post.population}</td>
         </tr>
     )
@@ -140,10 +140,13 @@ function BasicStatis() {
                         GetDataStatic('religion')
                     }}><AiFillCaretRight /> 5. Tôn giáo</div>
                     <div className="optionStatic" onClick={() => {
+                        GetDataStatic('otherNationality')
+                    }}><AiFillCaretRight /> 6. Quốc tịch khác</div>
+                    <div className="optionStatic" onClick={() => {
                         setShowAge(true)
                         setShowChart(false)
                     }
-                    }><AiFillCaretRight /> 6. Nhóm tuổi theo năm</div>
+                    }><AiFillCaretRight /> 7. Nhóm tuổi</div>
                 </div>
 
             </div>

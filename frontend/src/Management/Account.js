@@ -134,10 +134,10 @@ function Account() {
   );
 
   const listDeclaration = declarations.map((declaration, index) =>
-    <tr key={index} className="rowTable" style={{ backgroundColor: (CheckedTimeDeclaration(declaration.endTime)) ? "lime" : "orange" }}>
+    <tr key={index} className="rowTable" style={{ backgroundColor: (CheckedTimeDeclaration(declaration.endTime)) ? "lime" : "red" }}>
       <td>{declaration.startTime.substring(0, 10)}</td>
       <td>{declaration.endTime.substring(0, 10)}</td>
-      <td>{declaration.status}</td>
+      <td>{CheckedTimeDeclaration(declaration.endTime) ? "Đang khai báo" : "Đã hết hạn"}</td>
     </tr>
   )
 
