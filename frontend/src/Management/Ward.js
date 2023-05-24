@@ -10,8 +10,13 @@ import Modal from 'react-bootstrap/Modal';
 import { BiCheckCircle } from 'react-icons/bi'
 
 function Ward() {
-    const role_acc = JSON.parse(localStorage.getItem("user"));
-    const user = role_acc.username;
+    const user_account = JSON.parse(localStorage.getItem("user"));
+    const user = user_account.info.username;
+    const config = {
+        headers: {
+            Authorization: `Bearer ${user_account.accessToken}`
+        },
+    };
 
     const [showWarning, setShowWarning] = useState(false)
     const [wards, setWards] = useState([]);
@@ -19,6 +24,7 @@ function Ward() {
     const [showEdit, setShowEdit] = useState(false);
     const [nameWard, setNameWard] = useState('');
     const [idWard, setIdWard] = useState('');
+    const [defaultidWard, setDefaultIdWard] = useState('');
     const [idUnitWard, setIdUnitWard] = useState('');
     const [checkedId, setCheckedId] = useState(-1);
     const [showWarningCreate, setWarningCreate] = useState(false);
@@ -26,7 +32,7 @@ function Ward() {
 
     const fetchFullWard = async () => {
         try {
-            const response = await axios('http://localhost:8080/api/v1/ward/by-district/' + user);
+            const response = await axios('http://localhost:8080/api/v1/ward/by-district/' + user, config);
             setWards(response.data);
         } catch (err) {
             console.error(err);
@@ -36,11 +42,12 @@ function Ward() {
     const fetchDetailWard = async (code) => {
         setShowWarning(false)
         try {
-            const response = await axios('http://localhost:8080/api/v1/ward/' + code);
+            const response = await axios('http://localhost:8080/api/v1/ward/' + code, config);
             setIdWard(response.data.code)
             setNameWard(response.data.name)
             setIdUnitWard(response.data.administrativeUnit.id)
             setShowEdit(true)
+            setDefaultIdWard(response.data.code)
         } catch (err) {
             console.error(err);
         }
@@ -55,10 +62,10 @@ function Ward() {
         }
         console.log(ward)
         try {
-            await axios.put("http://localhost:8080/api/v1/ward/save/" + idWard + "/", ward)
+            await axios.put("http://localhost:8080/api/v1/ward/save/" + defaultidWard + "/", ward, config)
             setShowWarning(false)
             setShowEdit(false)
-            const response = await axios('http://localhost:8080/api/v1/ward/by-district/' + user);
+            const response = await axios('http://localhost:8080/api/v1/ward/by-district/' + user, config);
             setWards(response.data);
         } catch {
             setShowWarning(true)
@@ -74,10 +81,10 @@ function Ward() {
         }
         if (checkedId === 1 && idWard !== '' && idUnitWard !== '') {
             try {
-                await axios.post("http://localhost:8080/api/v1/ward/save", ward)
+                await axios.post("http://localhost:8080/api/v1/ward/save", ward, config)
                 setWarningCreate(true)
                 setShowEdit(false)
-                const response = await axios('http://localhost:8080/api/v1/ward/by-district/' + user);
+                const response = await axios('http://localhost:8080/api/v1/ward/by-district/' + user, config);
                 setWards(response.data);
                 setShow(false)
             } catch {
@@ -94,7 +101,7 @@ function Ward() {
         if (idWard.substring(0, 4) !== user || idWard.length < 6) setCheckedId(3)
         else {
             try {
-                const response = await axios.get("http://localhost:8080/api/v1/ward/" + idWard)
+                const response = await axios.get("http://localhost:8080/api/v1/ward/" + idWard, config)
                 setCheckedId(2)
             } catch {
                 setCheckedId(1)
