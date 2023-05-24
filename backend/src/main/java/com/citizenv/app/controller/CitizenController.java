@@ -3,6 +3,7 @@ package com.citizenv.app.controller;
 import com.citizenv.app.payload.CitizenDto;
 import com.citizenv.app.payload.custom.CustomCitizenRequest;
 import com.citizenv.app.secirity.CustomUserDetail;
+import com.citizenv.app.secirity.SecurityUtils;
 import com.citizenv.app.service.CitizenService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,13 +49,13 @@ public class CitizenController {
     public ResponseEntity<Map<String, Object>> getAllByHamletCode(@PathVariable String hamletCode, @RequestParam int page) {
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 //        CustomUserDetail userDetail = (CustomUserDetail) authentication.getPrincipal();
-//        String divisionCode = userDetail.getUser().getDivision().getCode();
-//        if (hamletCode.indexOf(divisionCode) == 0) {
+        String divisionCode = SecurityUtils.getDivisionCodeCurrentUserLogin();
+        if (hamletCode.indexOf(divisionCode) == 0) {
            Map<String, Object> list = citizenService.getAllByHamletCode(hamletCode, page);
             return new ResponseEntity<>(list, HttpStatus.OK);
-//        } else {
-//            throw new AccessDeniedException("Khong co quyen try cap");
-//        }
+        } else {
+            throw new AccessDeniedException("Khong co quyen try cap");
+        }
     }
 
     @GetMapping(value = "/by-ward/{wardCode}", params = "page")

@@ -20,7 +20,7 @@ public class Association {
     private String associatedCitizenNationalId;
     private String associatedCitizenName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "association_type")
     private AssociationType associationType;
 

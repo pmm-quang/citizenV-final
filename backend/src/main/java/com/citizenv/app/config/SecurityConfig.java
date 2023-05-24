@@ -65,7 +65,7 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-//                .antMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                .antMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
                 .antMatchers("/api/v1/auth/login").permitAll()
 //                .antMatchers(HttpMethod.GET, "/api/v1/province/**").hasAuthority("READ")
 //                .antMatchers( "**/province/save", "**/province/save/**").hasRole("A1")
@@ -75,8 +75,8 @@ public class SecurityConfig {
 //                .antMatchers("**/citizen/save","**/citizen/save/**").hasAnyRole("B1", "B2")
 //                .antMatchers("**/user/save").hasAnyRole("A1", "A2", "A3", "B1")
 //                .antMatchers("**/user/change-password/**").hasAnyRole("A1", "A2", "A3", "B1", "B2")
-                .anyRequest().authenticated();
-//                .anyRequest().permitAll()
+//                .anyRequest().authenticated();
+                .anyRequest().permitAll();
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 //                .and()

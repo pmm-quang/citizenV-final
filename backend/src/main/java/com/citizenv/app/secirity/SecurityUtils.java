@@ -41,7 +41,7 @@ public final class SecurityUtils {
         }
         return Optional.ofNullable(userId);
     }
-    public static Optional<String> getUsernameCurrentUserLogin() {
+    public static String getUsernameCurrentUserLogin() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         Authentication authentication = securityContext.getAuthentication();
         String username = null;
@@ -49,18 +49,21 @@ public final class SecurityUtils {
             CustomUserDetail springSecurityUser = (CustomUserDetail) authentication.getPrincipal();
             username = springSecurityUser.getUsername();
         }
-        return Optional.ofNullable(username);
+        return username;
     }
 
-    public static Optional<AdministrativeDivision> getDivisionCurrentUserLogin() {
+    public static String getDivisionCodeCurrentUserLogin() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         Authentication authentication = securityContext.getAuthentication();
-        AdministrativeDivision division = null;
+        String divisionCode = null;
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
             CustomUserDetail springSecurityUser = (CustomUserDetail) authentication.getPrincipal();
-            division = springSecurityUser.getUser().getDivision();
+            AdministrativeDivision division = springSecurityUser.getUser().getDivision();
+            if (division != null) {
+                divisionCode = division.getCode();
+            }
         }
-        return Optional.ofNullable(division);
+        return divisionCode;
     }
 
     public static Optional<String> getCurrentUserJWT() {

@@ -3,6 +3,7 @@ package com.citizenv.app.controller;
 import com.citizenv.app.payload.DistrictDto;
 
 import com.citizenv.app.secirity.CustomUserDetail;
+import com.citizenv.app.secirity.SecurityUtils;
 import com.citizenv.app.service.DistrictService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -48,15 +49,16 @@ public class DistrictController {
     /**
      * Lấy ra toàn bộ district mà user quản lý
      */
-//    @Secured("ROLE_A1")
-//    @GetMapping("/by-province")
-//    public ResponseEntity<List<DistrictDto>> getAllByProvinceCode() {
+    @Secured("ROLE_A2")
+    @GetMapping("/by-province")
+    public ResponseEntity<List<DistrictDto>> getAllByProvinceCode() {
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 //            CustomUserDetail customUserDetail = (CustomUserDetail) authentication.getPrincipal();
 //            String provinceCode = customUserDetail.getUser().getDivision().getCode();
-//            List<DistrictDto> list = districtService.getAllByProvinceCode(provinceCode);
-//            return ResponseEntity.ok().body(list);
-//    }
+        String provinceCode = SecurityUtils.getDivisionCodeCurrentUserLogin();
+        List<DistrictDto> list = districtService.getAllByProvinceCode(provinceCode);
+        return ResponseEntity.ok().body(list);
+    }
 
 //    @PreAuthorize("hasAuthority('WRITE')")
     @PostMapping("/save")

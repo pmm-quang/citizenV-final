@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,9 +26,9 @@ public class UserController {
 
     @GetMapping("/")
     public ResponseEntity<List<UserDto>> getAll() {
-        CustomUserDetail userDetail = getUserDetail();
-        List<UserDto> userDtoList = userService.getAll(userDetail);
-        System.out.println(SecurityUtils.getCurrentUserLogin());
+//        CustomUserDetail userDetail = getUserDetail();
+        String usernameUserDetail = SecurityUtils.getUsernameCurrentUserLogin();
+        List<UserDto> userDtoList = userService.getByCreatedBy(usernameUserDetail);
 //        List<UserDto> userDtoList = userService.getAll();
         return new ResponseEntity<>(userDtoList, HttpStatus.OK);
     }
@@ -39,21 +40,24 @@ public class UserController {
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 
-//    @PutMapping("/change-password/{username}")
-//    public ResponseEntity<UserDto> changePassword(@PathVariable String username, @RequestBody String newPassword ) {
+    @PutMapping("/change-password/{username}")
+    public ResponseEntity<UserDto> changePassword(@PathVariable String username, @RequestBody String newPassword ) {
 //        CustomUserDetail userDetail = getUserDetail();
 //        String userDetailUsername = userDetail.getUsername();
-//        UserDto userDto = userService.changePassword(userDetailUsername, username, newPassword);
-//        return ResponseEntity.ok(userDto);
-//    }
+        String userDetailUsername = SecurityUtils.getUsernameCurrentUserLogin();
+        UserDto userDto = userService.changePassword(userDetailUsername, username, newPassword);
+        return ResponseEntity.ok(userDto);
+    }
 
     @PostMapping("/save")
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto user) {
 //        CustomUserDetail userDetail = getUserDetail();
 //        UserDto userDto = userService.createUser(userDetail, user);
-        UserDto userDto = userService.createUser(user);
+        String divisionUserDetail = SecurityUtils.getDivisionCodeCurrentUserLogin();
+        String usernameUserDetail = SecurityUtils.getUsernameCurrentUserLogin();
+        System.out.println("username: " + usernameUserDetail + ", divisionCode: " + divisionUserDetail);
+        UserDto userDto = userService.createUser(usernameUserDetail,divisionUserDetail, user);
         return ResponseEntity.status(201).body(userDto);
-
     }
 
 //    @PostMapping("/")
@@ -73,9 +77,4 @@ public class UserController {
 //        return new ResponseEntity<>(userService.deleteById(userId), HttpStatus.OK);
 //    }
 
-    private CustomUserDetail getUserDetail() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        CustomUserDetail userDetail = (CustomUserDetail) authentication.getPrincipal();
-        return userDetail;
-    }
 }

@@ -22,7 +22,7 @@ public class AdministrativeDivision {
 
     private String name;
 
-    @ManyToOne()
+    @ManyToOne(fetch =  FetchType.EAGER)
     @JoinColumn(name = "administrative_unit_id")
     private AdministrativeUnit administrativeUnit;
 

@@ -4,6 +4,7 @@ import com.citizenv.app.payload.HamletDto;
 import com.citizenv.app.payload.custom.CustomHamletRequest;
 import com.citizenv.app.payload.custom.CustomWardRequest;
 import com.citizenv.app.secirity.CustomUserDetail;
+import com.citizenv.app.secirity.SecurityUtils;
 import com.citizenv.app.service.HamletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -43,15 +44,16 @@ public class HamletController {
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-//    @Secured("ROLE_B1")
-//    @GetMapping("/by-ward")
-//    public ResponseEntity<List<HamletDto>> getAllByWardCode() {
+    @Secured("ROLE_B1")
+    @GetMapping("/by-ward")
+    public ResponseEntity<List<HamletDto>> getAllByWardCode() {
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 //        CustomUserDetail userDetail = (CustomUserDetail) authentication.getPrincipal();
 //        String wardCode = userDetail.getUser().getDivision().getCode();
-//        List<HamletDto> list = service.getAllByWardCode(wardCode);
-//        return ResponseEntity.ok(list);
-//    }
+        String wardCode = SecurityUtils.getDivisionCodeCurrentUserLogin();
+        List<HamletDto> list = service.getAllByWardCode(wardCode);
+        return ResponseEntity.ok(list);
+    }
 
     @GetMapping("/by-administrative-unit/{admUnitID}")
     public ResponseEntity<List<HamletDto>> getAllByAdministrativeUnitId(@PathVariable int admUnitID) {

@@ -61,10 +61,11 @@ public class AuthController {
         info.setUsername(userDetail.getUsername());
         info.setRole(role);
         info.setDivision(division);
-        Map<String, Object> map = new HashMap<>();
-        map.put("info", info);
-        map.put("accessToken", jwt);
-        return new ResponseEntity<>(map, HttpStatus.OK);
+        info.setAccessToken(jwt);
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("info", info);
+//        map.put("accessToken", jwt);
+        return new ResponseEntity<>(info, HttpStatus.OK);
     }
 
 }

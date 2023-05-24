@@ -21,7 +21,7 @@ public class Address {
     @JoinColumn(name = "hamlet_id")
     private Hamlet hamlet;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "address_type")
     private AddressType addressType;
 

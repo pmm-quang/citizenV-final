@@ -1,5 +1,6 @@
 package com.citizenv.app.controller;
 
+import com.citizenv.app.config.SecurityConfig;
 import com.citizenv.app.entity.AdministrativeDivision;
 import com.citizenv.app.entity.User;
 import com.citizenv.app.exception.InvalidException;
@@ -8,6 +9,7 @@ import com.citizenv.app.payload.WardDto;
 import com.citizenv.app.payload.custom.CustomHamletRequest;
 import com.citizenv.app.payload.custom.CustomWardRequest;
 import com.citizenv.app.secirity.CustomUserDetail;
+import com.citizenv.app.secirity.SecurityUtils;
 import com.citizenv.app.service.WardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -53,14 +55,15 @@ public class WardController {
         return ResponseEntity.ok().body(list);
     }
 
-//    @GetMapping("/by-district")
-//    public ResponseEntity<List<WardDto>> getAllByDistrictCode() {
+    @GetMapping("/by-district")
+    public ResponseEntity<List<WardDto>> getAllByDistrictCode() {
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 //        CustomUserDetail userDetail = (CustomUserDetail) authentication.getPrincipal();
 //        String districtCode = userDetail.getUser().getDivision().getCode();
-//        List<WardDto> list = wardService.getByDistrictCode(districtCode);
-//        return ResponseEntity.ok().body(list);
-//    }
+        String districtCode = SecurityUtils.getDivisionCodeCurrentUserLogin();
+        List<WardDto> list = wardService.getByDistrictCode(districtCode);
+        return ResponseEntity.ok().body(list);
+    }
 
     @GetMapping("/by-administrative-unit/{admUnitID}")
     public ResponseEntity<List<WardDto>> getAllByAdministrativeUnitID(@PathVariable int admUnitID) {
