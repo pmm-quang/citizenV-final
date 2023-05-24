@@ -6,18 +6,13 @@ import './BasicStatis.css'
 import Table from 'react-bootstrap/Table';
 import axios from 'axios';
 import { Bar, Line, Pie } from 'react-chartjs-2';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js/auto';
-import { CategoryScale } from 'chart.js';
 import { AiFillCaretRight } from 'react-icons/ai'
 import { Button } from 'react-bootstrap';
 
-ChartJS.register(CategoryScale);
-ChartJS.register(ArcElement, Tooltip, Legend);
-
 function BasicStatis() {
     const user_account = JSON.parse(localStorage.getItem("user"));
-    const user = user_account.info.username;
-    const role = user_account.info.role;
+    const user = user_account.username;
+    const role = user_account.role;
     const config = {
         headers: {
             Authorization: `Bearer ${user_account.accessToken}`
@@ -41,8 +36,6 @@ function BasicStatis() {
             },
         ],
     });
-
-    let startYear, endYear;
 
     const GetDataStatic = async (code) => {
         setDataStatic([])

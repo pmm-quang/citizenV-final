@@ -20,7 +20,7 @@ function Account() {
   const [showCreateDeclaration, setShowCreateDeclaration] = useState(false)
   const [declarations, setDeclarations] = useState([])
   const [idAccount, setIdAccount] = useState()
-  const [districts, setDistricts] = useState([])
+  const [nameDivision, setNameDivison] = useState([])
   const [wards, setWards] = useState([])
   const [hamlets, setHamlets] = useState([])
   const [division, setDivision] = useState([])
@@ -33,8 +33,8 @@ function Account() {
   const [createEndTime, setCreateEndTime] = useState()
 
   const user_account = JSON.parse(localStorage.getItem("user"));
-  const user = user_account.info.username;
-  const role = user_account.info.role;
+  const user = user_account.username;
+  const role = user_account.role;
 
   const config = {
     headers: {
@@ -86,23 +86,31 @@ function Account() {
       username: userAccount,
       password: password,
       isActive: true,
-      roles: [],
       declaration: null,
-      division: {}
+      division: {
+        code: userAccount,
+        name: "",
+        administrativeUnit: {
+        }
+      }
     }
 
     if (role === 'A1') {
       const response = await axios('http://localhost:8080/api/v1/province/' + userAccount, config);
-      account.division = response.data;
+      account.division.name = response.data.name
+      account.division.administrativeUnit = response.data.administrativeUnit
     } else if (role === 'A2') {
       const response = await axios('http://localhost:8080/api/v1/district/' + userAccount, config);
-      account.division = response.data;
+      account.division.name = response.data.name
+      account.division.administrativeUnit = response.data.administrativeUnit
     } else if (role === 'A3') {
       const response = await axios('http://localhost:8080/api/v1/ward/' + userAccount, config);
-      account.division = response.data;
+      account.division.name = response.data.name
+      account.division.administrativeUnit = response.data.administrativeUnit
     } else if (role === 'B1') {
       const response = await axios('http://localhost:8080/api/v1/hamlet/' + userAccount, config);
-      account.division = response.data;
+      account.division.name = response.data.name
+      account.division.administrativeUnit = response.data.administrativeUnit
     }
 
     console.log(account)
@@ -112,6 +120,7 @@ function Account() {
         setShow(false)
         const response = await axios('http://localhost:8080/api/v1/user/', config);
         setAccountList(response.data);
+        console.log(response.data)
       } catch (err) {
         console.error(err);
       }
@@ -135,8 +144,8 @@ function Account() {
 
   const listDeclaration = declarations.map((declaration, index) =>
     <tr key={index} className="rowTable" style={{ backgroundColor: (CheckedTimeDeclaration(declaration.endTime)) ? "lime" : "red" }}>
-      <td>{declaration.startTime.substring(0, 10)}</td>
-      <td>{declaration.endTime.substring(0, 10)}</td>
+      <td>{declaration.startTime}</td>
+      <td>{declaration.endTime}</td>
       <td>{CheckedTimeDeclaration(declaration.endTime) ? "Đang khai báo" : "Đã hết hạn"}</td>
     </tr>
   )
@@ -188,8 +197,8 @@ function Account() {
     <tr className="top-row" key={account.username} style={{ backgroundColor: account.checked ? 'yellow' : null }}>
       <th className="top-row-title">{account.username}</th>
       <th className="top-row-title">{account.division.administrativeUnit.shortName + " " + account.division.name}</th>
-      {(account.declaration === null) ? <th className="top-row-title">Chưa khai báo</th> : <th className="top-row-title">{account.declaration.startTime.substring(0, 10)}</th>}
-      {(account.declaration === null) ? <th className="top-row-title">Chưa khai báo</th> : <th className="top-row-title">{account.declaration.endTime.substring(0, 10)}</th>}
+      {(account.declaration === null) ? <th className="top-row-title">Chưa khai báo</th> : <th className="top-row-title">{account.declaration.startTime}</th>}
+      {(account.declaration === null) ? <th className="top-row-title">Chưa khai báo</th> : <th className="top-row-title">{account.declaration.endTime}</th>}
       {(account.isActive) ? <th className="top-row-title" style={{ color: 'green' }}>Đang khai báo</th> : <th className="top-row-title" style={{ color: 'red' }}>Chưa khai báo</th>}
     </tr>
   ));

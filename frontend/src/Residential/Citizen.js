@@ -14,8 +14,8 @@ import { AiFillCaretRight, AiFillCaretDown } from 'react-icons/ai'
 
 function Citizen() {
     const user_account = JSON.parse(localStorage.getItem("user"));
-    const user = user_account.info.username;
-    const role = user_account.info.role;
+    const user = user_account.username;
+    const role = user_account.role;
     const config = {
         headers: {
             Authorization: `Bearer ${user_account.accessToken}`
@@ -64,7 +64,7 @@ function Citizen() {
 
     const CountCitizen = async () => {
         let role_name
-        if (role !== 'A1') role_name = user_account.info.division.administrativeUnit.shortName + " " + user_account.info.division.name;
+        if (role !== 'A1') role_name = user_account.division.administrativeUnit.shortName + " " + user_account.division.name;
         if (role === 'A1') {
             GetPopulationInCountry()
         } else if (role === 'A2') {
