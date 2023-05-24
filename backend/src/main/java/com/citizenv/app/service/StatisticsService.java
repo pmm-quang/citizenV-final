@@ -8,7 +8,7 @@ import java.util.Map;
 
 public interface StatisticsService {
     Long getCountryPopulation();
-    List<DivisionGeneralPopulationDto> getProvincePopulationList(DivisionPopulationRequest request);
+    List<DivisionGeneralPopulationDto> getDivisionPopulationList(DivisionPopulationRequest request);
     List<DivisionGeneralPopulationDto> getDistrictPopulationListByProvince(String provinceCode);
     List<DivisionGeneralPopulationDto> getWardPopulationListByDistrict(String districtCode);
     List<DivisionGeneralPopulationDto> getHamletPopulationListByWard(String wardCode);

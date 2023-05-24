@@ -46,9 +46,9 @@ public class StatisticsController {
         return new ResponseEntity<>(population, HttpStatus.OK);
     }
 
-    @GetMapping("/population/province")
-    public ResponseEntity<List<DivisionGeneralPopulationDto>> getProvincePopulationList(@RequestBody DivisionPopulationRequest request) {
-        List<DivisionGeneralPopulationDto> population = populationService.getProvincePopulationList(request);
+    @GetMapping("/population/division")
+    public ResponseEntity<List<DivisionGeneralPopulationDto>> getDivisionPopulationList(@RequestBody DivisionPopulationRequest request) {
+        List<DivisionGeneralPopulationDto> population = populationService.getDivisionPopulationList(request);
         return new ResponseEntity<>(population, HttpStatus.OK);
     }
 
@@ -82,7 +82,7 @@ public class StatisticsController {
         return new ResponseEntity<>(population, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/population/province/citizen", params = "property")
+    /*@GetMapping(value = "/population/province/citizen", params = "property")
     public ResponseEntity<List<DivisionPopulationByCitizenPropertyDto>> getProvincePopulationListByCitizenProperty(@RequestParam String property) {
         List<DivisionPopulationByCitizenPropertyDto> population = populationService.getProvincePopulationListByCitizenProperty(property);
         return new ResponseEntity<>(population, HttpStatus.OK);
@@ -92,7 +92,7 @@ public class StatisticsController {
     public ResponseEntity<List<DivisionPopulationByCitizenPropertyDto>> getDistrictPopulationListByCitizenProperty(@RequestParam String property) {
         List<DivisionPopulationByCitizenPropertyDto> population = populationService.getProvincePopulationListByCitizenProperty(property);
         return new ResponseEntity<>(population, HttpStatus.OK);
-    }
+    }*/
 
     @GetMapping(value = "/population/citizen/age-group", params = {"startYear", "endYear"})
     public ResponseEntity<List<AgeGroupDto>> getPopulationListByAgeGroup(@RequestParam Integer startYear, @RequestParam Integer endYear) {

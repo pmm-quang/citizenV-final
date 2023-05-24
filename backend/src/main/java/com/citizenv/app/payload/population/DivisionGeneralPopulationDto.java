@@ -14,6 +14,10 @@ import java.io.Serializable;
 public class DivisionGeneralPopulationDto extends PopulationDto {
     private String code;
 
+    public DivisionGeneralPopulationDto() {
+        super();
+    }
+
     public DivisionGeneralPopulationDto(String code, String name) {
         super(name);
         this.code = code;
