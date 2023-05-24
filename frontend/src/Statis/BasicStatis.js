@@ -8,6 +8,8 @@ import axios from 'axios';
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js/auto';
 import { CategoryScale } from 'chart.js';
+import { AiFillCaretRight } from 'react-icons/ai'
+import { Button } from 'react-bootstrap';
 
 ChartJS.register(CategoryScale);
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -23,7 +25,13 @@ function BasicStatis() {
     };
 
     const [option, setOption] = useState();
+    const [showAge, setShowAge] = useState(false);
+    const [showChartAge, setShowChartAge] = useState(false);
+    const [showChart, setShowChart] = useState(false);
     const [dataStatic, setDataStatic] = useState([]);
+    const [start, setStart] = useState('')
+    const [end, setEnd] = useState('')
+    const [dataAgeStatic, setDataAgeStatic] = useState([]);
     const [dataChart, setDataChart] = useState({
         labels: [],
         datasets: [
@@ -34,10 +42,18 @@ function BasicStatis() {
         ],
     });
 
+    let startYear, endYear;
+
     const GetDataStatic = async (code) => {
+        setDataStatic([])
+        setDataAgeStatic([])
+        setShowAge(false)
+        setShowChartAge(false)
+        setShowChart(true)
         let response;
+        setOption(code)
         if (code === 'region') {
-            response = await axios.get("http://localhost:8080/api/v1/statistics/population/region", config )
+            response = await axios.get("http://localhost:8080/api/v1/statistics/population/region", config)
         } else {
             response = await axios.get("http://localhost:8080/api/v1/statistics/population/citizen?property=" + code, config)
         }
@@ -55,27 +71,37 @@ function BasicStatis() {
         console.log(dataChart)
     }
 
-    useEffect(() => {
-    }, [])
-
-    const SelectOption = () => {
-        return (
-            <div className="selectOption">
-                <div className='title'>Chọn thuộc tính cần thống kê: </div>
-                <Form.Select className='optionInput' value={option} onChange={(e) => GetDataStatic(e.target.value)}>
-                    <option></option>
-                    <option value={'sex'}>Giới tính</option>
-                    <option value={'maritalStatus'}>Tình trạng hôn nhân</option>
-                    <option value={'bloodType'}>Nhóm máu</option>
-                    <option value={'ethnicity'}>Dân tộc</option>
-                    <option value={'religion'}>Tôn giáo</option>
-                    <option value={'maritalStatus'}>Tình trạng hôn nhân</option>
-                    <option value={'region'}>Dân cư theo vùng</option>
-                </Form.Select>
-            </div>
-        )
+    const GetDataAgeStatic = async (start, end) => {
+        setDataStatic([])
+        setDataAgeStatic([])
+        setOption("ageGroup")
+        setShowChart(false)
+        const year = end - start;
+        const response = await axios.get("http://localhost:8080/api/v1/statistics/population/citizen/age-group?year=" + year + "&startYear=" + start + "&endYear=" + end, config)
+        setDataAgeStatic(response.data)
+        setDataChart({
+            labels: response.data.map(item => item.year),
+            datasets: [
+                {
+                    label: "Dưới độ tuổi lao động",
+                    data: response.data.map(item => item.ageGroupPopulation[0].population)
+                },
+                {
+                    label: "Trong độ tuổi lao động",
+                    data: response.data.map(item => item.ageGroupPopulation[1].population)
+                },
+                {
+                    label: "Trên độ tuổi lao động",
+                    data: response.data.map(item => item.ageGroupPopulation[2].population)
+                }
+            ]
+        })
+        console.log(dataChart)
     }
 
+
+    useEffect(() => {
+    }, [])
 
     const listStatics = dataStatic.map((post, index) =>
         <tr key={index}>
@@ -84,9 +110,50 @@ function BasicStatis() {
         </tr>
     )
 
+    const listAgeGroupStatics = dataAgeStatic.map((post, index) =>
+        <tr key={index}>
+            <td>{post.year}</td>
+            <td>{post.ageGroupPopulation[0].population}</td>
+            <td>{post.ageGroupPopulation[1].population}</td>
+            <td>{post.ageGroupPopulation[2].population}</td>
+        </tr>
+    )
+
+    const TreeUnits = () => {
+        return (
+            <div className="flex_citizen">
+                <div className="title">Các thuộc tính thống kê</div>
+                <div className='listProvinces'>
+                    <div className="optionStatic" onClick={() => {
+                        GetDataStatic('sex')
+                    }}><AiFillCaretRight /> 1. Giới tính</div>
+                    <div className="optionStatic" onClick={() => {
+                        GetDataStatic('maritalStatus')
+                    }}><AiFillCaretRight /> 2. Tình trạng hôn nhân</div>
+                    <div className="optionStatic" onClick={() => {
+                        GetDataStatic('bloodType')
+                    }}><AiFillCaretRight /> 3. Nhóm máu</div>
+                    <div className="optionStatic" onClick={() => {
+                        GetDataStatic('ethnicity')
+                    }}><AiFillCaretRight /> 4. Dân tộc</div>
+                    <div className="optionStatic" onClick={() => {
+                        GetDataStatic('religion')
+                    }}><AiFillCaretRight /> 5. Tôn giáo</div>
+                    <div className="optionStatic" onClick={() => {
+                        setShowAge(true)
+                        setShowChart(false)
+                    }
+                    }><AiFillCaretRight /> 6. Nhóm tuổi theo năm</div>
+                </div>
+
+            </div>
+        )
+    }
+
     const TableStatic = () => {
         return (
             <div>
+                <div className='titleStatic'>BẢNG THỐNG KÊ TỔNG DÂN SỐ</div>
                 <Table striped bordered hover size="sm" className="tableResidentialInHamlet">
                     <thead>
                         <tr>
@@ -102,19 +169,75 @@ function BasicStatis() {
         )
     }
 
+    const TableAgeStatic = () => {
+        return (
+            <div>
+                <div className='titleStatic'>BẢNG THỐNG KÊ TỔNG DÂN SỐ</div>
+                <Table striped bordered hover size="sm" className="tableResidentialInHamlet">
+                    <thead>
+                        <tr>
+                            <th>Năm</th>
+                            <th>Dưới độ tuổi lao động</th>
+                            <th>Trong độ tuổi lao động</th>
+                            <th>Trên độ tuổi lao động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {listAgeGroupStatics}
+                    </tbody>
+                </Table>
+            </div>
+        )
+    }
+
+    const SelectYear = () => {
+        return (
+            <div>
+                <div className="titleSelectYear">THỐNG KÊ CÁC NHÓM TUỔI TRONG KHOẢNG THỜI GIAN</div>
+                <div className="flex-year">
+                    <Form.Group className="formInput">
+                        <Form.Label style={{ width: '150px', marginTop: '6px' }}>1*. Năm bắt đầu</Form.Label>
+                        <Form.Control type="text" style={{ width: '200px' }} value={start} onChange={(e) => {
+                            setStart(e.target.value)
+                            setShowChartAge(false)
+                        }} />
+                    </Form.Group>
+                    <Form.Group className="formInput">
+                        <Form.Label style={{ width: '150px', marginTop: '6px' }}>2*. Năm kết thúc</Form.Label>
+                        <Form.Control type="text" style={{ width: '200px' }} value={end} onChange={(e) => {
+                            setEnd(e.target.value)
+                            setShowChartAge(false)
+                        }} />
+                    </Form.Group>
+                    <Form.Group style={{ marginLeft: '30px' }}>
+                        <Button onClick={() => {
+                            GetDataAgeStatic(start, end)
+                            setShowChartAge(true)
+                        }}> Xác nhận </Button>
+                    </Form.Group>
+                </div>
+            </div>
+        )
+    }
+
     const SexStatic = () => {
         return (
             <div className="flexStatic">
-                <div>
+                <TreeUnits className="flex_first" />
+                <div className="flex_second">
+                    {(showAge) ? SelectYear() : null}
                     <div className="chartStatic">
-                        {(option === undefined) ? null : <div className='titleStatic'>BIỂU ĐỒ THỂ HIỆN CƠ CẤU</div>}
-                        {(option !== 'region') ? <Pie data={dataChart} className='chart' /> : null}
+                        {(showChart || showChartAge) ? <div className='titleStatic'>BIỂU ĐỒ THỂ HIỆN CƠ CẤU</div> : null}
+                        {(showChart) ? <Pie data={dataChart} className='chart' /> : null}
                         {(option === 'region') ? <Bar data={dataChart} className='chart' /> : null}
                     </div>
-                </div>
-                <div className='flex_second'>
-                    {(option === undefined) ? null : <div className='titleStatic'>BẢNG THỐNG KÊ TỔNG DÂN SỐ</div>}
-                    {(option === undefined) ? null : <TableStatic />}
+                    <div className="chartLine">
+                        {(showChartAge) ? <Line data={dataChart} /> : null}
+                    </div>
+                    <div className='flex_second'>
+                        {(showChartAge) ? <TableAgeStatic /> : null}
+                        {(showChart) ? <TableStatic /> : null}
+                    </div>
                 </div>
             </div>
         )
@@ -123,10 +246,7 @@ function BasicStatis() {
     return (
         <div>
             <NavbarPage />
-            <div>
-                <SelectOption />
-            </div>
-            <SexStatic />
+            {SexStatic()}
         </div>
     );
 }

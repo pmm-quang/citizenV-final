@@ -37,3 +37,63 @@ th, td {
     color: red;
     font-weight: bold;
 }
+
+.checked {
+    font-size: 13px;
+    font-weight: bold;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.iconChecked {
+    margin-right: 5px;
+    width: 18px;
+    height: 18px
+}
+
+.checked:hover {
+    color: blue;
+    cursor: pointer;
+}
+
+.warningChecked {
+    color: red;
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.successChecked {
+    color: rgb(5, 164, 50);
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+
+.tableAccount {
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    border: 2px solid grey;
+}
+
+thead {
+    background-color: #3F72AF;
+    color: white;
+    font-size: 14px;
+    border: 2px solid grey;
+    height: 1cm;
+}
+
+td {
+    background-color: azure;
+    font-size: 14px;
+    font-weight: bold;
+    height: 1cm;
+}
+
+Modal {
+    width: 1000px;
+}

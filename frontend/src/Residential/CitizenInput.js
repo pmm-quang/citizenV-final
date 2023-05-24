@@ -4,6 +4,7 @@ import { Form, Button } from 'react-bootstrap';
 import axios from 'axios';
 import PDFFile from './mau_phieu.pdf'
 import './CitizenInput.css'
+import ExcelFile from './mau_excel.xlsx'
 import { useState, useEffect } from 'react';
 import Modal from 'react-bootstrap/Modal';
 
@@ -641,6 +642,9 @@ function CitizenInput() {
                     <a href={PDFFile} download="mau-phieu-thu-thap-thong-tin-dan-cu" target="_blank" rel="noreferrer">
                         <Button className="optionButton">Tải mẫu phiếu</Button>
                     </a>
+                    <a href={ExcelFile} download="mau-file-du-lieu-dan-cu" target="_blank" rel="noreferrer">
+                        <Button className="optionButton">Tải file mẫu</Button>
+                    </a>
                 </div>
             </div>
         )
@@ -664,7 +668,7 @@ function CitizenInput() {
     return (
         <div>
             <NavbarPage />
-            {(declaration === null) ? <div className = "warning">ĐÃ HẾT THỜI GIAN KHAI BÁO<div className = "childWarning">Vui lòng đợi đến đợt khai báo dân số sau</div></div> : <FormInput />}
+            {FormInput()}
         </div>
     );
 }
