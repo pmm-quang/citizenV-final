@@ -1,12 +1,16 @@
 package com.citizenv.app.entity;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "associations")
-@Data
+@Getter
+@Setter
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class Association {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -19,8 +19,6 @@ public interface CitizenService {
     List<CitizenDto> getAllByDistrictCode(String districtCode);
     List<CitizenDto> getAllByProvinceCode(String provinceCode);
     List<CitizenDto> getAllByAddressId(String addressId); //get dia chi thuong tru
-    CitizenDto createCitizen(CitizenDto citizen);
-    CitizenDto updateCitizen(String citizenId, CitizenDto citizen);
 
     void deleteCitizen(String citizenId);
 
@@ -34,5 +32,5 @@ public interface CitizenService {
 
     CitizenDto createCitizen(CustomCitizenRequest citizen);
     CitizenDto updateCitizen(String nationalId, CustomCitizenRequest citizen);
-    List<UserDto> createUserFromExcelFile(File excelFile);
+    List<CitizenDto> createUserFromExcelFile(File excelFile);
 }

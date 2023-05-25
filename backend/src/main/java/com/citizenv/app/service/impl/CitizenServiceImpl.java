@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -91,14 +92,6 @@ public class CitizenServiceImpl implements CitizenService {
         Page<Citizen> citizenEntities = repo.findAll(PageRequest.of(page - 1, 15));
         return getStringObjectMap(page, citizenEntities);
     }
-//    public List<CitizenCustom> getAll() {
-//        List<Citizen> entities = repo.findAll();
-//        List<CitizenCustom> list = new ArrayList<>();
-//        for (Citizen c: entities) {
-//            list.add(mapping(c));
-//        }
-//        return list;
-//    }
 
     public CitizenDto getById(String citizenId) {
         Citizen citizen = repo.findById(citizenId).orElseThrow(
@@ -357,75 +350,6 @@ public class CitizenServiceImpl implements CitizenService {
     public List<CitizenDto> getAllByAddressId(String addressId) {
         return null;
     }
-
-    @Override
-    public CitizenDto createCitizen(CitizenDto citizen) {
-        String citizenId = citizen.getNationalId();
-        repo.findById(citizenId).ifPresent(
-                c -> {throw new ResourceFoundException("Citizen", "CititzenId", citizenId);
-        });
-       if (validateInfo(citizen)) {
-           Citizen newCitizen = mapper.map(citizen, Citizen.class);
-           newCitizen.setName(Utils.standardizeName(citizen.getName()));
-           newCitizen.getAddresses().forEach(address -> address.setCitizen(newCitizen));
-           newCitizen.getAssociations().forEach(association -> association.setCitizen(newCitizen));
-           Citizen createCitizen = repo.save(newCitizen);
-//           addressRepo.saveAll(newCitizen.getAddresses());
-//           associationRepo.saveAll(newCitizen.getAssociations());
-           return mapper.map(createCitizen, CitizenDto.class);
-      }
-       return null;
-    }
-
-
-    @Override
-    public CitizenDto updateCitizen(String citizenId, CitizenDto citizen) {
-        Citizen foundCitizen = repo.findById(citizenId).orElseThrow(
-                () -> new ResourceNotFoundException("Citizen", "CitizenId", citizenId)
-        );
-        String cIdUpdate = citizen.getNationalId();
-
-        if (validateInfo(citizen)) {
-            if (!cIdUpdate.equals(citizenId)) {
-                repo.findById(cIdUpdate).ifPresent(
-                        citizen1 -> {throw new ResourceFoundException("Citizen", "CitizenId", cIdUpdate);});
-                Citizen newCitizen = mapper.map(citizen, Citizen.class);
-                newCitizen.setName(Utils.standardizeName(citizen.getName()));
-                newCitizen.getAddresses().forEach(address -> address.setCitizen(newCitizen));
-                newCitizen.getAssociations().forEach(association -> association.setCitizen(newCitizen));
-                Citizen createCitizen = repo.save(newCitizen);
-                repo.delete(foundCitizen);
-                return mapper.map(createCitizen, CitizenDto.class);
-            } else {
-                List<Integer> addressIdListOfOriginalCitizen = foundCitizen.getAddresses().stream().map(Address::getId).collect(Collectors.toList());
-                List<Integer> associationIdListOfOriginalCitizen = foundCitizen.getAssociations().stream().map(Association::getId).collect(Collectors.toList());
-                List<Integer> addressIdListOfNewCitizen = citizen.getAddresses().stream().map(AddressDto::getId).collect(Collectors.toList());
-                List<Integer> associationIdListOfNewCitizen = citizen.getAssociations().stream().map(AssociationDto::getId).collect(Collectors.toList());
-                addressIdListOfOriginalCitizen.removeAll(addressIdListOfNewCitizen);
-                foundCitizen.getAddresses().forEach(address -> address.setCitizen(foundCitizen));
-                foundCitizen.getAssociations().forEach(association -> association.setCitizen(foundCitizen));
-                repo.save(foundCitizen);
-                if (addressIdListOfOriginalCitizen.size() > 0) {
-                    addressIdListOfOriginalCitizen.forEach(id -> {
-                        addressRepo.deleteById(id);
-                    });
-                }
-                associationIdListOfOriginalCitizen.removeAll(associationIdListOfNewCitizen);
-                if (associationIdListOfOriginalCitizen.size() > 0) {
-                    associationIdListOfOriginalCitizen.forEach(a -> {
-                        associationRepo.deleteById(a);
-                    });
-                }
-                Citizen updateCititzen = mapper.map(citizen, Citizen.class);
-                updateCititzen.getAddresses().forEach(address -> address.setCitizen(updateCititzen));
-                updateCititzen.getAssociations().forEach(association -> association.setCitizen(updateCititzen));
-                repo.save(updateCititzen);
-                return mapper.map(updateCititzen, CitizenDto.class);
-            }
-        }
-        return null;
-    }
-
     @Override
     public void deleteCitizen(String citizenId) {
         Citizen foundCitizen = repo.findById(citizenId).orElseThrow(
@@ -434,77 +358,6 @@ public class CitizenServiceImpl implements CitizenService {
         repo.delete(foundCitizen);
     }
 
-
-
-
-    private boolean validateInfo(CitizenDto citizen) {
-        String citizenId = citizen.getNationalId();
-        String provinceCodeOfQueQuan = null;
-
-        //Kiểm tra mã địa chỉ - address
-        int countRequiredAddress = 0;
-        for (AddressDto a: citizen.getAddresses()) {
-            if (a.getAddressType().getId() == 1 || a.getAddressType().getId() == 2) {
-                countRequiredAddress ++;
-            }
-            Hamlet h = hamletRepo.findByCode(a.getHamlet().getCode()).orElseThrow(
-                    () -> new ResourceNotFoundException("Hamlet", "HamletCode", a.getHamlet().getCode())
-            );
-            if (a.getAddressType().getId() == 1) {
-                provinceCodeOfQueQuan = h.getWard().getDistrict().getProvince().getCode();
-            }
-        }
-        if (countRequiredAddress != 2) {
-            throw new InvalidException("Chua nhap du cac truong dia chi bat buoc");
-        }
-        // Kiểm tra số định danh- id
-//        if (!Utils.validateNationalId(citizenId, citizen.getSex(), provinceCodeOfQueQuan, citizen.getDateOfBirth())) {
-//            throw new InvalidException("Ma so dinh danh khong hop le");
-//        }
-        //Kiểm tra định dạng tên tiếng Việt hợp lệ - name
-//        String name = citizen.getName();
-//        if (!Utils.validateName(name)) {
-//            throw new InvalidException("Dinh dang ten khong hop le");
-//        }
-
-        //Kiểm tra giới tính hợp lệ - sex
-        String sex = citizen.getSex();
-        if (!Utils.validateSex(sex)) {
-            throw new InvalidException("Gioi tinh khong hop le");
-        }
-
-        //Kiểm tra nhóm máu - bloodType
-        String blood = citizen.getBloodType();
-        try {
-            Utils.BloodType.valueOf(blood);
-        } catch (IllegalArgumentException e) {
-            throw new InvalidException("Nhom mau khong hop le");
-        }
-
-        //Kiểm tra ngày sinh hợp lệ - dateOfBirth
-        LocalDate dob = citizen.getDateOfBirth();
-        if (dob.isAfter(LocalDate.now())) {
-            throw new InvalidException("Ngay thang nam sinh khong hop le");
-        }
-
-        //Kiểm tra dân tộc - ethnicity
-        if (citizen.getEthnicity() != null) {
-            Integer ethnicityId = citizen.getEthnicity().getId();
-            Ethnicity foundEthnicity = ethnicityRepo.findById(ethnicityId).orElseThrow(
-                    () -> new ResourceNotFoundException("Ethnicity", "EthnicityId", "" + ethnicityId)
-            );
-        }
-
-        //Kiểm tra tôn giáo - religion
-        if (citizen.getReligion() != null) {
-            Integer religionId = citizen.getReligion().getId();
-            Religion foundReligion = religionRepo.findById(religionId).orElseThrow(
-                    () -> new ResourceNotFoundException("Religion", "ReligionId","" + religionId)
-            );
-        }
-
-        return true;
-    }
 
     private Citizen validate(CustomCitizenRequest citizenRequest) {
         String nationalId = citizenRequest.getNationalId();
@@ -592,7 +445,7 @@ public class CitizenServiceImpl implements CitizenService {
     }
 
     @Override
-    public List<UserDto> createUserFromExcelFile(File excelFile) {
+    public List<CitizenDto> createUserFromExcelFile(File excelFile) {
         try {
             FileInputStream file = new FileInputStream(excelFile);
             Workbook workbook = new XSSFWorkbook(file);
@@ -614,11 +467,11 @@ public class CitizenServiceImpl implements CitizenService {
                 List<Association> associations = new ArrayList<>();
                 Row row = sheet.getRow(rowNum);
                 Association association = new Association();
-
+                Integer associationTypeIndex = 0;
                 for (int colNum = startCol; colNum <= endCol; colNum++) {
                     Cell cell = row.getCell(colNum);
                     switch (colNum + 1) {
-                        case 1: model.setNationalId(cell.getStringCellValue());break;
+                        case 1: citizen.setNationalId(cell.getStringCellValue());break;
                         case 2:
                             model.setName(cell.getStringCellValue());
 //                            if (!Utils.validateName(model.getName())) {
@@ -628,36 +481,42 @@ public class CitizenServiceImpl implements CitizenService {
                             citizen.setName(Utils.standardizeName(cell.getStringCellValue()));
                             break;
                         case 3:
-//                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yyyy");
-                            model.setDateOfBirth(LocalDate.parse(cell.getStringCellValue()));
-                            citizen.setDateOfBirth(LocalDate.parse(cell.getStringCellValue()));
+                            DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                            LocalDate date = LocalDate.parse(cell.getStringCellValue(), inputFormatter);
+
+                            DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                            String formattedDate = date.format(outputFormatter);
+                            model.setDateOfBirth(date);
+                            citizen.setDateOfBirth(date);
                             break;
                         case 4:
                             model.setSex(cell.getStringCellValue());
                             if (!Utils.validateSex(model.getSex())) {
                                 RowInvalid.append(rowNum);
-                                throw new InvalidException("Invalid in row: " + rowNum + " and column: " + (colNum + 1));
+                                throw new InvalidException("Invalid Gioi Tinh in row: " + (rowNum +1) + " and column: " + (colNum + 1));
                             } else {
                                 citizen.setSex(cell.getStringCellValue());
                             }
                             break;
                         case 5:
                             model.setBloodType(cell.getStringCellValue());
-                            Object value = model.getSex();
-                            if (!(value instanceof Utils.BloodType)) {
-                                RowInvalid.append(rowNum);
-                                throw new InvalidException("Invalid in row: " + rowNum + " and column: " + (colNum + 1));
+                            try {
+                                Utils.BloodType.valueOf(cell.getStringCellValue());
+                                citizen.setBloodType(cell.getStringCellValue());
+                            } catch (Exception e) {
+                                throw new InvalidException("Invalid Nhom Mau in row: " + (rowNum +1) + " and column: " + (colNum + 1));
                             }
                             break;
                         case 6:
                             model.setMaritalStatus(cell.getStringCellValue());
+                            citizen.setMaritalStatus(cell.getStringCellValue());
                             break;
                         case 7:
                             model.setEthnicity(cell.getStringCellValue());
                             int finalRowNum = rowNum;
                             int finalColNum = colNum;
-                            Ethnicity ethnicity = ethnicityRepo.findByName(model.getName()).orElseThrow(
-                                    () -> new InvalidException("Invalid in row: " + finalRowNum + " and column: " + (finalColNum + 1))
+                            Ethnicity ethnicity = ethnicityRepo.findByName(cell.getStringCellValue()).orElseThrow(
+                                    () -> new InvalidException("Invalid in Dan Toc in row: " + (finalRowNum+1) + " and column: " + (finalColNum + 1))
                             );
                             citizen.setEthnicity(ethnicity);
                             break;
@@ -667,7 +526,7 @@ public class CitizenServiceImpl implements CitizenService {
                                 finalRowNum = rowNum;
                                 finalColNum = colNum;
                                 Religion religion = religionRepo.findByName(cell.getStringCellValue()).orElseThrow(
-                                        () -> new InvalidException("Invalid in row: " + finalRowNum + " and column: " + (finalColNum + 1))
+                                        () -> new InvalidException("Invalid in Ton Giao in row: " + (finalRowNum+1) + " and column: " + (finalColNum + 1))
                                 );
                                 citizen.setReligion(religion);
                             }
@@ -689,22 +548,24 @@ public class CitizenServiceImpl implements CitizenService {
                         case 12: case 13: case 14:
                             String adr = cell.getStringCellValue();
                             if (colNum != 13 && adr.equals("")) {
-                                throw new InvalidException("Invalid in row: " + rowNum + " and column: " + (colNum + 1));
+                                throw new InvalidException("Invalid in row: " + (rowNum +1) + " and column: " + (colNum + 1));
                             }
                             if (!adr.equals("")) {
-                                String[] listNameOfAdr = adr.split("-");
+                                String[] listNameOfAdr = adr.split(" - ");
                                 if (listNameOfAdr.length != 4) {
-                                    throw new InvalidException("Invalid in row: " + rowNum + " and column: " + (colNum + 1));
+                                    throw new InvalidException("Invalid in row: " + (rowNum +1) + " and column: " + (colNum + 1));
                                 }
                                 List<Hamlet> hamlet = hamletRepo.findHamletFromExcel(listNameOfAdr[3], listNameOfAdr[2],
                                         listNameOfAdr[1], listNameOfAdr[0]);
-                                if (hamlet != null) {
+
+                                if (hamlet.size() > 0 || hamlet != null) {
                                     if (colNum == 11) {
                                         provinceCodeOfHometown = hamlet.get(0).getCode().substring(0, 2);
                                     }
                                     Address add = new Address();
                                     add.setHamlet(hamlet.get(0));
                                     add.setAddressType(addressTypes.get(colNum-11));
+                                    add.setCitizen(citizen);
                                     addresses.add(add);
                                 }
                             }
@@ -712,6 +573,7 @@ public class CitizenServiceImpl implements CitizenService {
                                 Address add = new Address();
 //                                AddressType addressType = addressTypeRepo.findById(3).orElse(null);
                                 add.setAddressType(addressTypes.get(2));
+                                add.setCitizen(citizen);
                                 addresses.add(add);
                             }
                             // Lấy ra associatedCitizenNationalId
@@ -723,33 +585,42 @@ public class CitizenServiceImpl implements CitizenService {
                         case 16: case 18: case 20: case 22:
                             if (!cell.getStringCellValue().equals("")) {
                                 association.setAssociatedCitizenName(cell.getStringCellValue());
-                                association.setAssociationType(associationTypes.get(colNum - 15));
+                                association.setAssociationType(associationTypes.get(associationTypeIndex++));
+                                association.setCitizen(citizen);
                             }
                             if (association.getAssociatedCitizenName()!= null && association.getAssociatedCitizenNationalId()!= null) {
                                 associations.add(association);
+                                System.out.println("Dm quan col: " + (colNum + 1)  +" row: " + (rowNum + 1));
+                                System.out.println(association.getAssociatedCitizenName() + association.getAssociatedCitizenNationalId() + association.getCitizen());
                             }
-                            association.setAssociatedCitizenName(null);
-                            association.setAssociatedCitizenNationalId(null);
-                            association.setAssociationType(null);
+                            association = new Association();
+//                            association.setAssociatedCitizenName(null);
+//                            association.setAssociatedCitizenNationalId(null);
+//                            association.setAssociationType(null);
+//                            association.setCitizen(null);
                             break;
                     }
                     System.out.print(cell.getStringCellValue()+" ");
                 }
                 excelModels.add(model);
                 System.out.println();
-                if (!Utils.validateNationalId(citizen.getNationalId(),citizen.getSex(),provinceCodeOfHometown, citizen.getDateOfBirth())) {
-                    throw new InvalidException("Invalid identifier at row " + rowNum);
+                citizen.setAddresses(addresses);
+                citizen.setAssociations(associations);
+//                if (!Utils.validateNationalId(citizen.getNationalId(),citizen.getSex(),provinceCodeOfHometown, citizen.getDateOfBirth())) {
+//                    throw new InvalidException("Invalid identifier at row " + (rowNum+1));
+//                }
+                for (Association as :
+                        associations) {
+                    System.out.println(as.getCitizen() + as.getAssociatedCitizenName() + as.getAssociatedCitizenNationalId() + as.getAssociationType());
                 }
                 Citizen foundCitizen = repo.findByNationalId(citizen.getNationalId()).orElse(null);
                 if (foundCitizen == null) {
                     citizens.add(citizen);
                 }
             }
-            for (ExcelCitizen model: excelModels) {
-                System.out.println(model.toString());
-            }
+            List<Citizen> list = repo.saveAll(citizens);
 
-            return null;
+            return list.stream().map(citizen -> mapper.map(citizen, CitizenDto.class)).collect(Collectors.toList());
         }  catch (IOException e) {
             throw new RuntimeException(e);
         }
