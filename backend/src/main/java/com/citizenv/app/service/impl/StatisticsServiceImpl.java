@@ -17,10 +17,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class StatisticsServiceImpl implements StatisticsService {
@@ -42,6 +39,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         this.addressRepository = addressRepository;
         this.provinceRepository = provinceRepository;
         this.administrativeDivisionRepository = administrativeDivisionRepository;
+
     }
 
     @Cacheable("addressesForPopulationCount")
@@ -81,11 +79,10 @@ public class StatisticsServiceImpl implements StatisticsService {
                                 () -> {
                                     AdministrativeDivision foundDivision = administrativeDivisionRepository.findByCode(currentDivisionCode).orElseThrow(() -> new ResourceNotFoundException("Division", "code", currentDivisionCode));
                                     if (request.getProperties() == null) {
-                                        result.add(new DivisionGeneralPopulationDto(foundDivision.getCode(), foundDivision.getName()));
+                                        result.add(new DivisionGeneralPopulationDto(foundDivision.getCode(), foundDivision.getName(), 1L));
                                     } else {
-                                        DivisionPopulationByCitizenPropertyDto currentDivisionPopulation = new DivisionPopulationByCitizenPropertyDto(foundDivision.getCode(), foundDivision.getName(), getDivisionPopulationByProperty(foundDivision.getCode(), request.getProperties().iterator().next()));
+                                        DivisionPopulationByCitizenPropertyDto currentDivisionPopulation = new DivisionPopulationByCitizenPropertyDto(foundDivision.getCode(), foundDivision.getName(), 1L,  getDivisionPopulationByProperty(foundDivision.getCode(), request.getProperties()));
                                         result.add(currentDivisionPopulation);
-                                        currentDivisionPopulation.recalculatePopulation();
                                     }
                                 });
             }
@@ -106,7 +103,7 @@ public class StatisticsServiceImpl implements StatisticsService {
                         }
                     }
                 } else {
-                    DivisionPopulationByCitizenPropertyDto currentDivisionPopulation = new DivisionPopulationByCitizenPropertyDto(foundDivision.getCode(), foundDivision.getName(), getDivisionPopulationByProperty(foundDivision.getCode(), request.getProperties().iterator().next()));
+                    DivisionPopulationByCitizenPropertyDto currentDivisionPopulation = new DivisionPopulationByCitizenPropertyDto(foundDivision.getCode(), foundDivision.getName(), getDivisionPopulationByProperty(foundDivision.getCode(), request.getProperties()));
                     result.add(currentDivisionPopulation);
                     currentDivisionPopulation.recalculatePopulation();
                 }
@@ -224,7 +221,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Override
     public List<DivisionPopulationByCitizenPropertyDto> getProvincePopulationListByCitizenProperty(String property) {
-        try {
+        /*try {
             List<Address> addressesForPopulationCount = getAddressesForPopulationCount();
             List<DivisionPopulationByCitizenPropertyDto> result = new ArrayList<>();
             sb.setLength(0);
@@ -253,23 +250,27 @@ public class StatisticsServiceImpl implements StatisticsService {
         } catch (SecurityException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
             throw new RuntimeException();
-        }
+        }*/
+        return null;
     }
 
-    private List<PopulationDto> getDivisionPopulationByProperty(String code, String property) {
+    private List<Object[]> getDivisionPopulationByProperty(String code, Set<String> properties) {
         try {
-            List<Address> addressesForPopulationCount = getAddressesForPopulationCount(code);
+            return addressRepository.countByProperties(properties, code);
+
+
+            /*List<Address> addressesForPopulationCount = getAddressesForPopulationCount(code);
             List<PopulationDto> result = new ArrayList<>();
             sb.setLength(0);
             Method method;
-            method = Citizen.class.getDeclaredMethod(sb.append("get").append(property.substring(0, 1).toUpperCase()).append(property.substring(1)).toString());
+            method = Citizen.class.getDeclaredMethod(sb.append("get").append(properties.substring(0, 1).toUpperCase()).append(properties.substring(1)).toString());
             for (Address currentAddress :
                     addressesForPopulationCount) {
                 Citizen currentCitizen = currentAddress.getCitizen();
                 Object requestProperty = method.invoke(currentCitizen);
                 result.stream().filter(populationDto -> populationDto.getName().equals(requestProperty.toString())).findFirst().ifPresentOrElse(currentPropertyPopulation ->
                                 currentPropertyPopulation.increasePopulation(1L), () -> result.add(new PopulationDto(requestProperty.toString(), 1L)));
-                /*result
+                result
                         .stream()
                         .filter(population -> population.getCode().equals(currentProvince.getCode()))
                         .findFirst()
@@ -281,10 +282,10 @@ public class StatisticsServiceImpl implements StatisticsService {
                                                 .ifPresentOrElse(currentPopulationByCitizenPropertyDto ->
                                                                 currentPopulationByCitizenPropertyDto.increasePopulation(1L),
                                                         () -> divisionPopulationByCitizenPropertyDto.getDetails().add(new PopulationDto(requestProperty.toString(), 1L))),
-                                () -> result.add(new DivisionPopulationByCitizenPropertyDto(currentProvince.getCode(), currentProvince.getName(), new ArrayList<>(List.of(new PopulationDto(requestProperty.toString(), 1L))))));*/
+                                () -> result.add(new DivisionPopulationByCitizenPropertyDto(currentProvince.getCode(), currentProvince.getName(), new ArrayList<>(List.of(new PopulationDto(requestProperty.toString(), 1L))))));
             }
-            return result;
-        } catch (SecurityException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            return result;*/
+        } catch (SecurityException/* | NoSuchMethodException | InvocationTargetException | IllegalAccessException*/ e) {
             e.printStackTrace();
             throw new RuntimeException();
         }
@@ -342,5 +343,22 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public List<PopulationDto> getPopulation(Map<String, Object> body) {
         return null;
+    }
+
+    @Override
+    public List<Object[]> test() {
+        Set<String> properties = new HashSet<>();
+        properties.add("sex");
+        properties.add("local");
+        String code = "24";
+        List<Object[]> a = addressRepository.countByProperties(properties, code);
+        for (Object[] saf:
+             a) {
+            for (Object b:
+                 saf) {
+                System.out.println(b);
+            }
+        }
+        return a;
     }
 }

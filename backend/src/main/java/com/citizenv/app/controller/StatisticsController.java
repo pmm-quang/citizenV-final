@@ -111,4 +111,9 @@ public class StatisticsController {
         List<AverageAgeDto> population = populationService.getProvinceAverageAgeList();
         return new ResponseEntity<>(population, HttpStatus.OK);
     }
+    @GetMapping("/test")
+    public ResponseEntity<List<Object[]>> test() {
+        List<Object[]> population = populationService.test();
+        return new ResponseEntity<>(population, HttpStatus.OK);
+    }
 }
