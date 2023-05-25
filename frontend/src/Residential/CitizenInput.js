@@ -10,7 +10,7 @@ import Modal from 'react-bootstrap/Modal';
 
 function CitizenInput() {
     const user_account = JSON.parse(localStorage.getItem("user"));
-    const user = user_account.info.username;
+    const user = user_account.username;
     const config = {
         headers: {
             Authorization: `Bearer ${user_account.accessToken}`
@@ -665,10 +665,19 @@ function CitizenInput() {
         )
     }
 
+    const NotifyDeclaration = () => {
+        return (
+            <div>
+                <div className = "warning">HIỆN KHÔNG PHẢI THỜI GIAN KHAI BÁO DÂN SỐ</div>
+                <div className = "childWarning">Vui lòng quay trở lại sau</div>
+            </div>
+        )
+    }
+
     return (
         <div>
             <NavbarPage />
-            {FormInput()}
+            {(user_account.declarationStatus === "Đang khai báo") ? FormInput() : <NotifyDeclaration/>}
         </div>
     );
 }
