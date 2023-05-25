@@ -1,6 +1,7 @@
 package com.citizenv.app.controller;
 
 import com.citizenv.app.payload.DeclarationDto;
+import com.citizenv.app.secirity.SecurityUtils;
 import com.citizenv.app.service.DeclarationService;
 import com.citizenv.app.service.impl.DeclarationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +23,9 @@ public class DeclarationController {
 
     @GetMapping("/")
     public ResponseEntity<List<DeclarationDto>> getAll() {
-
-        List<DeclarationDto> declarationDtoList = declarationService.getAll();
+        Long userDetailId = SecurityUtils.getIdCurrentUserLogin();
+        System.out.println(userDetailId);
+        List<DeclarationDto> declarationDtoList = declarationService.getAllByCreatedBy(userDetailId);
         return new ResponseEntity<List<DeclarationDto>>(declarationDtoList, HttpStatus.OK);
     }
 
@@ -40,4 +42,9 @@ public class DeclarationController {
         return ResponseEntity.status(201).body(dto);
     }
 
+    @GetMapping("/lock-declaration/{username}")
+    public ResponseEntity<String> lockDeclaration(@PathVariable String username) {
+        declarationService.lockDeclaration(username);
+        return ResponseEntity.ok().body("Đã khóa quyền khai báo");
+    }
 }

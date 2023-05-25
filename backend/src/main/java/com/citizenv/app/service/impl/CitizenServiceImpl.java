@@ -1,7 +1,6 @@
 package com.citizenv.app.service.impl;
 
 
-import ch.qos.logback.core.util.COWArrayList;
 import com.citizenv.app.component.Utils;
 import com.citizenv.app.entity.*;
 import com.citizenv.app.exception.InvalidException;
@@ -63,10 +62,12 @@ public class CitizenServiceImpl implements CitizenService {
 //    @Autowired
     private final AddressTypeRepository addressTypeRepo;
 
+    private final AssociationTypeRepository associationTypeRepo;
+
     public CitizenServiceImpl(CitizenRepository repo, DistrictRepository districtRepo, ProvinceRepository provinceRepo
             , WardRepository wardRepo, HamletRepository hamletRepo, AddressRepository addressRepo
             , EthnicityRepository ethnicityRepo, ReligionRepository religionRepo, AssociationRepository associationRepo
-            , AddressTypeRepository addressTypeRepo) {
+            , AddressTypeRepository addressTypeRepo, AssociationTypeRepository associationTypeRepo) {
         this.repo = repo;
         this.districtRepo = districtRepo;
         this.provinceRepo = provinceRepo;
@@ -77,6 +78,7 @@ public class CitizenServiceImpl implements CitizenService {
         this.religionRepo = religionRepo;
         this.associationRepo = associationRepo;
         this.addressTypeRepo = addressTypeRepo;
+        this.associationTypeRepo = associationTypeRepo;
     }
 
     public List<CitizenDto> getAll() {
@@ -591,6 +593,8 @@ public class CitizenServiceImpl implements CitizenService {
 
     @Override
     public List<UserDto> createUserFromExcelFile(File excelFile) {
+        List<AddressType> addressTypes = addressTypeRepo.findAll();
+        List<AssociationType> associationTypes = associationTypeRepo.findAll();
         StringBuilder RowInvalid = new StringBuilder();
         String provinceCodeOfHometown = null;
         try {
@@ -605,11 +609,10 @@ public class CitizenServiceImpl implements CitizenService {
             for (int rowNum = startRow; rowNum <= endRow; rowNum++) {
                 Citizen citizen = new Citizen();
                 ExcelCitizen model = new ExcelCitizen();
-                List<String> address = new ArrayList<>();
                 List<Address> addresses = new ArrayList<>();
-                List<String> associations = new ArrayList<>();
+                List<Association> associations = new ArrayList<>();
                 Row row = sheet.getRow(rowNum);
-
+                Association association = new Association();
                 int associationType = 0;
                 String associatedCitizenNationalId = null;
                 String associatedCitizenName = null;
@@ -690,64 +693,74 @@ public class CitizenServiceImpl implements CitizenService {
                             citizen.setJob(cell.getStringCellValue());
                             break;
                         case 12:
-                            String hometown = cell.getStringCellValue();
-                            if (hometown.equals("")) {
+                        case 13:
+                        case 14:
+                            String adr = cell.getStringCellValue();
+                            if (colNum != 13 && adr.equals("")) {
                                 throw new InvalidException("Invalid in row: " + rowNum + " and column: " + (colNum + 1));
                             }
-                            String[] listNameOfHomeTown = hometown.split("-");
-                            if (listNameOfHomeTown.length != 4) {
-                                throw new InvalidException("Invalid in row: " + rowNum + " and column: " + (colNum + 1));
+                            if (!adr.equals("")) {
+                                String[] listNameOfAdr = adr.split("-");
+                                if (listNameOfAdr.length != 4) {
+                                    throw new InvalidException("Invalid in row: " + rowNum + " and column: " + (colNum + 1));
+                                }
+                                List<Hamlet> hamlet = hamletRepo.findHamletFromExcel(listNameOfAdr[3], listNameOfAdr[2],
+                                        listNameOfAdr[1], listNameOfAdr[0]);
+                                if (hamlet != null) {
+                                    if (colNum == 11) {
+                                        provinceCodeOfHometown = hamlet.get(0).getCode().substring(0, 2);
+                                    }
+                                    Address add = new Address();
+                                    add.setHamlet(hamlet.get(0));
+                                    add.setAddressType(addressTypes.get(colNum-11));
+                                    addresses.add(add);
+                                }
                             }
-                            List<Hamlet> hamlet = hamletRepo.findHamletFromExcel(listNameOfHomeTown[3],listNameOfHomeTown[2],
-                                    listNameOfHomeTown[1],listNameOfHomeTown[0]);
-                            if (hamlet != null) {
-                                provinceCodeOfHometown = hamlet.get(0).getCode().substring(0, 2);
+                            if (colNum == 13 && adr.equals("")) {
                                 Address add = new Address();
-                                AddressType addressType = addressTypeRepo.findById(1).orElse(null);
-                                add.setHamlet(hamlet.get(0));
-                                add.setAddressType(addressType);
+//                                AddressType addressType = addressTypeRepo.findById(3).orElse(null);
+                                add.setAddressType(addressTypes.get(2));
                                 addresses.add(add);
                             }
-                        case 14:
-                        case 13:
-                            address.add(cell.getStringCellValue());
+                            // Lấy ra associatedCitizenNationalId
                         case 15:
                         case 17:
                         case 19:
                         case 21:
-                            if (cell.getStringCellValue()!= null || !cell.getStringCellValue().equals("")) {
-                                associatedCitizenNationalId = cell.getStringCellValue();
+                            if (!cell.getStringCellValue().equals("")) {
+                                association.setAssociatedCitizenNationalId(cell.getStringCellValue());
                             }break;
+                            //lấy ra associatedCitizenName
                         case 16:
                         case 18:
                         case 20:
                         case 22:
                             if (!cell.getStringCellValue().equals("")) {
-                                associatedCitizenName = cell.getStringCellValue();
-                                if (colNum + 1 == 16) {
-                                    associationType = 1;
-                                } else if (colNum + 1 == 18) {
-                                    associationType = 2;
-                                } else if (colNum + 1 == 20) {
-                                    associationType = 3;
-                                } else {
-                                    associationType = 4;
-                                }
-                                String association = associatedCitizenNationalId + "-" + associatedCitizenName + "-" + associationType;
+                                association.setAssociatedCitizenName(cell.getStringCellValue());
+                                association.setAssociationType(associationTypes.get(colNum - 15));
+                            }
+                            if (association.getAssociatedCitizenName()!= null && association.getAssociatedCitizenNationalId()!= null) {
                                 associations.add(association);
-                            }break;
+                            }
+                            association.setAssociatedCitizenName(null);
+                            association.setAssociatedCitizenNationalId(null);
+                            association.setAssociationType(null);
+                            break;
                     }
                     System.out.print(cell.getStringCellValue()+" ");
                 }
-                model.setAssociations(associations);
-                model.setAddresses(address);
                 excelModels.add(model);
                 System.out.println();
+                if (!Utils.validateNationalId(citizen.getNationalId(),citizen.getSex(),provinceCodeOfHometown, citizen.getDateOfBirth())) {
+                    throw new InvalidException("Invalid identifier at row " + rowNum);
+                }
+                
 
             }
             for (ExcelCitizen model: excelModels) {
                 System.out.println(model.toString());
             }
+
             return null;
         }  catch (IOException e) {
             throw new RuntimeException(e);

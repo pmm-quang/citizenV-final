@@ -8,6 +8,7 @@ import java.util.List;
 public interface DeclarationService {
 
     List<DeclarationDto> getAll();
+    List<DeclarationDto> getAllByCreatedBy(Long  userDetailId);
 
     DeclarationDto createDeclaration(DeclarationDto declaration);
     DeclarationDto updateDeclaration(String username, DeclarationDto declaration);

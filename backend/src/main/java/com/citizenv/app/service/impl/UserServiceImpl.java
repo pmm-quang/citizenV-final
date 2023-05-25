@@ -1,5 +1,6 @@
 package com.citizenv.app.service.impl;
 
+import com.citizenv.app.component.Constant;
 import com.citizenv.app.component.Utils;
 import com.citizenv.app.entity.AdministrativeDivision;
 import com.citizenv.app.entity.Declaration;
@@ -276,10 +277,10 @@ public class UserServiceImpl implements UserService {
             newUser.setIsActive(true);
             Long roleId = 0L;
             switch (newUsername.length()) {
-                case 2: roleId = Utils.A2;break;
-                case 4: roleId = Utils.A3; break;
-                case 6: roleId = Utils.B1;break;
-                case 8: roleId = Utils.B2; break;
+                case 2: roleId = Constant.A2_ROLE_ID;break;
+                case 4: roleId = Constant.A3_ROLE_ID; break;
+                case 6: roleId = Constant.B1_ROLE_ID;break;
+                case 8: roleId = Constant.B2_ROLE_ID; break;
             }
             Long finalRoleId = roleId;
             Role role = roleRepo.findById(finalRoleId).orElseThrow(

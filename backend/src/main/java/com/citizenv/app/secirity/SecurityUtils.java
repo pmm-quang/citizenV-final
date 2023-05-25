@@ -31,15 +31,15 @@ public final class SecurityUtils {
         return null;
     }
 
-    public static Optional<Long> getIdCurrentUserLogin() {
+    public static Long getIdCurrentUserLogin() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         Authentication authentication = securityContext.getAuthentication();
-        Long userId = 0L;
+        Long userId = null;
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
             CustomUserDetail springSecurityUser = (CustomUserDetail) authentication.getPrincipal();
             userId = springSecurityUser.getUser().getId();
         }
-        return Optional.ofNullable(userId);
+        return userId;
     }
     public static String getUsernameCurrentUserLogin() {
         SecurityContext securityContext = SecurityContextHolder.getContext();

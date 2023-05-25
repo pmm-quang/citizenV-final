@@ -22,6 +22,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.IllegalFormatCodePointException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,8 +42,34 @@ public class DeclarationServiceImpl implements DeclarationService {
 
     @Override
     public List<DeclarationDto> getAll() {
-        List<Declaration> entities = repository.findAll();
-        return entities.stream().map(l-> mapper.map(l, DeclarationDto.class)).collect(Collectors.toList());
+//        List<Declaration> entities = repository.findAll();
+//        List<DeclarationDto> dtos = new ArrayList<>();
+//        for (Declaration dec: entities) {
+//            DeclarationDto declarationDto = new DeclarationDto();
+//            declarationDto.setStatus(dec.getStatus());
+//            declarationDto.setEndTime(dec.getEndTime().toLocalDateTime().toLocalDate());
+//            declarationDto.setStartTime(dec.getStartTime().toLocalDateTime().toLocalDate());
+//        }
+//        return entities.stream().map(l-> mapper.map(l, DeclarationDto.class)).collect(Collectors.toList());
+        return null;
+    }
+
+    @Override
+    public List<DeclarationDto> getAllByCreatedBy(Long userDetailId) {
+        List<Object[]> list = repository.findAllDeclarationByCreatedBy(userDetailId);
+        List<DeclarationDto> dtos = new ArrayList<>();
+        for (Object[] l: list) {
+            DeclarationDto dto = new DeclarationDto();
+            if (l[0] != null) {
+                dto.setStartTime(LocalDate.parse(l[0].toString()));
+            }
+            if (l[1] != null) {
+                dto.setEndTime(LocalDate.parse(l[1].toString()));
+            }
+            dto.setStatus(l[2].toString());
+            dtos.add(dto);
+        }
+        return dtos;
     }
 
     @Transactional
