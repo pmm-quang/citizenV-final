@@ -30,6 +30,7 @@ public class UserController {
     public ResponseEntity<List<UserDto>> getAll() {
 //        CustomUserDetail userDetail = getUserDetail();
         String usernameUserDetail = SecurityUtils.getUsernameCurrentUserLogin();
+        System.out.println(usernameUserDetail);
         List<UserDto> userDtoList = userService.getByCreatedBy(usernameUserDetail);
 //        List<UserDto> userDtoList = userService.getAll();
         return new ResponseEntity<>(userDtoList, HttpStatus.OK);

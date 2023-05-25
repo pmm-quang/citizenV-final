@@ -106,8 +106,29 @@ public class UserServiceImpl implements UserService {
         User foundUser = repository.findByUsername(usernameUserDetail).orElseThrow(
                 () -> new ResourceNotFoundException("User", "username", usernameUserDetail)
         );
-        List<User> list = repository.findAllByCreatedBy(foundUser);
-        return list.stream().map(user -> mapper.map(user, UserDto.class)).collect(Collectors.toList());
+        List<User> entities = repository.findAllByCreatedBy(foundUser);
+        List<UserDto> dtoList = new ArrayList<>();
+        for (User user: entities) {
+            UserDto userDto = new UserDto();
+            DeclarationDto declarationDto = new DeclarationDto();
+            userDto.setUsername(user.getUsername());
+            AdministrativeDivisionDto divisionDto = mapper.map(user.getDivision(), AdministrativeDivisionDto.class);
+            userDto.setDivision(divisionDto);
+            if (user.getDeclaration()!= null) {
+                if (user.getDeclaration().getStartTime()!= null) {
+                    declarationDto.setStartTime(user.getDeclaration().getStartTime().toLocalDateTime().toLocalDate());
+                }
+                if (user.getDeclaration().getEndTime()!= null) {
+                    declarationDto.setEndTime(user.getDeclaration().getEndTime().toLocalDateTime().toLocalDate());
+                }
+                if (user.getDeclaration().getStatus()!= null) {
+                    declarationDto.setStatus(user.getDeclaration().getStatus());
+                }
+            }
+            userDto.setDeclaration(declarationDto);
+            dtoList.add(userDto);
+        }
+        return dtoList;
     }
 
     @Override
