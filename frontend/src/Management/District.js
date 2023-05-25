@@ -11,7 +11,7 @@ import { BiCheckCircle } from 'react-icons/bi'
 
 function District() {
     const user_account = JSON.parse(localStorage.getItem("user"));
-    const user = user_account.info.username;
+    const user = user_account.username;
 
     const [showWarning, setShowWarning] = useState(false)
     const [districts, setDistricts] = useState([]);

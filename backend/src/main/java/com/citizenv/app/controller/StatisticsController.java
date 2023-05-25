@@ -46,8 +46,9 @@ public class StatisticsController {
         return new ResponseEntity<>(population, HttpStatus.OK);
     }
 
-    @GetMapping("/population/division")
+    @PostMapping("/population/division")
     public ResponseEntity<List<DivisionGeneralPopulationDto>> getDivisionPopulationList(@RequestBody DivisionPopulationRequest request) {
+        System.out.println(request.toString());
         List<DivisionGeneralPopulationDto> population = populationService.getDivisionPopulationList(request);
         return new ResponseEntity<>(population, HttpStatus.OK);
     }
@@ -109,6 +110,11 @@ public class StatisticsController {
     @GetMapping("/avg-age/province")
     public ResponseEntity<List<AverageAgeDto>> getProvinceAverageAgeList() {
         List<AverageAgeDto> population = populationService.getProvinceAverageAgeList();
+        return new ResponseEntity<>(population, HttpStatus.OK);
+    }
+    @GetMapping("/test")
+    public ResponseEntity<List<Object[]>> test() {
+        List<Object[]> population = populationService.test();
         return new ResponseEntity<>(population, HttpStatus.OK);
     }
 }

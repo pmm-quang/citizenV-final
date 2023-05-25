@@ -11,7 +11,7 @@ import { BiCheckCircle } from 'react-icons/bi'
 
 function Ward() {
     const user_account = JSON.parse(localStorage.getItem("user"));
-    const user = user_account.info.username;
+    const user = user_account.username;
     const config = {
         headers: {
             Authorization: `Bearer ${user_account.accessToken}`
