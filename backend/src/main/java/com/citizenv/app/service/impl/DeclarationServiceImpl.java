@@ -157,6 +157,7 @@ public class DeclarationServiceImpl implements DeclarationService {
         return null;
     }
 
+    @Transactional
     @Override
     public DeclarationDto openDeclaration(String username, DeclarationDto declaration) {
         User foundUser = userRepo.findByUsername(username).orElseThrow(
@@ -175,11 +176,13 @@ public class DeclarationServiceImpl implements DeclarationService {
         }
         foundUser.getDeclaration().setStartTime(Timestamp.valueOf(startTime));
         foundUser.getDeclaration().setEndTime(Timestamp.valueOf(endTime));
-        foundUser.getDeclaration().setStatus(Constant.DECLARATION_STATUS_NOT_OPEN);
         declaration.setStatus(Constant.DECLARATION_STATUS_NOT_OPEN);
         if (startTime.isBefore(now) && endTime.isAfter(now)) {
             userRepo.insertUserRole(foundUser.getId(), Constant.EDITOR_ROLE_ID);
             foundUser.getDeclaration().setStatus(Constant.DECLARATION_STATUS_DECLARING);
+            declaration.setStatus(Constant.DECLARATION_STATUS_DECLARING);
+        } else {
+            foundUser.getDeclaration().setStatus(Constant.DECLARATION_STATUS_NOT_OPEN);
         }
         return declaration;
     }

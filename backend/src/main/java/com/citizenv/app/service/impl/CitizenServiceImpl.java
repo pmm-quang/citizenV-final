@@ -593,10 +593,6 @@ public class CitizenServiceImpl implements CitizenService {
 
     @Override
     public List<UserDto> createUserFromExcelFile(File excelFile) {
-        List<AddressType> addressTypes = addressTypeRepo.findAll();
-        List<AssociationType> associationTypes = associationTypeRepo.findAll();
-        StringBuilder RowInvalid = new StringBuilder();
-        String provinceCodeOfHometown = null;
         try {
             FileInputStream file = new FileInputStream(excelFile);
             Workbook workbook = new XSSFWorkbook(file);
@@ -605,6 +601,11 @@ public class CitizenServiceImpl implements CitizenService {
             int endRow = sheet.getLastRowNum();
             int startCol = 0;
             int endCol = 21;
+            List<AddressType> addressTypes = addressTypeRepo.findAll();
+            List<AssociationType> associationTypes = associationTypeRepo.findAll();
+            List<Citizen> citizens = new ArrayList<>();
+            StringBuilder RowInvalid = new StringBuilder();
+            String provinceCodeOfHometown = null;
             List<ExcelCitizen> excelModels = new ArrayList<>();
             for (int rowNum = startRow; rowNum <= endRow; rowNum++) {
                 Citizen citizen = new Citizen();
@@ -613,16 +614,9 @@ public class CitizenServiceImpl implements CitizenService {
                 List<Association> associations = new ArrayList<>();
                 Row row = sheet.getRow(rowNum);
                 Association association = new Association();
-                int associationType = 0;
-                String associatedCitizenNationalId = null;
-                String associatedCitizenName = null;
 
                 for (int colNum = startCol; colNum <= endCol; colNum++) {
                     Cell cell = row.getCell(colNum);
-                    String cellValue = cell.getStringCellValue();
-                    if (cell.getStringCellValue() == "") {
-                        cellValue = "1";
-                    }
                     switch (colNum + 1) {
                         case 1: model.setNationalId(cell.getStringCellValue());break;
                         case 2:
@@ -692,9 +686,7 @@ public class CitizenServiceImpl implements CitizenService {
                             model.setJob(cell.getStringCellValue());
                             citizen.setJob(cell.getStringCellValue());
                             break;
-                        case 12:
-                        case 13:
-                        case 14:
+                        case 12: case 13: case 14:
                             String adr = cell.getStringCellValue();
                             if (colNum != 13 && adr.equals("")) {
                                 throw new InvalidException("Invalid in row: " + rowNum + " and column: " + (colNum + 1));
@@ -723,18 +715,12 @@ public class CitizenServiceImpl implements CitizenService {
                                 addresses.add(add);
                             }
                             // Lấy ra associatedCitizenNationalId
-                        case 15:
-                        case 17:
-                        case 19:
-                        case 21:
+                        case 15: case 17: case 19: case 21:
                             if (!cell.getStringCellValue().equals("")) {
                                 association.setAssociatedCitizenNationalId(cell.getStringCellValue());
                             }break;
                             //lấy ra associatedCitizenName
-                        case 16:
-                        case 18:
-                        case 20:
-                        case 22:
+                        case 16: case 18: case 20: case 22:
                             if (!cell.getStringCellValue().equals("")) {
                                 association.setAssociatedCitizenName(cell.getStringCellValue());
                                 association.setAssociationType(associationTypes.get(colNum - 15));
@@ -754,8 +740,10 @@ public class CitizenServiceImpl implements CitizenService {
                 if (!Utils.validateNationalId(citizen.getNationalId(),citizen.getSex(),provinceCodeOfHometown, citizen.getDateOfBirth())) {
                     throw new InvalidException("Invalid identifier at row " + rowNum);
                 }
-                
-
+                Citizen foundCitizen = repo.findByNationalId(citizen.getNationalId()).orElse(null);
+                if (foundCitizen == null) {
+                    citizens.add(citizen);
+                }
             }
             for (ExcelCitizen model: excelModels) {
                 System.out.println(model.toString());
@@ -767,40 +755,4 @@ public class CitizenServiceImpl implements CitizenService {
         }
     }
 
-    private void insertCitizenFromExcelFile(ExcelCitizen citizen) {
-        CustomCitizenRequest customCitizen = new CustomCitizenRequest();
-        List<CustomAddress> customAddresses = new ArrayList<>();
-        List<String> addresses = citizen.getAddresses();
-//        String provinceCode = null;
-        for (int i = 0; i < addresses.size(); i++) {
-            CustomAddress address = new CustomAddress();
-            String[] nameList = addresses.get(i).split("-");
-            if (!addresses.get(i).equals("")) {
-                List<Hamlet> hamlet = hamletRepo.findHamletFromExcel(nameList[3],nameList[2],nameList[1],nameList[0]);
-                String hamletCode = null;
-                String provinceCode = null;
-                Integer addressType;
-                if (hamlet != null) {
-                    hamletCode = hamlet.get(0).getCode();
-                    provinceCode = hamletCode.substring(0,2);
-                    if (i == 0) addressType = 1;
-                    else if (i == 2) addressType = 2;
-                    else addressType = 3;
-                    address.setAddressType(addressType);
-                    address.setHamletCode(hamletCode);
-                    address.setProvinceCode(provinceCode);
-                    customAddresses.add(address);
-                }
-            }
-        }
-        String nationalId = citizen.getNationalId();
-        Ethnicity ethnicity = ethnicityRepo.findByName(citizen.getEthnicity()).orElseThrow();
-        if (!citizen.getReligion().equals("")) {
-            Religion religion = religionRepo.findByName(citizen.getReligion()).orElseThrow();
-        }
-
-        customCitizen.setNationalId(nationalId);
-
-
-    }
 }

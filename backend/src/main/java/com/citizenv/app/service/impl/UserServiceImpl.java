@@ -10,6 +10,7 @@ import com.citizenv.app.exception.InvalidException;
 import com.citizenv.app.exception.ResourceFoundException;
 import com.citizenv.app.exception.ResourceNotFoundException;
 import com.citizenv.app.payload.AdministrativeDivisionDto;
+import com.citizenv.app.payload.DeclarationDto;
 import com.citizenv.app.payload.UserDto;
 import com.citizenv.app.payload.excel.ExcelCitizen;
 import com.citizenv.app.repository.AdministrativeDivisionRepository;
@@ -84,7 +85,20 @@ public class UserServiceImpl implements UserService {
                 () -> new ResourceNotFoundException("User", "username", username)
         );
         List<User> entities = repository.findAllByCreatedBy(foundUser);
-        return entities.stream().map(l-> mapper.map(l, UserDto.class)).collect(Collectors.toList());
+        List<UserDto> dtoList = new ArrayList<>();
+        for (User user: entities) {
+            UserDto userDto = new UserDto();
+            DeclarationDto declarationDto = new DeclarationDto();
+            userDto.setUsername(user.getUsername());
+            AdministrativeDivisionDto divisionDto = mapper.map(user.getDivision(), AdministrativeDivisionDto.class);
+            userDto.setDivision(divisionDto);
+            declarationDto.setStartTime(user.getDeclaration().getStartTime().toLocalDateTime().toLocalDate());
+            declarationDto.setEndTime(user.getDeclaration().getEndTime().toLocalDateTime().toLocalDate());
+            declarationDto.setStatus(user.getDeclaration().getStatus());
+            userDto.setDeclaration(declarationDto);
+            dtoList.add(userDto);
+        }
+        return dtoList;
     }
 
     @Override
