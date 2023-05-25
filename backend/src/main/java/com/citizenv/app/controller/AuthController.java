@@ -30,7 +30,7 @@ public class AuthController {
     private final ModelMapper mapper;
     private final JwtTokenProvider tokenProvider;
 
-    public AuthController(AuthenticationManager authenticationManager, ModelMapper mapper, JwtFilter jwtFilter, JwtTokenProvider tokenProvider) {
+    public AuthController(AuthenticationManager authenticationManager, ModelMapper mapper, JwtTokenProvider tokenProvider) {
         this.authenticationManager = authenticationManager;
         this.mapper = mapper;
         this.tokenProvider = tokenProvider;
@@ -67,22 +67,17 @@ public class AuthController {
                 LocalDateTime endTime = userDetail.getUser().getDeclaration().getEndTime().toLocalDateTime();
                 declarationEndTime = endTime.toString();
             }
-
         } else {
             role = "A1";
         }
         LoginResponse info = new LoginResponse();
         info.setUsername(userDetail.getUsername());
-
         info.setRole(role);
         info.setDivision(division);
         info.setDeclarationStatus(declarationStatus);
         info.setDeclarationStartTime(declarationStartTime);
         info.setDeclarationEndTime(declarationEndTime);
         info.setAccessToken(jwt);
-//        Map<String, Object> map = new HashMap<>();
-//        map.put("info", info);
-//        map.put("accessToken", jwt);
         return new ResponseEntity<>(info, HttpStatus.OK);
     }
 

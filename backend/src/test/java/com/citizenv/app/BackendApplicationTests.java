@@ -62,7 +62,7 @@ class BackendApplicationTests {
 
     @Test
     public void TestQuery() {
-        List<Hamlet> list = hamletRepository.findHamletFromExcel("Hà Nội", "Ba Đình", "Phúc Xá", "1");
+        List<Hamlet> list = hamletRepository.findHamletFromExcel("Nam Định", "Ý Yên", "Yên Thắng", "Hậu");
         System.out.println(list.size());
     }
 

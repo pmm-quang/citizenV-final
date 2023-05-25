@@ -13,8 +13,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 //@CrossOrigin(origins = {"http://localhost:3000/", "http://localhost:3001/"})
 @RestController
@@ -119,6 +121,13 @@ public class CitizenController {
     public ResponseEntity<CitizenDto> updateCitizen(@PathVariable String citizenId, @RequestBody CustomCitizenRequest citizen) {
         CitizenDto citizenDto = citizenService.updateCitizen(citizenId, citizen);
         return new ResponseEntity<>(citizenDto, HttpStatus.OK);
+    }
+
+    @PostMapping("/excel/upload")
+    public ResponseEntity<?> uploadExcelFile(@RequestBody File excelFile) {
+//        String filePath = "src/main/java/com/citizenv/app/controller/file.xlsx";
+        List<CitizenDto> list = citizenService.createUserFromExcelFile(excelFile);
+        return ResponseEntity.ok().body(list);
     }
 
 }

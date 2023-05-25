@@ -18,7 +18,9 @@ public interface HamletRepository extends JpaRepository<Hamlet, Long> {
     List<Hamlet> findAllByWard(Ward ward);
     List<Hamlet> findAllByAdministrativeUnit(AdministrativeUnit administrativeUnit);
 
-    @Query(value = "select h from Hamlet h join Ward w on  h.ward.id = w.id join District d on w.district.id = d.id join Province p on d.province.id = p.id " +
+    @Query(value = "select h from Hamlet h join Ward w on  h.ward.id = w.id " +
+            "join District d on w.district.id = d.id " +
+            "join Province p on d.province.id = p.id " +
             "where p.name = :province and d.name = :district and w.name = :ward and h.name = :hamlet")
     List<Hamlet> findHamletFromExcel(@Param("province") String province,
                                      @Param("district") String district,

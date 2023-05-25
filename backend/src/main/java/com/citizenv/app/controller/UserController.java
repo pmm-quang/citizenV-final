@@ -1,4 +1,5 @@
 package com.citizenv.app.controller;
+import com.citizenv.app.payload.CitizenDto;
 import com.citizenv.app.payload.UserDto;
 import com.citizenv.app.secirity.CustomUserDetail;
 import com.citizenv.app.secirity.SecurityUtils;
@@ -61,12 +62,6 @@ public class UserController {
         return ResponseEntity.status(201).body(userDto);
     }
 
-    @GetMapping("/excel/upload")
-    public ResponseEntity<Objects> uploadExcelFile() {
-        String filePath = "src/main/java/com/citizenv/app/controller/file.xlsx";
-//        List<UserDto> list = userService.createUserFromExcelFile(new File(filePath));
-        return ResponseEntity.ok().build();
-    }
 
 
 }

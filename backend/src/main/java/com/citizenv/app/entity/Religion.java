@@ -19,6 +19,7 @@ public class Religion {
     @Column(name = "id", nullable = false)
     private Integer id;
 
+    @Column(unique = true, nullable = false)
     private String name;
 
     @OneToMany(mappedBy = "religion", cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)

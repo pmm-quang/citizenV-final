@@ -14,7 +14,6 @@ import java.util.Objects;
 @Table(name = "citizens")
 @Getter
 @Setter
-@ToString
 @RequiredArgsConstructor
 public class Citizen {
     @Id
@@ -83,6 +82,25 @@ public class Citizen {
         return educationalLevel == null ? "Không" : educationalLevel;
     }
 //    @Override
+
+    @Override
+    public String toString() {
+        return "Citizen{" +
+                "id=" + id +
+                ", nationalId='" + nationalId + '\'' +
+                ", name='" + name + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
+                ", age=" + age +
+                ", bloodType='" + bloodType + '\'' +
+                ", sex='" + sex + '\'' +
+                ", maritalStatus='" + maritalStatus + '\'' +
+                ", ethnicity=" + ethnicity +
+                ", otherNationality='" + otherNationality + '\'' +
+                ", religion=" + religion +
+                ", job='" + job + '\'' +
+                ", educationalLevel='" + educationalLevel + '\'' +
+                '}';
+    }
 //    public boolean equals(Object o) {
 //        if (this == o) return true;
 //        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
