@@ -135,7 +135,7 @@ function Account() {
   }, [])
 
   const listAccDeclaration = accountList.map((account, index) =>
-    (account.declaration === null) ? <option key={index} value={account.username}>{account.username + ". " + account.division.name}</option> : null
+    (account.declaration.startTime === null) ? <option key={index} value={account.username}>{account.username + ". " + account.division.name}</option> : null
   )
 
   const listDivision = division.map((post) =>
@@ -197,11 +197,34 @@ function Account() {
     <tr className="top-row" key={account.username} style={{ backgroundColor: account.checked ? 'yellow' : null }}>
       <th className="top-row-title">{account.username}</th>
       <th className="top-row-title">{account.division.administrativeUnit.shortName + " " + account.division.name}</th>
-      {(account.declaration === null) ? <th className="top-row-title">Chưa khai báo</th> : <th className="top-row-title">{account.declaration.startTime}</th>}
-      {(account.declaration === null) ? <th className="top-row-title">Chưa khai báo</th> : <th className="top-row-title">{account.declaration.endTime}</th>}
-      {(account.isActive) ? <th className="top-row-title" style={{ color: 'green' }}>Đang khai báo</th> : <th className="top-row-title" style={{ color: 'red' }}>Chưa khai báo</th>}
+      {(account.declaration.startTime === null) ? <th className="top-row-title">Chưa khai báo</th> : <th className="top-row-title">{account.declaration.startTime}</th>}
+      {(account.declaration.endTime === null) ? <th className="top-row-title">Chưa khai báo</th> : <th className="top-row-title">{account.declaration.endTime}</th>}
+      {<th className="top-row-title">{account.declaration.status}</th>}
     </tr>
   ));
+
+  const AddDeclaration = async () => {
+    const startDate = new Date(createStartTime)
+    const endDate = new Date(createEndTime)
+    const timeNow = new Date()
+    const declaration = {
+      startTime: createStartTime,
+      endTime: createEndTime,
+      status: "Đang khai báo"
+    }
+    console.log(declaration)
+    if (startDate < endDate && startDate >= timeNow && endDate >= timeNow) {
+      try {
+        await axios.put("http://localhost:8080/api/v1/declaration/save/" + idAccount, declaration, config);
+        setShowCreateDeclaration(false)
+        GetAllAccount()
+      } catch {
+        console.log('error')
+      }
+    } else {
+      console.log('error')
+    }
+  }
 
   const ModalAddAccount = () => {
     return (
@@ -334,9 +357,7 @@ function Account() {
             Đóng
           </Button>
           <Button variant="secondary" onClick={() => {
-            const startDate = new Date(createStartTime)
-            const endDate = new Date(createEndTime)
-            if (startDate > endDate) console.log('error')
+            AddDeclaration()
           }}>
             Lưu
           </Button>
