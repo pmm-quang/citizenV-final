@@ -10,6 +10,7 @@ import com.citizenv.app.exception.ResourceFoundException;
 import com.citizenv.app.exception.ResourceNotFoundException;
 import com.citizenv.app.payload.AdministrativeDivisionDto;
 import com.citizenv.app.payload.UserDto;
+import com.citizenv.app.payload.excel.ExcelCitizen;
 import com.citizenv.app.repository.AdministrativeDivisionRepository;
 import com.citizenv.app.repository.DeclarationRepository;
 import com.citizenv.app.repository.RoleRepository;
@@ -18,6 +19,11 @@ import com.citizenv.app.secirity.CustomUserDetail;
 import com.citizenv.app.service.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -26,6 +32,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -71,6 +84,15 @@ public class UserServiceImpl implements UserService {
         );
         List<User> entities = repository.findAllByCreatedBy(foundUser);
         return entities.stream().map(l-> mapper.map(l, UserDto.class)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserDto> getByCreatedBy(String usernameUserDetail) {
+        User foundUser = repository.findByUsername(usernameUserDetail).orElseThrow(
+                () -> new ResourceNotFoundException("User", "username", usernameUserDetail)
+        );
+        List<User> list = repository.findAllByCreatedBy(foundUser);
+        return list.stream().map(user -> mapper.map(user, UserDto.class)).collect(Collectors.toList());
     }
 
     @Override
@@ -154,6 +176,82 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Transactional
+    @Override
+    public UserDto createUser(String usernameUserDetail, String divisionCodeUserDetail, UserDto userDto) {
+        String newUsername = userDto.getUsername();
+        AdministrativeDivisionDto divisionOfNewUser = userDto.getDivision();
+        String divisionCodeOfNewUser = divisionOfNewUser.getCode();
+        long roleId = 0L;
+        boolean check = true;
+        if (divisionOfNewUser == null || newUsername == null) {
+            throw new InvalidException("Chưa nhập đủ thông tin cần thiết");
+        }
+        if (divisionCodeUserDetail == null) {
+            check = (divisionCodeOfNewUser.length() == 2);
+            roleId = Utils.A2;
+        } else {
+            switch (divisionCodeUserDetail.length()) {
+                case 2: check = (divisionCodeOfNewUser.length() == 4) && (divisionCodeOfNewUser.indexOf(divisionCodeUserDetail) == 0);
+                        roleId = Utils.A3;
+                        break;
+                case 4: check = (divisionCodeOfNewUser.length() == 6) && (divisionCodeOfNewUser.indexOf(divisionCodeUserDetail) == 0);
+                        roleId = Utils.B1;
+                        break;
+                case 6: check = (divisionCodeOfNewUser.length() == 8) && (divisionCodeOfNewUser.indexOf(divisionCodeUserDetail) == 0);
+                        roleId = Utils.B2;
+                        break;
+            }
+        }
+        if (!check) {
+            throw new AccessDeniedException("Khong co quyen tao tai khoan voi don vi co ma: " + divisionCodeOfNewUser);
+        }
+        if (!divisionCodeOfNewUser.equals(newUsername)) {
+            throw new InvalidException("Ten tai khoan va ma don vi khong trung khop");
+        }
+        repository.findByUsername(newUsername).ifPresent(user1 -> {
+            throw new ResourceFoundException("User", "username",newUsername);
+        });
+        AdministrativeDivision division = divisionRepo.findByCode(divisionOfNewUser.getCode()).orElseThrow(
+                () -> new ResourceNotFoundException("division", "divisionCode", divisionOfNewUser.getCode())
+        );
+
+        User userDetail = repository.findByUsername(usernameUserDetail).orElseThrow(
+                () -> new ResourceNotFoundException("UserDetail", "username", usernameUserDetail)
+        );
+
+
+        User newUser = new User();
+        newUser.setUsername(newUsername);
+        newUser.setPassword(encoder.encode(userDto.getPassword()));
+        newUser.setDivision(division);
+        newUser.setCreatedBy(userDetail);
+        newUser.setIsActive(true);
+//        switch (newUsername.length()) {
+//            case 2: roleId = Utils.A2;break;
+//            case 4: roleId = Utils.A3; break;
+//            case 6: roleId = Utils.B1;break;
+//            case 8: roleId = Utils.B2; break;
+//        }
+        long finalRoleId = roleId;
+        Role role = roleRepo.findById(finalRoleId).orElseThrow(
+                () -> new ResourceNotFoundException("Role", "roleId", String.valueOf(finalRoleId))
+        );
+        List<Role> roles = new ArrayList<>();
+        roles.add(role);
+        newUser.setRoles(roles);
+        Declaration declaration = new Declaration();
+//        declaration.setStartTime(Timestamp.valueOf(LocalDateTime.now()));
+        declaration.setStatus("Chưa cấp quyền khai báo");
+        User createUser = repository.save(newUser);
+        createUser.setDeclaration(declaration); // Thiết lập quan hệ giữa User và Declaration
+        User savedUser = repository.save(createUser); // Lưu lại đối tượng User để cập nhật quan hệ với Declaration
+        declaration.setUser(savedUser); // Thiết lập quan hệ giữa Declaration và User
+        declarationRepo.save(declaration);
+        return mapper.map(createUser, UserDto.class);
+
+    }
+
     @Override
     public UserDto createUser(UserDto userDto) {
         String newUsername = userDto.getUsername();
@@ -204,7 +302,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto updateUser(String username, UserDto userDto) {
+    public UserDto updateUser(String divisionCodeUserDetail, UserDto userDto) {
+
         return null;
     }
 
@@ -226,5 +325,6 @@ public class UserServiceImpl implements UserService {
         userDto.setPassword(null);
         return userDto;
     }
+
 
 }

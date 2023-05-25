@@ -45,6 +45,7 @@ public class AuthController {
         String jwt = tokenProvider.generateToken(userDetail);
         UserDto userDto = mapper.map(userDetail.getUser(), UserDto.class);
         AdministrativeDivisionDto division = userDto.getDivision();
+        String declarationStatus = null;
         String role = null;
         if (division != null) {
             String divisionCode = division.getCode();
@@ -54,6 +55,7 @@ public class AuthController {
                 case 6: role = "B1"; break;
                 case 8: role = "B2"; break;
             }
+            declarationStatus = userDetail.getUser().getDeclaration().getStatus();
         } else {
             role = "A1";
         }
@@ -61,10 +63,12 @@ public class AuthController {
         info.setUsername(userDetail.getUsername());
         info.setRole(role);
         info.setDivision(division);
-        Map<String, Object> map = new HashMap<>();
-        map.put("info", info);
-        map.put("accessToken", jwt);
-        return new ResponseEntity<>(map, HttpStatus.OK);
+        info.setDeclarationStatus(declarationStatus);
+        info.setAccessToken(jwt);
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("info", info);
+//        map.put("accessToken", jwt);
+        return new ResponseEntity<>(info, HttpStatus.OK);
     }
 
 }

@@ -21,4 +21,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Modifying
     @Query(value = "delete from users_roles where user_id = :userId and role_id = :roleId", nativeQuery = true)
     void deleteUserRole(@Param("userId") Long userId, @Param("roleId") Long roleId);
+
+    @Transactional
+    @Modifying
+    @Query(value = "insert into users_roles (user_id, role_id) values (:userId, :roleId)", nativeQuery = true)
+    void insertUserRole(@Param("userId") Long userId, @Param("roleId") Long roleId);
+
+    @Query(value = "select u from User u where u.username like concat(:username, '%')")
+    List<User> findAllSubordinateAccounts(@Param("username") String username);
 }

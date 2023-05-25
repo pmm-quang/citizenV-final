@@ -12,9 +12,9 @@ import java.time.LocalTime;
 @Data
 public class DeclarationDto {
 //    private UserDto user;
-    @JsonFormat(pattern="yyyy-MM-dd@HH:mm:ss")
-    private Timestamp startTime;
-    @JsonFormat(pattern="yyyy-MM-dd@HH:mm:ss")
-    private Timestamp endTime;
+    @JsonFormat(pattern="yyyy-MM-dd")
+    private LocalDate startTime;
+    @JsonFormat(pattern="yyyy-MM-dd")
+    private LocalDate endTime;
     private String status;
 }

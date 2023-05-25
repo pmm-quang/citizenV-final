@@ -22,6 +22,7 @@ public class DeclarationController {
 
     @GetMapping("/")
     public ResponseEntity<List<DeclarationDto>> getAll() {
+
         List<DeclarationDto> declarationDtoList = declarationService.getAll();
         return new ResponseEntity<List<DeclarationDto>>(declarationDtoList, HttpStatus.OK);
     }
@@ -32,10 +33,11 @@ public class DeclarationController {
         return new ResponseEntity<>(provinceDto, HttpStatus.OK);
     }*/
 
-    @PostMapping("/save/{username}")
+    @PutMapping("/save/{username}")
     public ResponseEntity<DeclarationDto> update(@PathVariable String username,
                                                  @RequestBody DeclarationDto declarationDto) {
-        DeclarationDto dto = declarationService.updateDeclaration(username,declarationDto);
+        DeclarationDto dto = declarationService.openDeclaration(username, declarationDto);
         return ResponseEntity.status(201).body(dto);
     }
+
 }

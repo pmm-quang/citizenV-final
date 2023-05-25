@@ -4,6 +4,8 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Entity
@@ -15,6 +17,8 @@ public class User {
     private Long id;
 
     @Column(unique = true, nullable = false)
+    @NotNull(message = "Username cannot be null")
+    @NotBlank(message = "Username cannot be blank")
     private String username;
 
     @Column(nullable = false)
@@ -22,7 +26,7 @@ public class User {
 
     private Boolean isActive;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "division_id")
     private AdministrativeDivision division;
 

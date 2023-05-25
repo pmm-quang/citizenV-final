@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface EthnicityRepository extends JpaRepository<Ethnicity, Integer> {
     Optional<Ethnicity> findById(String s);
+    Optional<Ethnicity> findByName(String name);
 }
