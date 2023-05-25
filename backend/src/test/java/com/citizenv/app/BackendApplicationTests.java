@@ -3,6 +3,9 @@ package com.citizenv.app;
 import static org.junit.jupiter.api.Assertions.*;
 import com.citizenv.app.component.Utils;
 import com.citizenv.app.entity.Citizen;
+import com.citizenv.app.entity.Hamlet;
+import com.citizenv.app.repository.CitizenRepository;
+import com.citizenv.app.repository.HamletRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,12 @@ class BackendApplicationTests {
 
     @Autowired
     private PasswordEncoder encoder;
+
+    @Autowired
+    private CitizenRepository citizenRepository;
+
+    @Autowired
+    private HamletRepository hamletRepository;
 
     @BeforeEach
     void setUp() {
@@ -49,6 +58,12 @@ class BackendApplicationTests {
         b.add(1);
         b.removeAll(a);
         System.out.println(b.size());
+    }
+
+    @Test
+    public void TestQuery() {
+        List<Hamlet> list = hamletRepository.findHamletFromExcel("Hà Nội", "Ba Đình", "Phúc Xá", "1");
+        System.out.println(list.size());
     }
 
     @Test

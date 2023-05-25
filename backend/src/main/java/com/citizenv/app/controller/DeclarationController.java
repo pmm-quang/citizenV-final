@@ -36,7 +36,8 @@ public class DeclarationController {
     @PutMapping("/save/{username}")
     public ResponseEntity<DeclarationDto> update(@PathVariable String username,
                                                  @RequestBody DeclarationDto declarationDto) {
-        DeclarationDto dto = declarationService.updateDeclaration(username,declarationDto);
+        DeclarationDto dto = declarationService.openDeclaration(username, declarationDto);
         return ResponseEntity.status(201).body(dto);
     }
+
 }

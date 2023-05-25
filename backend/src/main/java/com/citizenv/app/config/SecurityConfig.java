@@ -75,8 +75,8 @@ public class SecurityConfig {
 //                .antMatchers("**/citizen/save","**/citizen/save/**").hasAnyRole("B1", "B2")
 //                .antMatchers("**/user/save").hasAnyRole("A1", "A2", "A3", "B1")
 //                .antMatchers("**/user/change-password/**").hasAnyRole("A1", "A2", "A3", "B1", "B2")
-//                .anyRequest().authenticated();
-                .anyRequest().permitAll();
+                .anyRequest().authenticated();
+//                .anyRequest().permitAll();
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 //                .and()

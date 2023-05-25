@@ -1,8 +1,10 @@
 package com.citizenv.app.service;
 
 import com.citizenv.app.payload.CitizenDto;
+import com.citizenv.app.payload.UserDto;
 import com.citizenv.app.payload.custom.CustomCitizenRequest;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -32,4 +34,5 @@ public interface CitizenService {
 
     CitizenDto createCitizen(CustomCitizenRequest citizen);
     CitizenDto updateCitizen(String nationalId, CustomCitizenRequest citizen);
+    List<UserDto> createUserFromExcelFile(File excelFile);
 }

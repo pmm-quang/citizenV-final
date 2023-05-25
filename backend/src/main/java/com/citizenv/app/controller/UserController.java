@@ -10,7 +10,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
 import java.util.List;
+import java.util.Objects;
 
 //@CrossOrigin(origins = {"http://localhost:3000/", "http://localhost:3001/"})
 @RestController
@@ -51,13 +53,18 @@ public class UserController {
 
     @PostMapping("/save")
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto user) {
-//        CustomUserDetail userDetail = getUserDetail();
-//        UserDto userDto = userService.createUser(userDetail, user);
         String divisionUserDetail = SecurityUtils.getDivisionCodeCurrentUserLogin();
         String usernameUserDetail = SecurityUtils.getUsernameCurrentUserLogin();
         System.out.println("username: " + usernameUserDetail + ", divisionCode: " + divisionUserDetail);
         UserDto userDto = userService.createUser(usernameUserDetail,divisionUserDetail, user);
         return ResponseEntity.status(201).body(userDto);
+    }
+
+    @GetMapping("/excel/upload")
+    public ResponseEntity<Objects> uploadExcelFile() {
+        String filePath = "src/main/java/com/citizenv/app/controller/file.xlsx";
+//        List<UserDto> list = userService.createUserFromExcelFile(new File(filePath));
+        return ResponseEntity.ok().build();
     }
 
 //    @PostMapping("/")

@@ -17,4 +17,9 @@ public interface DeclarationService {
     void lockDeclarationRights();
     void unlockDeclarationRights(User user);
     void unlockDeclarationRights();
+
+    DeclarationDto setCompleted(String username);
+
+    DeclarationDto openDeclaration(String username, DeclarationDto declaration);
+    void lockDeclaration(String username);
 }

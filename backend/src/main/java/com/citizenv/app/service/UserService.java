@@ -1,8 +1,10 @@
 package com.citizenv.app.service;
 
 import com.citizenv.app.payload.UserDto;
+import com.citizenv.app.payload.excel.ExcelCitizen;
 import com.citizenv.app.secirity.CustomUserDetail;
 
+import java.io.File;
 import java.util.List;
 
 public interface UserService {
@@ -16,6 +18,7 @@ public interface UserService {
     UserDto updateUser(String divisionCodeUserDetail, UserDto userDto);
 
     UserDto changePassword(String userDetailUsername, String username, String newPassword);
+
 
 
 }

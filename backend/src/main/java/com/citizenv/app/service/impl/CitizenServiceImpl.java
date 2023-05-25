@@ -1,6 +1,7 @@
 package com.citizenv.app.service.impl;
 
 
+import ch.qos.logback.core.util.COWArrayList;
 import com.citizenv.app.component.Utils;
 import com.citizenv.app.entity.*;
 import com.citizenv.app.exception.InvalidException;
@@ -9,10 +10,16 @@ import com.citizenv.app.exception.ResourceNotFoundException;
 import com.citizenv.app.payload.*;
 import com.citizenv.app.payload.custom.CustomAddress;
 import com.citizenv.app.payload.custom.CustomCitizenRequest;
+import com.citizenv.app.payload.excel.ExcelCitizen;
 import com.citizenv.app.repository.*;
 import com.citizenv.app.service.CitizenService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,6 +27,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -390,17 +400,6 @@ public class CitizenServiceImpl implements CitizenService {
                 List<Integer> addressIdListOfNewCitizen = citizen.getAddresses().stream().map(AddressDto::getId).collect(Collectors.toList());
                 List<Integer> associationIdListOfNewCitizen = citizen.getAssociations().stream().map(AssociationDto::getId).collect(Collectors.toList());
                 addressIdListOfOriginalCitizen.removeAll(addressIdListOfNewCitizen);
-//                if (addressIdListOfOriginalCitizen.size() > 0) {
-//                    addressIdListOfOriginalCitizen.forEach(id -> {
-//                        addressRepo.deleteById(id);
-//                    });
-//                }
-//                associationIdListOfOriginalCitizen.removeAll(associationIdListOfNewCitizen);
-//                if (associationIdListOfOriginalCitizen.size() > 0) {
-//                    associationIdListOfOriginalCitizen.forEach(a -> {
-//                        associationRepo.deleteById(a);
-//                    });
-//                }
                 foundCitizen.getAddresses().forEach(address -> address.setCitizen(foundCitizen));
                 foundCitizen.getAssociations().forEach(association -> association.setCitizen(foundCitizen));
                 repo.save(foundCitizen);
@@ -515,9 +514,6 @@ public class CitizenServiceImpl implements CitizenService {
         Integer ethnicityId = citizenRequest.getEthnicityId();
         String otherNationality = citizenRequest.getOtherNationality();
         ReligionDto religion = citizenRequest.getReligion();
-//        List<CustomAddress> addresses = citizenRequest.getAddresses();
-//        List<AssociationDto> associations = citizenRequest.getAssociations();
-
         String provinceCodeOfQueQuan = null;
         //Kiểm tra mã địa chỉ - address
         boolean checkHometown = false; //check có quê quán không
@@ -536,18 +532,6 @@ public class CitizenServiceImpl implements CitizenService {
                     throw new InvalidException("Truong dia chi thuong tru phai khac null");
                 }
             }
-//            AddressType at = addressTypeRepo.findById(a.getAddressType()).orElseThrow(
-//                    () -> new ResourceNotFoundException("AddressType", "AddressTypeId","" + a.getAddressType())
-//            );
-//
-//            Hamlet h = hamletRepo.findByCode(a.getHamletCode()).orElseThrow(
-//                    () -> new ResourceNotFoundException("Hamlet", "HamletCode", a.getHamletCode())
-//            );
-//            Address address = new Address();
-//            address.setId(a.getId());
-//            address.setHamlet(h);
-//            address.setAddressType(at);
-//            addressesList.add(address);
         }
         if (!checkHometown || !checkPermanentAddress) {
             throw new InvalidException("Chua nhap du cac truong dia chi bat buoc");
@@ -592,11 +576,6 @@ public class CitizenServiceImpl implements CitizenService {
                     () -> new ResourceNotFoundException("Religion", "ReligionId","" + religion.getId())
             );
         }
-//        List<Association> associationList = new ArrayList<>();
-//        if (associations != null) {
-//            associationList = associations.stream()
-//                    .map(associationDto -> mapper.map(associationDto, Association.class)).collect(Collectors.toList());
-//        }
         Citizen c = new Citizen();
         c.setNationalId(nationalId);
         c.setName(Utils.standardizeName(name));
@@ -608,5 +587,207 @@ public class CitizenServiceImpl implements CitizenService {
         c.setEthnicity(foundEthnicity);
         c.setReligion(foundReligion);
         return c;
+    }
+
+    @Override
+    public List<UserDto> createUserFromExcelFile(File excelFile) {
+        StringBuilder RowInvalid = new StringBuilder();
+        String provinceCodeOfHometown = null;
+        try {
+            FileInputStream file = new FileInputStream(excelFile);
+            Workbook workbook = new XSSFWorkbook(file);
+            Sheet sheet = workbook.getSheetAt(0);
+            int startRow = 2;
+            int endRow = sheet.getLastRowNum();
+            int startCol = 0;
+            int endCol = 21;
+            List<ExcelCitizen> excelModels = new ArrayList<>();
+            for (int rowNum = startRow; rowNum <= endRow; rowNum++) {
+                Citizen citizen = new Citizen();
+                ExcelCitizen model = new ExcelCitizen();
+                List<String> address = new ArrayList<>();
+                List<Address> addresses = new ArrayList<>();
+                List<String> associations = new ArrayList<>();
+                Row row = sheet.getRow(rowNum);
+
+                int associationType = 0;
+                String associatedCitizenNationalId = null;
+                String associatedCitizenName = null;
+
+                for (int colNum = startCol; colNum <= endCol; colNum++) {
+                    Cell cell = row.getCell(colNum);
+                    String cellValue = cell.getStringCellValue();
+                    if (cell.getStringCellValue() == "") {
+                        cellValue = "1";
+                    }
+                    switch (colNum + 1) {
+                        case 1: model.setNationalId(cell.getStringCellValue());break;
+                        case 2:
+                            model.setName(cell.getStringCellValue());
+//                            if (!Utils.validateName(model.getName())) {
+//                                listRowInvalid.append(rowNum);
+//                                break;
+//                            }
+                            citizen.setName(Utils.standardizeName(cell.getStringCellValue()));
+                            break;
+                        case 3:
+//                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yyyy");
+                            model.setDateOfBirth(LocalDate.parse(cell.getStringCellValue()));
+                            citizen.setDateOfBirth(LocalDate.parse(cell.getStringCellValue()));
+                            break;
+                        case 4:
+                            model.setSex(cell.getStringCellValue());
+                            if (!Utils.validateSex(model.getSex())) {
+                                RowInvalid.append(rowNum);
+                                throw new InvalidException("Invalid in row: " + rowNum + " and column: " + (colNum + 1));
+                            } else {
+                                citizen.setSex(cell.getStringCellValue());
+                            }
+                            break;
+                        case 5:
+                            model.setBloodType(cell.getStringCellValue());
+                            Object value = model.getSex();
+                            if (!(value instanceof Utils.BloodType)) {
+                                RowInvalid.append(rowNum);
+                                throw new InvalidException("Invalid in row: " + rowNum + " and column: " + (colNum + 1));
+                            }
+                            break;
+                        case 6:
+                            model.setMaritalStatus(cell.getStringCellValue());
+                            break;
+                        case 7:
+                            model.setEthnicity(cell.getStringCellValue());
+                            int finalRowNum = rowNum;
+                            int finalColNum = colNum;
+                            Ethnicity ethnicity = ethnicityRepo.findByName(model.getName()).orElseThrow(
+                                    () -> new InvalidException("Invalid in row: " + finalRowNum + " and column: " + (finalColNum + 1))
+                            );
+                            citizen.setEthnicity(ethnicity);
+                            break;
+                        case 8:
+                            model.setReligion(cell.getStringCellValue());
+                            if (!cell.getStringCellValue().equals("")) {
+                                finalRowNum = rowNum;
+                                finalColNum = colNum;
+                                Religion religion = religionRepo.findByName(cell.getStringCellValue()).orElseThrow(
+                                        () -> new InvalidException("Invalid in row: " + finalRowNum + " and column: " + (finalColNum + 1))
+                                );
+                                citizen.setReligion(religion);
+                            }
+                            break;
+                        case 9:
+                            model.setOtherNationality(cell.getStringCellValue());
+                            if (!cell.getStringCellValue().equals("")) {
+                                citizen.setOtherNationality(cell.getStringCellValue());
+                            }
+                            break;
+                        case 10:
+                            model.setEducationalLevel(cell.getStringCellValue());
+                            citizen.setEducationalLevel(cell.getStringCellValue());
+                            break;
+                        case 11:
+                            model.setJob(cell.getStringCellValue());
+                            citizen.setJob(cell.getStringCellValue());
+                            break;
+                        case 12:
+                            String hometown = cell.getStringCellValue();
+                            if (hometown.equals("")) {
+                                throw new InvalidException("Invalid in row: " + rowNum + " and column: " + (colNum + 1));
+                            }
+                            String[] listNameOfHomeTown = hometown.split("-");
+                            if (listNameOfHomeTown.length != 4) {
+                                throw new InvalidException("Invalid in row: " + rowNum + " and column: " + (colNum + 1));
+                            }
+                            List<Hamlet> hamlet = hamletRepo.findHamletFromExcel(listNameOfHomeTown[3],listNameOfHomeTown[2],
+                                    listNameOfHomeTown[1],listNameOfHomeTown[0]);
+                            if (hamlet != null) {
+                                provinceCodeOfHometown = hamlet.get(0).getCode().substring(0, 2);
+                                Address add = new Address();
+                                AddressType addressType = addressTypeRepo.findById(1).orElse(null);
+                                add.setHamlet(hamlet.get(0));
+                                add.setAddressType(addressType);
+                                addresses.add(add);
+                            }
+                        case 14:
+                        case 13:
+                            address.add(cell.getStringCellValue());
+                        case 15:
+                        case 17:
+                        case 19:
+                        case 21:
+                            if (cell.getStringCellValue()!= null || !cell.getStringCellValue().equals("")) {
+                                associatedCitizenNationalId = cell.getStringCellValue();
+                            }break;
+                        case 16:
+                        case 18:
+                        case 20:
+                        case 22:
+                            if (!cell.getStringCellValue().equals("")) {
+                                associatedCitizenName = cell.getStringCellValue();
+                                if (colNum + 1 == 16) {
+                                    associationType = 1;
+                                } else if (colNum + 1 == 18) {
+                                    associationType = 2;
+                                } else if (colNum + 1 == 20) {
+                                    associationType = 3;
+                                } else {
+                                    associationType = 4;
+                                }
+                                String association = associatedCitizenNationalId + "-" + associatedCitizenName + "-" + associationType;
+                                associations.add(association);
+                            }break;
+                    }
+                    System.out.print(cell.getStringCellValue()+" ");
+                }
+                model.setAssociations(associations);
+                model.setAddresses(address);
+                excelModels.add(model);
+                System.out.println();
+
+            }
+            for (ExcelCitizen model: excelModels) {
+                System.out.println(model.toString());
+            }
+            return null;
+        }  catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void insertCitizenFromExcelFile(ExcelCitizen citizen) {
+        CustomCitizenRequest customCitizen = new CustomCitizenRequest();
+        List<CustomAddress> customAddresses = new ArrayList<>();
+        List<String> addresses = citizen.getAddresses();
+//        String provinceCode = null;
+        for (int i = 0; i < addresses.size(); i++) {
+            CustomAddress address = new CustomAddress();
+            String[] nameList = addresses.get(i).split("-");
+            if (!addresses.get(i).equals("")) {
+                List<Hamlet> hamlet = hamletRepo.findHamletFromExcel(nameList[3],nameList[2],nameList[1],nameList[0]);
+                String hamletCode = null;
+                String provinceCode = null;
+                Integer addressType;
+                if (hamlet != null) {
+                    hamletCode = hamlet.get(0).getCode();
+                    provinceCode = hamletCode.substring(0,2);
+                    if (i == 0) addressType = 1;
+                    else if (i == 2) addressType = 2;
+                    else addressType = 3;
+                    address.setAddressType(addressType);
+                    address.setHamletCode(hamletCode);
+                    address.setProvinceCode(provinceCode);
+                    customAddresses.add(address);
+                }
+            }
+        }
+        String nationalId = citizen.getNationalId();
+        Ethnicity ethnicity = ethnicityRepo.findByName(citizen.getEthnicity()).orElseThrow();
+        if (!citizen.getReligion().equals("")) {
+            Religion religion = religionRepo.findByName(citizen.getReligion()).orElseThrow();
+        }
+
+        customCitizen.setNationalId(nationalId);
+
+
     }
 }

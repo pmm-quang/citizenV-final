@@ -10,6 +10,7 @@ import com.citizenv.app.exception.ResourceFoundException;
 import com.citizenv.app.exception.ResourceNotFoundException;
 import com.citizenv.app.payload.AdministrativeDivisionDto;
 import com.citizenv.app.payload.UserDto;
+import com.citizenv.app.payload.excel.ExcelCitizen;
 import com.citizenv.app.repository.AdministrativeDivisionRepository;
 import com.citizenv.app.repository.DeclarationRepository;
 import com.citizenv.app.repository.RoleRepository;
@@ -18,6 +19,11 @@ import com.citizenv.app.secirity.CustomUserDetail;
 import com.citizenv.app.service.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -26,7 +32,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -314,5 +325,6 @@ public class UserServiceImpl implements UserService {
         userDto.setPassword(null);
         return userDto;
     }
+
 
 }
