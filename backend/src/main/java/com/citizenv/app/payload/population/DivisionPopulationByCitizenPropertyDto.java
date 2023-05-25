@@ -3,27 +3,36 @@ package com.citizenv.app.payload.population;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class DivisionPopulationByCitizenPropertyDto extends DivisionGeneralPopulationDto {
-    private List<PopulationDto> details;
+    private List<Object[]> details;
 
-    public DivisionPopulationByCitizenPropertyDto(List<PopulationDto> populationDtos) {
+    public DivisionPopulationByCitizenPropertyDto(List<Object[]> populationDtos) {
         details = populationDtos;
     }
 
-    public DivisionPopulationByCitizenPropertyDto(String c, String n, List<PopulationDto> populationDtos) {
+    public DivisionPopulationByCitizenPropertyDto(String c, String n, List<Object[]> populationDtos) {
         super(c, n);
         details = populationDtos;
     }
+
+    public DivisionPopulationByCitizenPropertyDto(String c, String n, Long l, List<Object[]> populationDtos) {
+        super(c, n, l);
+        details = populationDtos;
+    }
+
     public void recalculatePopulation() {
         population = 0L;
-        for (PopulationDto p :
+        for (Object[] p :
                 details) {
-            population += p.getPopulation();
+            BigInteger currentPopulation = (BigInteger) p[p.length - 1];
+            population += currentPopulation.longValue() ;
         }
+        System.out.println(population);
     }
 }

@@ -28,4 +28,6 @@ public interface StatisticsService {
     List<PopulationDto> getUrbanAndRuralAreaPopulation();
 
     List<PopulationDto> getPopulation(Map<String, Object> body);
+
+    List<Object[]> test();
 }
