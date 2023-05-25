@@ -200,7 +200,7 @@ public class UserServiceImpl implements UserService {
             roles.add(role);
             newUser.setRoles(roles);
             Declaration declaration = new Declaration();
-            declaration.setStatus("Chưa");
+            declaration.setStatus(Constant.DECLARATION_STATUS_NOT_GRANT_YET); // mặc định lúc tạo mới tài khoản là chưa cấp quyền khai báo
             User createUser = repository.save(newUser);
             createUser.setDeclaration(declaration); // Thiết lập quan hệ giữa User và Declaration
             User savedUser = repository.save(createUser); // Lưu lại đối tượng User để cập nhật quan hệ với Declaration

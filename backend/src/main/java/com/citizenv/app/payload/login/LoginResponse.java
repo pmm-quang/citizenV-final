@@ -11,6 +11,8 @@ public class LoginResponse {
     private String username;
     private String role;
     private String declarationStatus;
+    private String declarationStartTime;
+    private String declarationEndTime;
     private AdministrativeDivisionDto division;
     private String accessToken;
 }

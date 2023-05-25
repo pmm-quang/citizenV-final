@@ -68,21 +68,5 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-//    @PostMapping("/")
-//    public ResponseEntity<UserDto> create(@RequestBody Map<String, Object> provinceJSONInfo) {
-//        UserDto userDto = userService.createUser(provinceJSONInfo);
-//        return new ResponseEntity<>(userDto, HttpStatus.CREATED);
-//    }
-
-//    @PutMapping("/")
-//    public ResponseEntity<UserDto> update(@RequestBody Map<String, Object> provinceJSONInfo) throws NoSuchMethodException {
-//        UserDto userDto = userService.updateUser(provinceJSONInfo);
-//        return new ResponseEntity<>(userDto, HttpStatus.OK);
-//    }
-
-//    @DeleteMapping("/{userId}")
-//    public ResponseEntity<String> deleteById(@PathVariable String userId) {
-//        return new ResponseEntity<>(userService.deleteById(userId), HttpStatus.OK);
-//    }
 
 }

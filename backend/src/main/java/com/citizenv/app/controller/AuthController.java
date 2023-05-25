@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,6 +47,8 @@ public class AuthController {
         UserDto userDto = mapper.map(userDetail.getUser(), UserDto.class);
         AdministrativeDivisionDto division = userDto.getDivision();
         String declarationStatus = null;
+        String declarationStartTime = null;
+        String declarationEndTime = null;
         String role = null;
         if (division != null) {
             String divisionCode = division.getCode();
@@ -56,14 +59,26 @@ public class AuthController {
                 case 8: role = "B2"; break;
             }
             declarationStatus = userDetail.getUser().getDeclaration().getStatus();
+            if (userDetail.getUser().getDeclaration().getStartTime() != null) {
+                LocalDateTime startTime = userDetail.getUser().getDeclaration().getStartTime().toLocalDateTime();
+                declarationStartTime = startTime.toString();
+            }
+            if (userDetail.getUser().getDeclaration().getEndTime() != null) {
+                LocalDateTime endTime = userDetail.getUser().getDeclaration().getEndTime().toLocalDateTime();
+                declarationEndTime = endTime.toString();
+            }
+
         } else {
             role = "A1";
         }
         LoginResponse info = new LoginResponse();
         info.setUsername(userDetail.getUsername());
+
         info.setRole(role);
         info.setDivision(division);
         info.setDeclarationStatus(declarationStatus);
+        info.setDeclarationStartTime(declarationStartTime);
+        info.setDeclarationEndTime(declarationEndTime);
         info.setAccessToken(jwt);
 //        Map<String, Object> map = new HashMap<>();
 //        map.put("info", info);
