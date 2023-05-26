@@ -1,11 +1,11 @@
 import Login from './Login/login';
-import FindResidential from './Residential/Controller/FindResidential'
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './Home';
-import Account from './Management/Account/Controller/Account';
-import Citizen from './Residential/Controller/Citizen' 
-import CitizenInput from './Residential/Controller/CitizenInput' 
 import Statis from './Statis/BasicStatis'
+import FindResidential from './Management/Citizen/Controller/FindResidential'
+import Account from './Management/Account/Controller/Account';
+import Citizen from './Management/Citizen/Controller/Citizen' 
+import CitizenInput from './Management/Citizen/Controller/CitizenInput' 
 import Province from './Management/AdministrativeUnits/Controler/Province';
 import District from './Management/AdministrativeUnits/Controler/District';
 import Ward from './Management/AdministrativeUnits/Controler/Ward';

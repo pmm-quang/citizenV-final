@@ -1,5 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import NavbarPage from '../../Navbar/NavbarPage.js';
+import NavbarPage from '../../../Navbar/NavbarPage.js';
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form';
 import '../css/Citizen.css'

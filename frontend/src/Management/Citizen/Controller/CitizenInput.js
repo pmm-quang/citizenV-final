@@ -1,5 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import NavbarPage from '../../Navbar/NavbarPage.js';
+import NavbarPage from '../../../Navbar/NavbarPage.js';
 import { Form, Button } from 'react-bootstrap';
 import axios from 'axios';
 import PDFFile from '../file/mau_phieu.pdf'

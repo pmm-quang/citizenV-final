@@ -1,5 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import NavbarPage from '../../Navbar/NavbarPage.js';
+import NavbarPage from '../../../Navbar/NavbarPage.js';
 import Form from 'react-bootstrap/Form';
 import '../css/findResidential.css'
 import { Button } from 'react-bootstrap';
