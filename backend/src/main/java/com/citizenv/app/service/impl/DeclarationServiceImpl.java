@@ -224,10 +224,13 @@ public class DeclarationServiceImpl implements DeclarationService {
         User foundUser = userRepo.findByUsername(username).orElseThrow(
                 ()-> new ResourceNotFoundException("User", "Username", username)
         );
+        foundUser.getDeclaration().setStatus(Constant.DECLARATION_STATUS_LOCKED);
         userRepo.deleteUserRole(foundUser.getId(), Constant.EDITOR_ROLE_ID);
         List<User> subUserList = userRepo.findAllSubordinateAccounts(username);
+
         if (subUserList != null) {
             for (User user : subUserList) {
+                user.getDeclaration().setStatus(Constant.DECLARATION_STATUS_LOCKED);
                 userRepo.deleteUserRole(user.getId(), Constant.EDITOR_ROLE_ID);
             }
         }
