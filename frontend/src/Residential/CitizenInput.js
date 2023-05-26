@@ -260,11 +260,18 @@ function CitizenInput() {
     }
 
     const PostFileExcel = async () => {
-        const fileData = {
-            excelFile: file
+        let formData = new FormData()
+        let reader = new FileReader()
+        formData.append("excelFile", file)
+        const config = {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "Authorization": `Bearer ${user_account.accessToken}`
+              },
         }
+        console.log(config)
         try {
-            const response = await axios.post("http://localhost:8080/api/v1/citizen/excel/upload", fileData, config)
+            const response = await axios.post("http://localhost:8080/api/v1/citizen/excel/upload", formData, config)
             console.log(response.data)
         } catch (error) {
             console.log(error)
@@ -586,7 +593,11 @@ function CitizenInput() {
                     <Modal.Title className='titleModal'>NHẬP DỮ LIỆU TỪ FILE</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <input type="file" accept=".xlsx, .xls, .csv" onChange={(e) => setFile(e.target.files[0])} />
+                    <Form>
+                        <Form.Control type="file" accept=".xlsx, .xls, .csv" onChange={(e) => {
+                            setFile(e.target.files[0])}
+                        } />
+                    </Form>
                     <div className="noteInputbyfile">Lưu ý: Chỉ chấp nhận các định dạng: ".xlsx", ".xls", ".csv"</div>
                 </Modal.Body>
                 <Modal.Footer>

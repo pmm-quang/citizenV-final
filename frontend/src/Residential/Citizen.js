@@ -88,7 +88,13 @@ function Citizen() {
         const response = await axios('http://localhost:8080/api/v1/statistics/population', config);
         setCountCitizen(response.data)
         setDivision("Toàn quốc")
-        const response_population = await axios('http://localhost:8080/api/v1/statistics/population/province', config)
+        const data = {
+            "division": "province",
+            "codes": null,
+            "properties": null
+        }
+        console.log(data)
+        const response_population = await axios.post("http://localhost:8080/api/v1/statistics/population/division", data, config)
         setProvince(response_population.data)
         setCitizens(response_population.data)
         setProvinceUnit(response_population.data)

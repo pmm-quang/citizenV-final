@@ -9,7 +9,6 @@ import {BsPersonCircle} from 'react-icons/bs'
 
 function NavbarPage() {
   const user_account = JSON.parse(localStorage.getItem("user"));
-  console.log(user_account)
   const author = user_account.role;
 
   let navigate = useNavigate();

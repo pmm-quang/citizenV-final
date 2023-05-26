@@ -315,12 +315,15 @@ function BasicStatis() {
                     <div className="optionStatic" onClick={() => {
                         setShowAge(true)
                         setShowChart(false)
+                        setShowMultiStatic(false)
+                        setShowTableMultiStatic(false)
                     }
                     }><AiFillCaretRight /> 7. Nhóm tuổi</div>
                     <div className="optionStatic" onClick={() => {
                         setShowMultiStatic(true)
                         setShowChart(false)
                         setShowChartAge(false)
+                        setShowAge(false)
                     }
                     }><AiFillCaretRight /> 8. Thuộc tính kết hợp</div>
                 </div>
@@ -394,7 +397,6 @@ function BasicStatis() {
     }
 
     const SelectYear = () => {
-
         return (
             <div>
                 <div className="titleSelectYear">THỐNG KÊ CÁC NHÓM TUỔI TRONG KHOẢNG THỜI GIAN</div>
