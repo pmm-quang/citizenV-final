@@ -29,5 +29,5 @@ public interface StatisticsService {
 
     List<PopulationDto> getPopulation(Map<String, Object> body);
 
-    List<Object[]> test();
+    List<Map<String, Object>> test();
 }

@@ -1,7 +1,11 @@
 package com.citizenv.app.repository;
 
+import org.hibernate.query.internal.NativeQueryImpl;
+import org.hibernate.transform.AliasToEntityMapResultTransformer;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import java.util.*;
 
 
@@ -12,7 +16,7 @@ public class CustomAddressRepositoryImpl implements CustomAddressRepository {
 
     StringBuilder sb;
 
-    Map<String, String> specialSqlSequenceSelectByProperty;
+    public Map<String, String> specialSqlSequenceSelectByProperty;
     Map<String, String> specialSqlSequenceJoinProperty;
 
     public CustomAddressRepositoryImpl() {
@@ -23,9 +27,9 @@ public class CustomAddressRepositoryImpl implements CustomAddressRepository {
         specialSqlSequenceSelectByProperty.put("bloodType", "c.blood_type");
         specialSqlSequenceSelectByProperty.put("sex", "c.sex");
         specialSqlSequenceSelectByProperty.put("maritalStatus", "c.marital_status");
-        specialSqlSequenceSelectByProperty.put("ethnicity", "c.ethnicity_id");
+        specialSqlSequenceSelectByProperty.put("ethnicity", "eth.name");
         specialSqlSequenceSelectByProperty.put("otherNationality", "c.other_nationality");
-        specialSqlSequenceSelectByProperty.put("religion", "c.religion_id");
+        specialSqlSequenceSelectByProperty.put("religion", "IFNULL(re.name, 'Không')");
         specialSqlSequenceSelectByProperty.put("educationalLevel", "c.educational_level");
         specialSqlSequenceSelectByProperty.put("job", "c.job");
         specialSqlSequenceSelectByProperty.put("ageGroup", "CASE when DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(),c.date_of_birth)), '%Y') + 0 <= 15 then \"Dưới độ tuổi lao động\" when DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(),c.date_of_birth)), '%Y') + 0 <= 65 then \"Trong độ tuổi lao động\" else \"Trên độ tuổi lao động\" end");
@@ -48,17 +52,24 @@ public class CustomAddressRepositoryImpl implements CustomAddressRepository {
     }
 
     @Override
-    public List<Object[]> countByProperties(Set<String> properties, String code) {
+    public List<Map<String, Object>> countByProperties(Set<String> properties, String code) {
         sb.setLength(0);
-        String propertiesSqlSequence = "";
+        String propertiesSqlSelectSequence;
+        String propertiesGroupBySequence = "";
         Iterator<String> propertiesIterator = properties.iterator();
         while (propertiesIterator.hasNext()) {
-            sb.append(specialSqlSequenceSelectByProperty.get(propertiesIterator.next()));
+            String tempKey = propertiesIterator.next();
+            String temp = specialSqlSequenceSelectByProperty.get(tempKey);
+            sb.append(temp);
+            sb.append(" as ");
+            sb.append(tempKey);
+            propertiesGroupBySequence += tempKey;
             if (propertiesIterator.hasNext()) {
                 sb.append(", ");
+                propertiesGroupBySequence += ", ";
             }
         }
-        propertiesSqlSequence = sb.toString();
+        propertiesSqlSelectSequence = sb.toString();
         String codeSqlSequence = "";
         sb.setLength(0);
         if (code != null) {
@@ -66,15 +77,17 @@ public class CustomAddressRepositoryImpl implements CustomAddressRepository {
         }
 
         sb.setLength(0);
-        String resultSqlString = "select " + propertiesSqlSequence + ", count(*) from addresses a join citizens c on c.id = a.citizen_id join hamlets h on h.id = a.hamlet_id join administrative_divisions admd1 on admd1.id = h.id join administrative_divisions admd2 on admd2.code = left(admd1.code, 4) where a.address_type = 2 group by " + propertiesSqlSequence;
+        String resultSqlString;
         resultSqlString = sb.append("select ")
-                .append(propertiesSqlSequence)
-                .append(", count(*) from addresses a join citizens c on c.id = a.citizen_id join hamlets h on h.id = a.hamlet_id join administrative_divisions admd1 on admd1.id = h.id join administrative_divisions admd2 on admd2.code = left(admd1.code, 4) where a.address_type = 2")
+                .append(propertiesSqlSelectSequence)
+                .append(", count(*) as population from addresses a join citizens c on c.id = a.citizen_id join hamlets h on h.id = a.hamlet_id join administrative_divisions admd1 on admd1.id = h.id join administrative_divisions admd2 on admd2.code = left(admd1.code, 4) join ethnicities eth on eth.id = c.ethnicity_id left join religions re on re.id = c.religion_id where a.address_type = 2")
                 .append(codeSqlSequence)
                 .append("group by ")
-                .append(propertiesSqlSequence).toString();
-        return entityManager.createNativeQuery(resultSqlString)
-                .unwrap(org.hibernate.query.Query.class)
-                .getResultList();
+                .append(propertiesGroupBySequence).toString();
+        Query query = entityManager.createNativeQuery(resultSqlString);
+        NativeQueryImpl nativeQuery = (NativeQueryImpl) query;
+        nativeQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+        List<Map<String,Object>> result = nativeQuery.getResultList();
+        return result;
     }
 }

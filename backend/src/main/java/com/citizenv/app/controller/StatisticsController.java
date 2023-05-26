@@ -113,8 +113,8 @@ public class StatisticsController {
         return new ResponseEntity<>(population, HttpStatus.OK);
     }
     @GetMapping("/test")
-    public ResponseEntity<List<Object[]>> test() {
-        List<Object[]> population = populationService.test();
+    public ResponseEntity<List<Map<String, Object>>> test() {
+        List<Map<String, Object>> population = populationService.test();
         return new ResponseEntity<>(population, HttpStatus.OK);
     }
 }

@@ -254,7 +254,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         return null;
     }
 
-    private List<Object[]> getDivisionPopulationByProperty(String code, Set<String> properties) {
+    private List<Map<String, Object>> getDivisionPopulationByProperty(String code, Set<String> properties) {
         try {
             return addressRepository.countByProperties(properties, code);
 
@@ -346,19 +346,12 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public List<Object[]> test() {
+    public List<Map<String, Object>> test() {
         Set<String> properties = new HashSet<>();
         properties.add("sex");
         properties.add("local");
         String code = "24";
-        List<Object[]> a = addressRepository.countByProperties(properties, code);
-        for (Object[] saf:
-             a) {
-            for (Object b:
-                 saf) {
-                System.out.println(b);
-            }
-        }
+        List<Map<String, Object>> a = addressRepository.countByProperties(properties, code);
         return a;
     }
 }
