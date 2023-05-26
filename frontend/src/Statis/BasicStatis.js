@@ -44,7 +44,7 @@ function BasicStatis() {
         },
     };
 
-    const [listProvinces, setListProvinces] = useState([])
+    const [listDivisions, setListDivisions] = useState([])
     const [option, setOption] = useState();
     const [showAge, setShowAge] = useState(false);
     const [showMultiStatic, setShowMultiStatic] = useState(false);
@@ -59,6 +59,7 @@ function BasicStatis() {
     const [provinceCodes, setProvinceCodes] = useState([])
     const [optionCodes, setOptionCodes] = useState([])
     const [dataMultiStatic, setDataMultiStatic] = useState([])
+    const [optionList, setOptionList] = useState([])
     const [dataChart, setDataChart] = useState({
         labels: [],
         datasets: [
@@ -78,20 +79,37 @@ function BasicStatis() {
         { value: 'otherNationality', label: "Quốc tịch khác" }
     ])
     const fetchProvince = async () => {
-        try {
-            const response = await axios('http://localhost:8080/api/v1/province/', config);
-            setListProvinces(response.data);
-        } catch (err) {
-            console.error(err);
+        if (role === 'A1') {
+            try {
+                const response = await axios('http://localhost:8080/api/v1/province/', config);
+                setListDivisions(response.data);
+            } catch (err) {
+                console.error(err);
+            }
+        } else if (role === 'A2') {
+            try {
+                const response = await axios('http://localhost:8080/api/v1/district/by-province/' + user, config);
+                setListDivisions(response.data);
+            } catch (err) {
+                console.error(err);
+            }
+        } else if (role === 'A3') {
+            try {
+                const response = await axios('http://localhost:8080/api/v1/ward/by-district/' + user, config);
+                setListDivisions(response.data);
+            } catch (err) {
+                console.error(err);
+            }
+        } else if (role === 'B1') {
+            try {
+                const response = await axios('http://localhost:8080/api/v1/hamlet/by-ward/' + user, config);
+                setListDivisions(response.data);
+            } catch (err) {
+                console.error(err);
+            }
+        } else if (role === 'B2') {
+            setProvinceCodes([user])
         }
-    };
-
-    const checkAccount = (listProvinces) => {
-        const updatedProvinces = listProvinces.map((province) => ({
-            ...province,
-            checked: false,
-        }));
-        setListProvinces(updatedProvinces);
     };
 
     const GetDataStatic = async (code) => {
@@ -106,14 +124,6 @@ function BasicStatis() {
         let response
         setOption(code)
         if (role === 'A1') {
-            const data = {
-                "division": "province",
-                "codes": null,
-                "properties": [
-                    code
-                ]
-            }
-            console.log(data)
             response = await axios.get("http://localhost:8080/api/v1/statistics/population/citizen?property=" + code, config)
             setDataStatic(response.data)
             console.log(response.data)
@@ -141,11 +151,11 @@ function BasicStatis() {
             response = await axios.post("http://localhost:8080/api/v1/statistics/population/division", data, config)
             setDataStatic(response.data[0].details)
             setDataChart({
-                labels: response.data[0].details.map(item => (item[0] === null) ? "Không có" : item[0]),
+                labels: response.data[0].details.map(item => (listDataOption(item, code) === null) ? "Không có" : listDataOption(item, code)),
                 datasets: [
                     {
                         label: 'Tổng dân số',
-                        data: response.data[0].details.map(item => item[1]),
+                        data: response.data[0].details.map((item) => item.population),
                     },
                 ],
             })
@@ -251,16 +261,28 @@ function BasicStatis() {
         fetchProvince()
     }, [])
 
-    const optionStaticProvinces = listProvinces.map((province) => ({
-        value: province.code,
-        label: province.name
+    const listDataOption = (data, option) => {
+        if (option === 'sex') return data.sex
+        else if (option === 'maritalStatus') return data.maritalStatus
+        else if (option === 'bloodType') return data.bloodType
+        else if (option === 'otherNationality') return data.otherNationality
+        else if (option === 'religion') return data.religion
+        else if (option === 'ethnicity') return data.ethnicity
+        else if (option === 'name') return data.name
+        else if (option === 'population') return data.population
+    }
+
+
+    const optionStaticProvinces = listDivisions.map((division) => ({
+        value: division.code,
+        label: division.name
     })
     )
 
     const listStaticsDivison = dataStatic.map((post, index) =>
         <tr key={index}>
-            <td>{(post[0] === null) ? "Không có" : post[0]}</td>
-            <td>{post[1]}</td>
+            <td>{(listDataOption(post, option) === null) ? "Không có" : listDataOption(post, option)}</td>
+            <td>{post.population}</td>
         </tr>
     )
 
@@ -284,8 +306,8 @@ function BasicStatis() {
         dataList.details.map((data) =>
             <tr key={index}>
                 <td>{dataList.name}</td>
-                {data.map((value) =>
-                    <td>{value}</td>)}
+                {optionList.map((option) => <td>{listDataOption(data, option)}</td>)}
+                <td>{data.population}</td>
             </tr>)
     )
 
@@ -430,15 +452,53 @@ function BasicStatis() {
         setShowTableMultiStatic(true)
         const provinceList = provinceCodes.map((province) => (province.value))
         console.log(provinceList)
-        const optionList = optionCodes.map((option) => (option.value))
-        console.log(optionList)
-        if (role === 'A1') {
+        const optionChooseList = optionCodes.map((option) => (option.value))
+        setOptionList(optionChooseList)
+        if (role === "A1") {
             const data = {
-                "division": "province",
-                "codes": provinceList,
-                "properties": optionList
+                division: "province",
+                codes: provinceList,
+                properties: optionChooseList
             }
+            if (data.codes.length === 0) data.codes = null;
+            if (data.properties.length === 0) data.properties = null;
             console.log(data)
+            const response = await axios.post("http://localhost:8080/api/v1/statistics/population/division", data, config)
+            setDataMultiStatic(response.data)
+            console.log(response.data)
+        } else if (role === 'A2') {
+            const data = {
+                "division": "district",
+                "codes": provinceList,
+                "properties": optionChooseList
+            }
+            const response = await axios.post("http://localhost:8080/api/v1/statistics/population/division", data, config)
+            setDataMultiStatic(response.data)
+            console.log(response.data)
+        } else if (role === 'A3') {
+            const data = {
+                "division": "ward",
+                "codes": provinceList,
+                "properties": optionChooseList
+            }
+            const response = await axios.post("http://localhost:8080/api/v1/statistics/population/division", data, config)
+            setDataMultiStatic(response.data)
+            console.log(response.data)
+        } else if (role === 'B1') {
+            const data = {
+                "division": "hamlet",
+                "codes": provinceList,
+                "properties": optionChooseList
+            }
+            const response = await axios.post("http://localhost:8080/api/v1/statistics/population/division", data, config)
+            setDataMultiStatic(response.data)
+            console.log(response.data)
+        } else if (role === 'B2') {
+            const data = {
+                "division": "hamlet",
+                "codes": [user],
+                "properties": optionChooseList
+            }
             const response = await axios.post("http://localhost:8080/api/v1/statistics/population/division", data, config)
             setDataMultiStatic(response.data)
             console.log(response.data)
@@ -451,19 +511,19 @@ function BasicStatis() {
                 <div className="titleSelectYear">THỐNG KÊ TÙY CHỌN</div>
                 <div>
                     <Form.Group className="formInput" style={{ marginBottom: '20px' }}>
-                        <Form.Label style={{ width: '200px', marginTop: '6px' }}>1*. Đơn vị hành chính</Form.Label>
-                        <Select className="selectMultiOption" placeholder="Chọn danh sách đơn vị hành chính cần thống kê" options={optionStaticProvinces} isMulti onChange={(e) => {
-                            setProvinceCodes(e)
-                            setShowTableMultiStatic(false)
-                        }} />
-                    </Form.Group>
-                    <Form.Group className="formInput">
-                        <Form.Label style={{ width: '200px', marginTop: '6px' }}>2*. Thuộc tính thống kê</Form.Label>
+                        <Form.Label style={{ width: '300px', marginTop: '6px' }}>1*. Chọn thuộc tính thống kê</Form.Label>
                         <Select className="selectMultiOption" placeholder="Chọn danh sách thuộc tính cần thống kê" options={listOption} isMulti onChange={(e) => {
                             setOptionCodes(e)
                             setShowTableMultiStatic(false)
                         }} />
                     </Form.Group>
+                    {(role !== 'B2') ? <Form.Group className="formInput">
+                        <Form.Label style={{ width: '300px', marginTop: '6px' }}>2*. Chọn đơn vị hành chính</Form.Label>
+                        <Select className="selectMultiOption" placeholder="Chọn danh sách đơn vị hành chính cần thống kê" options={optionStaticProvinces} isMulti onChange={(e) => {
+                            setProvinceCodes(e)
+                            setShowTableMultiStatic(false)
+                        }} />
+                    </Form.Group> : null}
                     <Form.Group style={{ marginLeft: '30px', marginTop: '20px' }}>
                         <Button onClick={() => {
                             GetDataToStatic()

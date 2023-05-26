@@ -82,7 +82,7 @@ function CitizenInput() {
         try {
             const response_province = await axios("http://localhost:8080/api/v1/province/" + provinceCodeAddress2, config)
             setNameProvinceAddress2(response_province.data.name)
-            const response_district = await axios('http://localhost:8080/api/v1/district/0101', config);
+            const response_district = await axios('http://localhost:8080/api/v1/district/' + districtCodeAddress2, config);
             setNameDistrictAddress2(response_district.data.name)
             console.log(response_district.data)
             const response_ward = await axios("http://localhost:8080/api/v1/ward/" + wardCodeAddress2, config)

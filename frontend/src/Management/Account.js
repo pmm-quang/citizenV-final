@@ -8,6 +8,7 @@ import axios from "axios";
 import Modal from "react-bootstrap/Modal";
 import { Form } from "react-bootstrap";
 import { BiCheckCircle } from 'react-icons/bi'
+import CountDownDate from "./CountDownDate";
 
 function Account() {
   const [checkedId, setCheckedId] = useState(-1)
@@ -194,7 +195,7 @@ function Account() {
   }
 
   const tableAccount = accountList.map((account) => (
-    <tr className="top-row" key={account.username} style={{ backgroundColor: account.checked ? 'yellow' : null }}>
+    <tr className="top-row" key={account.username} style={{ backgroundColor: (account.declaration.status === "Đang khai báo") ? 'yellow' : null }}>
       <th className="top-row-title">{account.username}</th>
       <th className="top-row-title">{account.division.administrativeUnit.shortName + " " + account.division.name}</th>
       {(account.declaration.startTime === null) ? <th className="top-row-title">Chưa khai báo</th> : <th className="top-row-title">{account.declaration.startTime}</th>}
@@ -370,6 +371,10 @@ function Account() {
     <div>
       <NavbarPage />
       <div className="account-main-page">
+        <div className="account-option-list">
+          <Button className="account-option" onClick={() => CreateAccount()}>Thêm tài khoản</Button>
+          <Button className="account-option" onClick={() => setShowCreateDeclaration(true)}>Cấp quyền khai báo</Button>
+        </div>
         <div className="account-table">
           <Table striped bordered hover>
             <thead>
@@ -382,12 +387,7 @@ function Account() {
             <tbody>{tableAccount}</tbody>
           </Table>
         </div>
-
-        <div className="account-option-list">
-          <Button className="account-option" onClick={() => CreateAccount()}>Thêm tài khoản</Button>
-          <Button className="account-option" onClick={() => setShowDeclaration(true)}>Xem lịch sử</Button>
-          <Button className="account-option" onClick={() => setShowCreateDeclaration(true)}>Cấp quyền khai báo</Button>
-        </div>
+        <CountDownDate />
         {(show) ? ModalAddAccount() : null}
         {(showDeclaration) ? ModalListDeclaration() : null}
         {ModalDeclaration()}
