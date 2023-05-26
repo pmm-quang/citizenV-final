@@ -54,11 +54,16 @@ public class CitizenController {
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 //        CustomUserDetail userDetail = (CustomUserDetail) authentication.getPrincipal();
         String divisionCode = SecurityUtils.getDivisionCodeCurrentUserLogin();
-        if (hamletCode.indexOf(divisionCode) == 0) {
-           Map<String, Object> list = citizenService.getAllByHamletCode(hamletCode, page);
+        if (divisionCode == null) {
+            Map<String, Object> list = citizenService.getAllByHamletCode(hamletCode, page);
             return new ResponseEntity<>(list, HttpStatus.OK);
         } else {
-            throw new AccessDeniedException("Khong co quyen try cap");
+            if (hamletCode.indexOf(divisionCode) == 0) {
+                Map<String, Object> list = citizenService.getAllByHamletCode(hamletCode, page);
+                return new ResponseEntity<>(list, HttpStatus.OK);
+            } else {
+                throw new AccessDeniedException("Khong co quyen try cap");
+            }
         }
     }
 
