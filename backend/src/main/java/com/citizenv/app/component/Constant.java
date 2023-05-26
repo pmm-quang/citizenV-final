@@ -6,7 +6,7 @@ public final class Constant {
     public static final String DECLARATION_STATUS_COMPLETED = "Đã hoàn thành";
     public static final String DECLARATION_STATUS_NOT_OPEN = "Chưa mở khai báo";
     public static final  String DECLARATION_STATUS_NOT_GRANT_YET = "Chưa cấp quyền khai báo";
-
+    public static final  String DECLARATION_STATUS_OUT_OF_DATE = "Đã quá hạn khai báo";
     public static final Long A1_ROLE_ID = 1L;
     public static final Long A2_ROLE_ID = 2L;
     public static final Long A3_ROLE_ID = 3L;

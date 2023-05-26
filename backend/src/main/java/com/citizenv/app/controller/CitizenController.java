@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -131,9 +132,12 @@ public class CitizenController {
     }
 
     @PostMapping(value = "/excel/upload")
-    public ResponseEntity<?> uploadExcelFile(@RequestParam("excelFile") MultipartFile excelFile) {
+    public ResponseEntity<?> uploadExcelFile(@RequestParam("excelFile") MultipartFile excelFile) throws IOException {
         System.out.println(excelFile.getSize());
-
+//        File tempFile = ((MultipartFile) excelFile).getInputStream().getFile();
+//        if (tempFile != null && tempFile.exists()) {
+//            tempFile.delete();
+//        }
 //        String filePath = "src/main/java/com/citizenv/app/controller/file.xlsx";
         List<CitizenDto> list = citizenService.createUserFromExcelFile(excelFile);
         return ResponseEntity.ok().build();
