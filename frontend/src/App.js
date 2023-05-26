@@ -1,15 +1,15 @@
 import Login from './Login/login';
-import FindResidential from './Residential/FindResidential'
-import Province from './Management/Province';
+import FindResidential from './Residential/Controller/FindResidential'
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './Home';
-import Account from './Management/Account';
-import Ward from './Management/Ward';
-import Citizen from './Residential/Citizen' 
-import CitizenInput from './Residential/CitizenInput' 
-import District from './Management/District';
+import Account from './Management/Account/Controller/Account';
+import Citizen from './Residential/Controller/Citizen' 
+import CitizenInput from './Residential/Controller/CitizenInput' 
 import Statis from './Statis/BasicStatis'
-import Hamlet from './Management/Hamlet';
+import Province from './Management/AdministrativeUnits/Controler/Province';
+import District from './Management/AdministrativeUnits/Controler/District';
+import Ward from './Management/AdministrativeUnits/Controler/Ward';
+import Hamlet from './Management/AdministrativeUnits/Controler/Hamlet';
 
 function App() {
   return (

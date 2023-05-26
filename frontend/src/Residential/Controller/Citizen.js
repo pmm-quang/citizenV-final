@@ -1,9 +1,9 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import NavbarPage from '../Navbar/NavbarPage.js';
+import NavbarPage from '../../Navbar/NavbarPage.js';
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form';
-import './Citizen.css'
-import citizen from './citizen.png'
+import '../css/Citizen.css'
+import citizen from '../file/citizen.png'
 import { BsSearch, BsArrowLeft } from 'react-icons/bs'
 import { useState, useEffect } from 'react';
 import Table from 'react-bootstrap/Table';

@@ -1,7 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import NavbarPage from '../Navbar/NavbarPage.js';
+import NavbarPage from '../../../Navbar/NavbarPage.js';
 import Button from 'react-bootstrap/Button'
-import './province.css'
+import '../css/province.css'
 import { useState, useEffect } from 'react';
 import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';

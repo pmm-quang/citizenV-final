@@ -1,7 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Form from 'react-bootstrap/Form';
 import './NavbarPage.css'
-import logo from './logo.png'
+import logo from './file/logo.png'
 import { AiOutlineMenu, AiOutlineLogout } from "react-icons/ai";
 import { Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +10,7 @@ import {BsPersonCircle} from 'react-icons/bs'
 function NavbarPage() {
   const user_account = JSON.parse(localStorage.getItem("user"));
   const author = user_account.role;
+  console.log(user_account)
 
   let navigate = useNavigate();
   return (

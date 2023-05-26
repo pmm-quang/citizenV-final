@@ -1,13 +1,12 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import NavbarPage from '../Navbar/NavbarPage';
+import NavbarPage from '../../Navbar/NavbarPage.js';
 import { Form, Button } from 'react-bootstrap';
 import axios from 'axios';
-import PDFFile from './mau_phieu.pdf'
-import './CitizenInput.css'
-import ExcelFile from './mau_excel.xlsx'
+import PDFFile from '../file/mau_phieu.pdf'
+import '../css/CitizenInput.css'
+import ExcelFile from '../file/mau_excel.xlsx'
 import { useState, useEffect } from 'react';
 import Modal from 'react-bootstrap/Modal';
-import fileExcel from './file.xlsx'
 
 function CitizenInput() {
     const user_account = JSON.parse(localStorage.getItem("user"));
@@ -69,15 +68,6 @@ function CitizenInput() {
     const [nameHamletAddress2, setNameHamletAddress2] = useState("")
     const [declaration, setDeclaration] = useState()
     const [file, setFile] = useState()
-
-    const CompleteDeclaration = async () => {
-        try {
-          await axios.get("http://localhost:8080/api/v1/declaration/set-completed", config)
-          setStatus("Đã hoàn thành")
-        } catch (error) {
-          console.log(error)
-        }
-      }
     
 
     const GetDecleration = async () => {
@@ -105,6 +95,7 @@ function CitizenInput() {
         }
     }
 
+    // get list of provinces
     const fetchProvince = async () => {
         try {
             const response = await axios('http://localhost:8080/api/v1/province/', config);
@@ -115,35 +106,7 @@ function CitizenInput() {
         }
     };
 
-    const fetchEthnicity = async () => {
-        try {
-            const response = await axios(' http://localhost:8080/api/v1/ethnicity/', config);
-            setEthnicitys(response.data);
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-    const fetchReigion = async () => {
-        try {
-            const response = await axios('http://localhost:8080/api/v1/religion/', config);
-            setReligions(response.data);
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-    const fetchWard = async (code, index) => {
-        try {
-            const response = await axios('http://localhost:8080/api/v1/ward/by-district/' + code, config);
-            if (index === 1) setWardsAddress1(response.data);
-            else if (index === 3) setWardsAddress3(response.data);
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-
+    // get list of districts in province
     const fetchDistrict = async (code, index) => {
         try {
             const response = await axios('http://localhost:8080/api/v1/district/by-province/' + code, config);
@@ -154,6 +117,18 @@ function CitizenInput() {
         }
     };
 
+    // get list of wards in district
+    const fetchWard = async (code, index) => {
+        try {
+            const response = await axios('http://localhost:8080/api/v1/ward/by-district/' + code, config);
+            if (index === 1) setWardsAddress1(response.data);
+            else if (index === 3) setWardsAddress3(response.data);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    // get list of hamlets in ward
     const fetchHamlet = async (code, index) => {
         try {
             const response = await axios('http://localhost:8080/api/v1/hamlet/by-ward/' + code, config);
@@ -165,14 +140,25 @@ function CitizenInput() {
         }
     };
 
-    useEffect(() => {
-        fetchProvince();
-        fetchEthnicity();
-        fetchReigion();
-        fetchNameAddress();
-        GetDecleration()
-    }, [])
+    // get list of ethnicities
+    const fetchEthnicity = async () => {
+        try {
+            const response = await axios(' http://localhost:8080/api/v1/ethnicity/', config);
+            setEthnicitys(response.data);
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
+    // get list of regions
+    const fetchRegion = async () => {
+        try {
+            const response = await axios('http://localhost:8080/api/v1/religion/', config);
+            setReligions(response.data);
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     const OnClickButton = async () => {
         const addresses = [
@@ -259,6 +245,7 @@ function CitizenInput() {
         setShowNotify(true)
     }
 
+    // get religion's name from religion's id
     const setNameReligion = (id) => {
         if (id === 0) setReligionName('Không có')
         else {
@@ -270,6 +257,7 @@ function CitizenInput() {
         }
     }
 
+    // post file Excel 
     const PostFileExcel = async () => {
         let formData = new FormData()
         let reader = new FileReader()
@@ -288,6 +276,53 @@ function CitizenInput() {
             console.log(error)
         }
     }
+
+    
+    const SetDefault = () => {
+        setProvinceCodeAddress1("")
+        setDistrictCodeAddress1("");
+        setWardCodeAddress1("");
+        setHamletCodeAddress1("");
+        setProvinceCodeAddress3("");
+        setDistrictCodeAddress3("");
+        setWardCodeAddress3("");
+        setHamletCodeAddress3("");
+        setDistrictsAddress1([]);
+        setDistrictsAddress3([]);
+        setWardsAddress1([]);
+        setWardsAddress3([]);
+        setHamletsAddress1([]);
+        setHamletsAddress3([]);
+        setBloodType("");
+        setDateOfBirth("");
+        setEthnicity("");
+        setSex("");
+        setMarriageStatus("");
+        setReligionId("");
+        setReligionName("");
+        setFullName("");
+        setOtherNationality("")
+        setNationalId("")
+        setNationalIdAssociation1("")
+        setNationalIdAssociation2("")
+        setNationalIdAssociation3("")
+        setNationalIdAssociation4("")
+        setFullNameAssociation1("")
+        setFullNameAssociation2("")
+        setFullNameAssociation3("")
+        setFullNameAssociation4("")
+    }
+
+
+
+    useEffect(() => {
+        fetchProvince();
+        fetchEthnicity();
+        fetchRegion();
+        fetchNameAddress();
+        GetDecleration()
+    }, [])
+
 
     const listEthnicity = ethnicitys.map((post) =>
         <option key={post.id} value={post.id}>{post.id + ". " + post.name}</option>
@@ -577,6 +612,26 @@ function CitizenInput() {
         )
     }
 
+    // Show message out of declared time
+    const NotifyDeclaration = () => {
+        return (
+            <div>
+                <div className="warning">HIỆN KHÔNG PHẢI THỜI GIAN KHAI BÁO DÂN SỐ</div>
+                <div className="childWarning">Vui lòng quay trở lại sau</div>
+            </div>
+        )
+    }
+
+    // Show message completed declaration
+    const NotifyCompleteDeclaration = () => {
+        return (
+            <div>
+                <div className="successNotify">ĐÃ HOÀN THÀNH KHAI BÁO</div>
+                <div className="childSuccessNotify">Vui lòng quay trở lại sau</div>
+            </div>
+        )
+    }
+
     const ModalNotify = () => {
         return (
             <Modal show={showNotify}>
@@ -597,6 +652,7 @@ function CitizenInput() {
         )
     }
 
+    // form input excel
     const ModalInputByExcel = () => {
         return (
             <Modal show={showInput}>
@@ -626,42 +682,6 @@ function CitizenInput() {
                 </Modal.Footer>
             </Modal>
         )
-    }
-
-
-    const SetDefault = () => {
-        setProvinceCodeAddress1("")
-        setDistrictCodeAddress1("");
-        setWardCodeAddress1("");
-        setHamletCodeAddress1("");
-        setProvinceCodeAddress3("");
-        setDistrictCodeAddress3("");
-        setWardCodeAddress3("");
-        setHamletCodeAddress3("");
-        setDistrictsAddress1([]);
-        setDistrictsAddress3([]);
-        setWardsAddress1([]);
-        setWardsAddress3([]);
-        setHamletsAddress1([]);
-        setHamletsAddress3([]);
-        setBloodType("");
-        setDateOfBirth("");
-        setEthnicity("");
-        setSex("");
-        setMarriageStatus("");
-        setReligionId("");
-        setReligionName("");
-        setFullName("");
-        setOtherNationality("")
-        setNationalId("")
-        setNationalIdAssociation1("")
-        setNationalIdAssociation2("")
-        setNationalIdAssociation3("")
-        setNationalIdAssociation4("")
-        setFullNameAssociation1("")
-        setFullNameAssociation2("")
-        setFullNameAssociation3("")
-        setFullNameAssociation4("")
     }
 
     const ListOptionButton = () => {
@@ -698,24 +718,6 @@ function CitizenInput() {
                 {(page === 3) ? ThirdPageFormInput() : null}
                 <ModalNotify />
                 {ModalInputByExcel()}
-            </div>
-        )
-    }
-
-    const NotifyDeclaration = () => {
-        return (
-            <div>
-                <div className="warning">HIỆN KHÔNG PHẢI THỜI GIAN KHAI BÁO DÂN SỐ</div>
-                <div className="childWarning">Vui lòng quay trở lại sau</div>
-            </div>
-        )
-    }
-
-    const NotifyCompleteDeclaration = () => {
-        return (
-            <div>
-                <div className="successNotify">ĐÃ HOÀN THÀNH KHAI BÁO</div>
-                <div className="childSuccessNotify">Vui lòng quay trở lại sau</div>
             </div>
         )
     }
