@@ -142,6 +142,7 @@ public class DeclarationServiceImpl implements DeclarationService {
 
     }
 
+    @Transactional
     @Override
     public DeclarationDto setCompleted(String username) {
         User foundUser = userRepo.findByUsername(username).orElseThrow(
@@ -153,7 +154,10 @@ public class DeclarationServiceImpl implements DeclarationService {
                 !roleId.contains(Constant.EDITOR_ROLE_ID)) {
             throw new InvalidException("Unable to perform this action");
         }
+        foundUser.getDeclaration().setStatus(Constant.DECLARATION_STATUS_COMPLETED);
+        String districtCode = foundUser.getDivision().getCode().substring(0,4);
         userRepo.deleteUserRole(foundUser.getId(), Constant.EDITOR_ROLE_ID);
+
         return null;
     }
 

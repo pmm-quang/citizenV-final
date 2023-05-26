@@ -6,12 +6,14 @@ import com.citizenv.app.secirity.CustomUserDetail;
 import com.citizenv.app.secirity.SecurityUtils;
 import com.citizenv.app.service.CitizenService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.util.List;
@@ -111,23 +113,25 @@ public class CitizenController {
 
 //    @PreAuthorize("hasAnyAuthority('WRITE')")
     @PostMapping("/save")
-    public ResponseEntity<CitizenDto> createCitizen(@RequestBody CustomCitizenRequest citizen) {
+    public ResponseEntity<?> createCitizen(@RequestBody CustomCitizenRequest citizen) {
         CitizenDto citizenDto = citizenService.createCitizen(citizen);
-        return new ResponseEntity<>(citizenDto, HttpStatus.CREATED);
+        return new ResponseEntity<>("Created success!", HttpStatus.CREATED);
     }
 
 //    @PreAuthorize("hasAnyAuthority('WRITE')")
     @PutMapping("/save/{citizenId}")
-    public ResponseEntity<CitizenDto> updateCitizen(@PathVariable String citizenId, @RequestBody CustomCitizenRequest citizen) {
+    public ResponseEntity<?> updateCitizen(@PathVariable String citizenId, @RequestBody CustomCitizenRequest citizen) {
         CitizenDto citizenDto = citizenService.updateCitizen(citizenId, citizen);
-        return new ResponseEntity<>(citizenDto, HttpStatus.OK);
+        return new ResponseEntity<>("Updated success!", HttpStatus.OK);
     }
 
-    @PostMapping("/excel/upload")
-    public ResponseEntity<?> uploadExcelFile(@RequestBody File excelFile) {
+    @PostMapping(value = "/excel/upload")
+    public ResponseEntity<?> uploadExcelFile(@RequestParam("excelFile") MultipartFile excelFile) {
+        System.out.println(excelFile.getSize());
+
 //        String filePath = "src/main/java/com/citizenv/app/controller/file.xlsx";
         List<CitizenDto> list = citizenService.createUserFromExcelFile(excelFile);
-        return ResponseEntity.ok().body(list);
+        return ResponseEntity.ok().build();
     }
 
 }
