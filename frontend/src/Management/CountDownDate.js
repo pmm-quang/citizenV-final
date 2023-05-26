@@ -48,8 +48,8 @@ function CountDownDate() {
 
     const ShowCountDown = () => {
         return (
-            <div className="countDownDeclaration">
-                <div className="statusDeclaration" style={{ color: (user_account.declarationStatus === "Đang khai báo") ? "black" : "red" }}>
+            <div className="countDownDeclaration" style={{backgroundColor: 'yellow'}}>
+                <div className="statusDeclaration">
                     {user_account.declarationStatus}
                 </div>
                 <div className="timeStamp">

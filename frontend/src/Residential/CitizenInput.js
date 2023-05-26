@@ -19,6 +19,7 @@ function CitizenInput() {
     };
 
     const [page, setPage] = useState(1);
+    const [status, setStatus] = useState(user_account.declarationStatus);
     const [showNotify, setShowNotify] = useState(false);
     const [showInput, setShowInput] = useState(false);
     const [checked, setChecked] = useState(false);
@@ -68,6 +69,16 @@ function CitizenInput() {
     const [nameHamletAddress2, setNameHamletAddress2] = useState("")
     const [declaration, setDeclaration] = useState()
     const [file, setFile] = useState()
+
+    const CompleteDeclaration = async () => {
+        try {
+          await axios.get("http://localhost:8080/api/v1/declaration/set-completed", config)
+          setStatus("Đã hoàn thành")
+        } catch (error) {
+          console.log(error)
+        }
+      }
+    
 
     const GetDecleration = async () => {
         try {
@@ -700,10 +711,21 @@ function CitizenInput() {
         )
     }
 
+    const NotifyCompleteDeclaration = () => {
+        return (
+            <div>
+                <div className="successNotify">ĐÃ HOÀN THÀNH KHAI BÁO</div>
+                <div className="childSuccessNotify">Vui lòng quay trở lại sau</div>
+            </div>
+        )
+    }
+
     return (
         <div>
             <NavbarPage />
-            {(user_account.declarationStatus === "Đang khai báo") ? FormInput() : <NotifyDeclaration />}
+            {(status === "Đang khai báo") ? FormInput() : null}
+            {(status === "Đã hoàn thành") ? <NotifyCompleteDeclaration /> : null}
+            {(status === "Chưa cấp quyền khai báo") ? <NotifyDeclaration /> : null}
         </div>
     );
 }

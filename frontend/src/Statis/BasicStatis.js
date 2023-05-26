@@ -173,11 +173,11 @@ function BasicStatis() {
             response = await axios.post("http://localhost:8080/api/v1/statistics/population/division", data, config)
             setDataStatic(response.data[0].details)
             setDataChart({
-                labels: response.data[0].details.map(item => (item[0] === null) ? "Không có" : item[0]),
+                labels: response.data[0].details.map(item => (listDataOption(item, code) === null) ? "Không có" : listDataOption(item, code)),
                 datasets: [
                     {
                         label: 'Tổng dân số',
-                        data: response.data[0].details.map(item => item[1]),
+                        data: response.data[0].details.map((item) => item.population),
                     },
                 ],
             })
@@ -195,11 +195,11 @@ function BasicStatis() {
             response = await axios.post("http://localhost:8080/api/v1/statistics/population/division", data, config)
             setDataStatic(response.data[0].details)
             setDataChart({
-                labels: response.data[0].details.map(item => (item[0] === null) ? "Không có" : item[0]),
+                labels: response.data[0].details.map(item => (listDataOption(item, code) === null) ? "Không có" : listDataOption(item, code)),
                 datasets: [
                     {
                         label: 'Tổng dân số',
-                        data: response.data[0].details.map(item => item[1]),
+                        data: response.data[0].details.map((item) => item.population),
                     },
                 ],
             })
@@ -217,11 +217,11 @@ function BasicStatis() {
             response = await axios.post("http://localhost:8080/api/v1/statistics/population/division", data, config)
             setDataStatic(response.data[0].details)
             setDataChart({
-                labels: response.data[0].details.map(item => (item[0] === null) ? "Không có" : item[0]),
+                labels: response.data[0].details.map(item => (listDataOption(item, code) === null) ? "Không có" : listDataOption(item, code)),
                 datasets: [
                     {
                         label: 'Tổng dân số',
-                        data: response.data[0].details.map(item => item[1]),
+                        data: response.data[0].details.map((item) => item.population),
                     },
                 ],
             })
@@ -460,8 +460,6 @@ function BasicStatis() {
                 codes: provinceList,
                 properties: optionChooseList
             }
-            if (data.codes.length === 0) data.codes = null;
-            if (data.properties.length === 0) data.properties = null;
             console.log(data)
             const response = await axios.post("http://localhost:8080/api/v1/statistics/population/division", data, config)
             setDataMultiStatic(response.data)

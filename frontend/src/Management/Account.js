@@ -11,6 +11,10 @@ import { BiCheckCircle } from 'react-icons/bi'
 import CountDownDate from "./CountDownDate";
 
 function Account() {
+  const user_account = JSON.parse(localStorage.getItem("user"));
+  const user = user_account.username;
+  const role = user_account.role;
+
   const [checkedId, setCheckedId] = useState(-1)
   const [checkedTime, setCheckedTime] = useState(false)
   const [selectAll, setSelectAll] = useState(false);
@@ -32,10 +36,7 @@ function Account() {
   const [nowTime, setNowTime] = useState(Date())
   const [createStartTime, setCreateStartTime] = useState()
   const [createEndTime, setCreateEndTime] = useState()
-
-  const user_account = JSON.parse(localStorage.getItem("user"));
-  const user = user_account.username;
-  const role = user_account.role;
+  const [status, setStatus] = useState(user_account.declarationStatus)
 
   const config = {
     headers: {
@@ -51,7 +52,7 @@ function Account() {
   const fetchFullDetail = async () => {
     try {
       if (role === 'A1') {
-        const response = await axios('http://localhost:8080/api/v1/province', config);
+        const response = await axios('http://localhost:8080/api/v1/province/', config);
         setDivision(response.data);
       } else if (role === 'A2') {
         const response = await axios('http://localhost:8080/api/v1/district/by-province/' + user, config);
@@ -136,7 +137,7 @@ function Account() {
   }, [])
 
   const listAccDeclaration = accountList.map((account, index) =>
-    (account.declaration.startTime === null) ? <option key={index} value={account.username}>{account.username + ". " + account.division.name}</option> : null
+    (account.declaration.startTime === null || account.declaration.status === "Đã hoàn thành") ? <option key={index} value={account.username}>{account.username + ". " + account.division.name}</option> : null
   )
 
   const listDivision = division.map((post) =>
@@ -195,7 +196,7 @@ function Account() {
   }
 
   const tableAccount = accountList.map((account) => (
-    <tr className="top-row" key={account.username} style={{ backgroundColor: (account.declaration.status === "Đang khai báo") ? 'yellow' : null }}>
+    <tr className="top-row" key={account.username} style={{ backgroundColor: (account.declaration.status === "Đang khai báo") ? 'yellow' : (account.declaration.status === "Đã hoàn thành") ? "rgb(108, 238, 108)" : (account.declaration.status === "Đã khóa") ? "#FFA8A8" : null}}>
       <th className="top-row-title">{account.username}</th>
       <th className="top-row-title">{account.division.administrativeUnit.shortName + " " + account.division.name}</th>
       {(account.declaration.startTime === null) ? <th className="top-row-title">Chưa khai báo</th> : <th className="top-row-title">{account.declaration.startTime}</th>}
@@ -203,6 +204,18 @@ function Account() {
       {<th className="top-row-title">{account.declaration.status}</th>}
     </tr>
   ));
+
+  const CompleteDeclaration = async () => {
+    try {
+      await axios.get("http://localhost:8080/api/v1/declaration/set-completed", config)
+      setStatus("Đã hoàn thành")
+      user_account.declarationStatus = "Đã hoàn thành"
+      localStorage.setItem("user", JSON.stringify(user_account))
+      GetAllAccount()
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   const AddDeclaration = async () => {
     const startDate = new Date(createStartTime)
@@ -214,13 +227,13 @@ function Account() {
       status: "Đang khai báo"
     }
     console.log(declaration)
-    if (startDate < endDate && startDate >= timeNow && endDate >= timeNow) {
+    if (startDate < endDate && endDate >= timeNow) {
       try {
         await axios.put("http://localhost:8080/api/v1/declaration/save/" + idAccount, declaration, config);
         setShowCreateDeclaration(false)
         GetAllAccount()
-      } catch {
-        console.log('error')
+      } catch(error){
+        console.log(error)
       }
     } else {
       console.log('error')
@@ -367,13 +380,34 @@ function Account() {
     )
   }
 
+  const UpdateCompleteDeclaration = () => {
+    return (
+      <div className="countDownDeclaration" style = {{height: '100px'}}>
+        <div className="statusDeclaration" style={{marginTop: '20px'}}>
+          {status}
+        </div>
+      </div>
+    )
+  }
+
+  const UpdateBlockDeclaration = () => {
+    return (
+      <div className="countDownDeclaration" style = {{height: '100px', backgroundColor: '#FFA8A8'}}>
+        <div className="statusDeclaration" style={{marginTop: '20px'}}>
+          {status}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div>
       <NavbarPage />
       <div className="account-main-page">
         <div className="account-option-list">
           <Button className="account-option" onClick={() => CreateAccount()}>Thêm tài khoản</Button>
-          <Button className="account-option" onClick={() => setShowCreateDeclaration(true)}>Cấp quyền khai báo</Button>
+          {((role === 'A1' || status === "Đang khai báo") && (role !== 'B2')) ? <Button className="account-option" onClick={() => setShowCreateDeclaration(true)}>Cấp quyền khai báo</Button> : null}
+          {(role === 'B1' && status === "Đang khai báo") ? <Button className="account-option" onClick={() => CompleteDeclaration()}>Hoàn thành khai báo</Button> : null}
         </div>
         <div className="account-table">
           <Table striped bordered hover>
@@ -387,7 +421,9 @@ function Account() {
             <tbody>{tableAccount}</tbody>
           </Table>
         </div>
-        <CountDownDate />
+        {(status === "Đã hoàn thành") ? <UpdateCompleteDeclaration /> : null}
+        {(status === "Đang khai báo") ? <CountDownDate /> : null}
+        {(status === "Đã khóa") ? <CountDownDate /> : null}
         {(show) ? ModalAddAccount() : null}
         {(showDeclaration) ? ModalListDeclaration() : null}
         {ModalDeclaration()}
