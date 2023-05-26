@@ -7,6 +7,7 @@ import './CitizenInput.css'
 import ExcelFile from './mau_excel.xlsx'
 import { useState, useEffect } from 'react';
 import Modal from 'react-bootstrap/Modal';
+import fileExcel from './file.xlsx'
 
 function CitizenInput() {
     const user_account = JSON.parse(localStorage.getItem("user"));
@@ -66,6 +67,7 @@ function CitizenInput() {
     const [nameWardAddress2, setNameWardAddress2] = useState("")
     const [nameHamletAddress2, setNameHamletAddress2] = useState("")
     const [declaration, setDeclaration] = useState()
+    const [file, setFile] = useState()
 
     const GetDecleration = async () => {
         try {
@@ -254,6 +256,18 @@ function CitizenInput() {
                     setReligionName(religions[i].name)
                 }
             }
+        }
+    }
+
+    const PostFileExcel = async () => {
+        const fileData = {
+            excelFile: file
+        }
+        try {
+            const response = await axios.post("http://localhost:8080/api/v1/citizen/excel/upload", fileData, config)
+            console.log(response.data)
+        } catch (error) {
+            console.log(error)
         }
     }
 
@@ -572,7 +586,7 @@ function CitizenInput() {
                     <Modal.Title className='titleModal'>NHẬP DỮ LIỆU TỪ FILE</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <input type="file" accept=".xlsx, .xls, .csv" />
+                    <input type="file" accept=".xlsx, .xls, .csv" onChange={(e) => setFile(e.target.files[0])} />
                     <div className="noteInputbyfile">Lưu ý: Chỉ chấp nhận các định dạng: ".xlsx", ".xls", ".csv"</div>
                 </Modal.Body>
                 <Modal.Footer>
@@ -583,6 +597,7 @@ function CitizenInput() {
                     </Button>
                     <Button variant="secondary" onClick={() => {
                         setShowInput(false)
+                        PostFileExcel()
                     }}>
                         Xác nhận
                     </Button>
@@ -660,7 +675,7 @@ function CitizenInput() {
                 {(page === 2) ? SecondPageFormInput() : null}
                 {(page === 3) ? ThirdPageFormInput() : null}
                 <ModalNotify />
-                <ModalInputByExcel />
+                {ModalInputByExcel()}
             </div>
         )
     }
@@ -668,8 +683,8 @@ function CitizenInput() {
     const NotifyDeclaration = () => {
         return (
             <div>
-                <div className = "warning">HIỆN KHÔNG PHẢI THỜI GIAN KHAI BÁO DÂN SỐ</div>
-                <div className = "childWarning">Vui lòng quay trở lại sau</div>
+                <div className="warning">HIỆN KHÔNG PHẢI THỜI GIAN KHAI BÁO DÂN SỐ</div>
+                <div className="childWarning">Vui lòng quay trở lại sau</div>
             </div>
         )
     }
@@ -677,7 +692,7 @@ function CitizenInput() {
     return (
         <div>
             <NavbarPage />
-            {(user_account.declarationStatus === "Đang khai báo") ? FormInput() : <NotifyDeclaration/>}
+            {(user_account.declarationStatus === "Đang khai báo") ? FormInput() : <NotifyDeclaration />}
         </div>
     );
 }
