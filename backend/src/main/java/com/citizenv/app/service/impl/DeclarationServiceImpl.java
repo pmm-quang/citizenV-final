@@ -9,11 +9,9 @@ import com.citizenv.app.exception.InvalidException;
 import com.citizenv.app.exception.ResourceNotFoundException;
 import com.citizenv.app.payload.DeclarationDto;
 import com.citizenv.app.repository.DeclarationRepository;
-import com.citizenv.app.repository.RoleRepository;
 import com.citizenv.app.repository.UserRepository;
 import com.citizenv.app.service.DeclarationService;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.IllegalFormatCodePointException;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -155,8 +153,37 @@ public class DeclarationServiceImpl implements DeclarationService {
             throw new InvalidException("Unable to perform this action");
         }
         foundUser.getDeclaration().setStatus(Constant.DECLARATION_STATUS_COMPLETED);
-        String districtCode = foundUser.getDivision().getCode().substring(0,4);
         userRepo.deleteUserRole(foundUser.getId(), Constant.EDITOR_ROLE_ID);
+
+        //Khóa quyền khai báo của các hamlet cấp dưới trực thuộc
+        List<User> subUserList = userRepo.findAllSubordinateAccounts(foundUser.getUsername());
+        if (subUserList!= null) {
+            for (User user : userRepo.findAllSubordinateAccounts(foundUser.getUsername())) {
+                repository.setDeclarationStatusToCompleteByUserId(user.getId());
+                userRepo.deleteUserRole(user.getId(), Constant.EDITOR_ROLE_ID);
+            }
+        }
+//        String districtCode = foundUser.getDivision().getCode().substring(0,4);
+        //Kiểm tra các user cấp trên, nếu toàn bộ user cấp dưới đều hoàn thành
+        // khai báo thì cấp trên cũng được xét là đã hoàn thành khai báo
+        Long createByIdOfUser = foundUser.getCreatedBy().getId();
+        Long countSubUserAreDeclaring = userRepo.countSubUserAreDeclaring(createByIdOfUser);
+        //đếm nếu tất cả tài khoản cấp dưới của 1 districtUser đều đã hoàn thành khai báo
+        if (countSubUserAreDeclaring == null) {
+            //set trạng thái cho districtUser đó là đã hoàn thành và khóa quyền khai báo
+            repository.setDeclarationStatusToCompleteByUserId(createByIdOfUser);
+            userRepo.deleteUserRole(createByIdOfUser, Constant.EDITOR_ROLE_ID);
+            createByIdOfUser = userRepo.getCreateByOfUserByUserId(createByIdOfUser).orElse(null);
+            if (createByIdOfUser != null) {
+                countSubUserAreDeclaring = userRepo.countSubUserAreDeclaring(createByIdOfUser);
+                //đếm nếu tất cả tài khoản cấp dưới của 1 provinceUser đều đã hoàn thành khai báo
+                if (countSubUserAreDeclaring == null) {
+                    //set trạng thái cho provinceUser đó là đã hoàn thành và khóa quyền khai báo
+                    repository.setDeclarationStatusToCompleteByUserId(createByIdOfUser);
+                    userRepo.deleteUserRole(createByIdOfUser, Constant.EDITOR_ROLE_ID);
+                }
+            }
+        }
 
         return null;
     }
@@ -211,28 +238,38 @@ public class DeclarationServiceImpl implements DeclarationService {
     public void processExpiredDeclarationRights() {
         List<Declaration> list = repository.findAll();
 //        List<User> users = userRepo.findAll();
-        for (Declaration dec: list) {
-            User user = dec.getUser();
-            List<Role> roles = user.getRoles();
-            List<Long> roleNames = roles.stream().map(Role::getId).collect(Collectors.toList());
-            Timestamp startTime = dec.getStartTime();
-            Timestamp endTime = dec.getEndTime();
-            Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-            for (Role r: roles) {
-                if (r.getId().equals(Utils.EDITOR) && currentTime.after(endTime)) {
-                    userRepo.deleteUserRole(user.getId(), r.getId());
-                    user.getRoles().remove(r);
-                    if (!dec.getStatus().equals(Constant.DECLARATION_STATUS_COMPLETED)) {
-                        dec.setStatus("Đã khóa khai báo");
-                    }
-                }
-            }
-            if (!roleNames.contains(Utils.EDITOR) && currentTime.after(startTime) && currentTime.before(endTime)) {
-                userRepo.insertUserRole(user.getId(), Utils.EDITOR);
-                dec.setStatus(Constant.DECLARATION_STATUS_DECLARING);
-            }
 
+        for (Declaration dec: list) {
+            LocalDateTime endTime  = dec.getEndTime().toLocalDateTime();
+            LocalDateTime now = LocalDateTime.now();
+            String status = dec.getStatus();
+            if (endTime.isBefore(now) && status.equals(Constant.DECLARATION_STATUS_DECLARING)) {
+                dec.setStatus(Constant.DECLARATION_STATUS_OUT_OF_DATE);
+                userRepo.deleteUserRole(dec.getUser().getId(), Constant.EDITOR_ROLE_ID);
+            }
         }
+//        for (Declaration dec: list) {
+//            User user = dec.getUser();
+//            List<Role> roles = user.getRoles();
+//            List<Long> roleNames = roles.stream().map(Role::getId).collect(Collectors.toList());
+//            Timestamp startTime = dec.getStartTime();
+//            Timestamp endTime = dec.getEndTime();
+//            Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+//            for (Role r: roles) {
+//                if (r.getId().equals(Utils.EDITOR) && currentTime.after(endTime)) {
+//                    userRepo.deleteUserRole(user.getId(), r.getId());
+//                    user.getRoles().remove(r);
+//                    if (!dec.getStatus().equals(Constant.DECLARATION_STATUS_COMPLETED)) {
+//                        dec.setStatus("Đã khóa khai báo");
+//                    }
+//                }
+//            }
+//            if (!roleNames.contains(Utils.EDITOR) && currentTime.after(startTime) && currentTime.before(endTime)) {
+//                userRepo.insertUserRole(user.getId(), Utils.EDITOR);
+//                dec.setStatus(Constant.DECLARATION_STATUS_DECLARING);
+//            }
+//
+//        }
     }
 
 }

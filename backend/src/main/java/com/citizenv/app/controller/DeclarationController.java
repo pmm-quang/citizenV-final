@@ -47,4 +47,11 @@ public class DeclarationController {
         declarationService.lockDeclaration(username);
         return ResponseEntity.ok().body("Đã khóa quyền khai báo");
     }
+
+    @GetMapping("/set-completed")
+    public ResponseEntity<?> setDeclarationCompleted() {
+        String usernameUserDetail = SecurityUtils.getUsernameCurrentUserLogin();
+        declarationService.setCompleted(usernameUserDetail);
+        return ResponseEntity.ok().body("Đã hòan thành khai báo");
+    }
 }

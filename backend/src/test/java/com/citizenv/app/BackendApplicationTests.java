@@ -6,6 +6,7 @@ import com.citizenv.app.entity.Citizen;
 import com.citizenv.app.entity.Hamlet;
 import com.citizenv.app.repository.CitizenRepository;
 import com.citizenv.app.repository.HamletRepository;
+import com.citizenv.app.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,8 @@ class BackendApplicationTests {
 
     @Autowired
     private HamletRepository hamletRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {
@@ -64,6 +67,12 @@ class BackendApplicationTests {
     public void TestQuery() {
         List<Hamlet> list = hamletRepository.findHamletFromExcel("Nam Định", "Ý Yên", "Yên Thắng", "Hậu");
         System.out.println(list.size());
+    }
+
+    @Test
+    public void TestQueryCount() {
+        Long a = userRepository.countSubUserAreDeclaring(1L);
+        System.out.println(a);
     }
 
     @Test

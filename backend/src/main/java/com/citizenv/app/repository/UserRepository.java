@@ -29,4 +29,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(value = "select u from User u where u.username like concat(:username, '%')")
     List<User> findAllSubordinateAccounts(@Param("username") String username);
+
+    @Query(value = "select count(u.id) from users u join declarations d on u.id = d.user_id " +
+            "where u.created_by = :createdById and d.status = 'Đang khai báo' group by u.created_by", nativeQuery = true)
+    Long countSubUserAreDeclaring(@Param("createdById") Long createdById);
+
+    @Query(value = "select u.created_by from users u where u.id = :userId", nativeQuery = true)
+    Optional<Long> getCreateByOfUserByUserId(@Param("userId") Long userId);
 }
