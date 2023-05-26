@@ -25,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -445,10 +446,10 @@ public class CitizenServiceImpl implements CitizenService {
     }
 
     @Override
-    public List<CitizenDto> createUserFromExcelFile(File excelFile) {
+    public List<CitizenDto> createUserFromExcelFile(MultipartFile excelFile) {
         try {
-            FileInputStream file = new FileInputStream(excelFile);
-            Workbook workbook = new XSSFWorkbook(file);
+//            FileInputStream file = new FileInputStream(excelFile);
+            Workbook workbook = new XSSFWorkbook(excelFile.getInputStream());
             Sheet sheet = workbook.getSheetAt(0);
             int startRow = 2;
             int endRow = sheet.getLastRowNum();

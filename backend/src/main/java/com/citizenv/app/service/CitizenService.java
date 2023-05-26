@@ -3,6 +3,7 @@ package com.citizenv.app.service;
 import com.citizenv.app.payload.CitizenDto;
 import com.citizenv.app.payload.UserDto;
 import com.citizenv.app.payload.custom.CustomCitizenRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.util.List;
@@ -32,5 +33,5 @@ public interface CitizenService {
 
     CitizenDto createCitizen(CustomCitizenRequest citizen);
     CitizenDto updateCitizen(String nationalId, CustomCitizenRequest citizen);
-    List<CitizenDto> createUserFromExcelFile(File excelFile);
+    List<CitizenDto> createUserFromExcelFile(MultipartFile excelFile);
 }
