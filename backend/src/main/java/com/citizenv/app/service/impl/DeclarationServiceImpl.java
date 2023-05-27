@@ -236,21 +236,6 @@ public class DeclarationServiceImpl implements DeclarationService {
         }
     }
 
-    @Transactional
-    @Scheduled(cron = "0 0 0 * * *")
-    public void processExpiredDeclarationRights() {
-        List<Declaration> list = repository.findAll();
-//        List<User> users = userRepo.findAll();
-
-        for (Declaration dec: list) {
-            LocalDateTime endTime  = dec.getEndTime().toLocalDateTime();
-            LocalDateTime now = LocalDateTime.now();
-            String status = dec.getStatus();
-            if (endTime.isBefore(now) && status.equals(Constant.DECLARATION_STATUS_DECLARING)) {
-                dec.setStatus(Constant.DECLARATION_STATUS_OUT_OF_DATE);
-                userRepo.deleteUserRole(dec.getUser().getId(), Constant.EDITOR_ROLE_ID);
-            }
-        }
 //        for (Declaration dec: list) {
 //            User user = dec.getUser();
 //            List<Role> roles = user.getRoles();
@@ -273,6 +258,5 @@ public class DeclarationServiceImpl implements DeclarationService {
 //            }
 //
 //        }
-    }
 
 }

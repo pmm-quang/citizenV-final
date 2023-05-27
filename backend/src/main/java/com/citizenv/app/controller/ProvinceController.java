@@ -74,8 +74,8 @@ public class ProvinceController {
 
 
 //    @PreAuthorize("hasAuthority('WRITE')")
-    @DeleteMapping("/delete/{provinceId}")
-    public ResponseEntity<String> deleteById(@PathVariable Long provinceId) {
-            return new ResponseEntity<>(provinceService.deleteById(provinceId), HttpStatus.OK);
+    @DeleteMapping("/delete/{code}")
+    public ResponseEntity<?> deleteById(@PathVariable String code) {
+            return new ResponseEntity<>("OK", HttpStatus.OK);
     }
 }
