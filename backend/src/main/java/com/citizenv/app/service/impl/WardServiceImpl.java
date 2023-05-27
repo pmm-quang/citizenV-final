@@ -50,17 +50,12 @@ public class WardServiceImpl implements WardService {
     }
 
     @Override
-    public List<WardDto> getAll(CustomUserDetail userDetail) {
-        AdministrativeDivision division = userDetail.getUser().getDivision();
+    public List<WardDto> getAll(String divisionCodeOfUserDetail) {
         List<Ward> entities = new ArrayList<>();
-        if (division == null) {
+        if (divisionCodeOfUserDetail == null) {
             entities.addAll(repo.findAll());
         } else {
-            String divisionCode = division.getCode();
-            switch (divisionCode.length()){
-                case 2: entities.addAll(repo.findAllByProvince_Code(divisionCode)); break;
-                case 4: entities.addAll(repo.findAllByDistrict_Code(divisionCode)); break;
-            }
+            entities.addAll(repo.findAllBySupDivisionCode(divisionCodeOfUserDetail));
         }
         return entities.stream().map(l-> mapper.map(l, WardDto.class)).collect(Collectors.toList());
     }
@@ -68,7 +63,7 @@ public class WardServiceImpl implements WardService {
     @Override
     public WardDto getByCode(String code) {
         Ward foundWard = repo.findByCode(code).orElseThrow(
-                () -> new ResourceNotFoundException("Xã/phường/thị trấn", "mã đơn vị", code)
+                () -> new ResourceNotFoundException("Xã/phường/thị trấn", "mã đơn vị" , code)
         );
         return mapper.map(foundWard, WardDto.class);
     }
@@ -93,7 +88,7 @@ public class WardServiceImpl implements WardService {
     }
 
     @Override
-    public WardDto createWard(String divisionCode, CustomWardRequest ward) {
+    public String createWard(String divisionCode, CustomWardRequest ward) {
         repo.findByCode(ward.getCode()).ifPresent(w -> {
             throw new ResourceFoundException("Xã/phường/thị trấn", "mã đơn vị", ward.getCode());
         });
@@ -102,11 +97,12 @@ public class WardServiceImpl implements WardService {
         );
         Ward createWard = validate(ward);
         Ward newWard = repo.save(createWard);
-        return mapper.map(newWard, WardDto.class);
+        return "Created success!";
     }
     @Transactional
     @Override
-    public WardDto updateWard(String wardNeedUpdateCode, CustomWardRequest ward) {
+    public String updateWard(String wardNeedUpdateCode, CustomWardRequest ward) {
+
         Ward foundWard = repo.findByCode(wardNeedUpdateCode).orElseThrow(
                 () -> new ResourceNotFoundException("Xã/phường/thị trấn", "mã đơn vị", wardNeedUpdateCode)
         );
@@ -115,6 +111,7 @@ public class WardServiceImpl implements WardService {
                     w -> {throw new ResourceFoundException("Xã/phường/thị trấn", "mã đơn vị", ward.getCode());}
             );
         }
+
         Ward createWard = validate(ward);
 
         if (!foundWard.getName().equals(ward.getName())) {
@@ -131,7 +128,7 @@ public class WardServiceImpl implements WardService {
         if (!ward.getCode().equals(wardNeedUpdateCode)) {
             admDivisionRepo.updateCodeOfSubDivision(ward.getCode(), 7, wardNeedUpdateCode);
         }
-        return mapper.map(foundWard, WardDto.class);
+        return "Updated success!";
     }
 
     private Ward validate(CustomWardRequest ward) {

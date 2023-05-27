@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +18,9 @@ public interface HamletRepository extends JpaRepository<Hamlet, Long> {
     Optional<Hamlet> findByCode(String code);
     List<Hamlet> findAllByWard(Ward ward);
     List<Hamlet> findAllByAdministrativeUnit(AdministrativeUnit administrativeUnit);
+
+    @Query(value = "select h from Hamlet  h where h.code like concat(:supDivisionCode, '%')")
+    List<Hamlet> findAllBySupDivisionCode(@Param("supDivisionCode") @NotNull String supDivisionCode);
 
     @Query(value = "select h from Hamlet h join Ward w on  h.ward.id = w.id " +
             "join District d on w.district.id = d.id " +

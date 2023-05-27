@@ -6,6 +6,7 @@ import com.citizenv.app.secirity.SecurityUtils;
 import com.citizenv.app.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
@@ -44,6 +45,7 @@ public class UserController {
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAuthority('WRITE')")
     @PutMapping("/change-password/{username}")
     public ResponseEntity<UserDto> changePassword(@PathVariable String username, @RequestBody String newPassword ) {
 //        CustomUserDetail userDetail = getUserDetail();
@@ -52,7 +54,7 @@ public class UserController {
         UserDto userDto = userService.changePassword(userDetailUsername, username, newPassword);
         return ResponseEntity.ok(userDto);
     }
-
+    @PreAuthorize("hasAuthority('WRITE')")
     @PostMapping("/save")
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto user) {
         String divisionUserDetail = SecurityUtils.getDivisionCodeCurrentUserLogin();

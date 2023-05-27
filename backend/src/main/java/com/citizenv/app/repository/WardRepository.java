@@ -33,4 +33,7 @@ public interface WardRepository extends JpaRepository<Ward, Long> {
     List<Ward> findAllByProvince_Code(@Param ("province_code") @NotNull String provinceCode);
 
     List<Ward> findAllByDistrict_Code(String districtCode);
+
+    @Query(value = "select w from Ward  w where w.code like concat(:supDivisionCode, '%')")
+    List<Ward> findAllBySupDivisionCode(@Param("supDivisionCode") @NotNull String supDivisionCode);
 }

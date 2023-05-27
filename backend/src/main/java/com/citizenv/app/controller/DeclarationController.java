@@ -7,6 +7,7 @@ import com.citizenv.app.service.impl.DeclarationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,7 +35,7 @@ public class DeclarationController {
         ProvinceDto provinceDto = declarationService.getById(provinceId);
         return new ResponseEntity<>(provinceDto, HttpStatus.OK);
     }*/
-
+    @PreAuthorize("hasAuthority('WRITE')")
     @PutMapping("/save/{username}")
     public ResponseEntity<DeclarationDto> update(@PathVariable String username,
                                                  @RequestBody DeclarationDto declarationDto) {
@@ -42,12 +43,14 @@ public class DeclarationController {
         return ResponseEntity.status(201).body(dto);
     }
 
+    @PreAuthorize("hasAuthority('WRITE')")
     @GetMapping("/lock-declaration/{username}")
     public ResponseEntity<String> lockDeclaration(@PathVariable String username) {
         declarationService.lockDeclaration(username);
         return ResponseEntity.ok().body("Đã khóa quyền khai báo");
     }
 
+    @PreAuthorize("hasAuthority('WRITE')")
     @GetMapping("/set-completed")
     public ResponseEntity<?> setDeclarationCompleted() {
         String usernameUserDetail = SecurityUtils.getUsernameCurrentUserLogin();

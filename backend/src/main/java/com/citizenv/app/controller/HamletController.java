@@ -28,7 +28,8 @@ public class HamletController {
 
     @GetMapping("/")
     public ResponseEntity<List<HamletDto>> getAll() {
-        List<HamletDto> list = service.getAll();
+        String divisionCodeOfUserDetail = SecurityUtils.getDivisionCodeCurrentUserLogin();
+        List<HamletDto> list = service.getAll(divisionCodeOfUserDetail);
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
@@ -47,9 +48,6 @@ public class HamletController {
     @Secured("ROLE_B1")
     @GetMapping("/by-ward")
     public ResponseEntity<List<HamletDto>> getAllByWardCode() {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        CustomUserDetail userDetail = (CustomUserDetail) authentication.getPrincipal();
-//        String wardCode = userDetail.getUser().getDivision().getCode();
         String wardCode = SecurityUtils.getDivisionCodeCurrentUserLogin();
         List<HamletDto> list = service.getAllByWardCode(wardCode);
         return ResponseEntity.ok(list);
@@ -61,7 +59,7 @@ public class HamletController {
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-//    @PreAuthorize("hasAuthority('WRITE')")
+    @PreAuthorize("hasAuthority('WRITE')")
     @PostMapping("/save")
     public ResponseEntity<HamletDto> createHamlet(@RequestBody CustomHamletRequest hamlet) {
         String divisionCode = SecurityUtils.getDivisionCodeCurrentUserLogin();

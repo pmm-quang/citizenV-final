@@ -19,6 +19,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,6 +48,17 @@ public class HamletServiceImpl implements HamletService {
         List<Hamlet> hamlets = repository.findAll();
         List<HamletDto> hamletDtos = hamlets.stream().map(hamlet -> mapper.map(hamlet, HamletDto.class)).collect(Collectors.toList());
         return hamletDtos;
+    }
+
+    @Override
+    public List<HamletDto> getAll(String divisionCodeOfUserDetail) {
+        List<Hamlet> list = new ArrayList<>();
+        if (divisionCodeOfUserDetail == null) {
+            list.addAll(repository.findAll());
+        } else {
+            list.addAll(repository.findAllBySupDivisionCode(divisionCodeOfUserDetail));
+        }
+        return list.stream().map(hamlet -> mapper.map(hamlet, HamletDto.class)).collect(Collectors.toList());
     }
 
     @Override
@@ -171,6 +183,7 @@ public class HamletServiceImpl implements HamletService {
             }
         }
     }
+
 
 }
 

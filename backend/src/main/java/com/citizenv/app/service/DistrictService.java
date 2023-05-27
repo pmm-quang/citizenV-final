@@ -7,6 +7,8 @@ import java.util.Map;
 
 public interface DistrictService {
     List<DistrictDto> getAll();
+
+    List<DistrictDto> getAll(String divisionCodeOfUserDetail);
     DistrictDto getById(Long districtId);
 
     DistrictDto getByCode(String code);
@@ -20,7 +22,6 @@ public interface DistrictService {
     DistrictDto updateDistrict(String districtCodeNeedUpdate, DistrictDto district);
 
     void deleteDistrict(String districtCode);
-
 
 
 }

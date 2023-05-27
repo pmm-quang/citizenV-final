@@ -30,7 +30,8 @@ public class DistrictController {
 
     @GetMapping("/")//OK
     public ResponseEntity<List<DistrictDto>> getAll() {
-        List<DistrictDto> districtDtoList = districtService.getAll();
+        String divisionCodeOfUserDetail = SecurityUtils.getDivisionCodeCurrentUserLogin();
+        List<DistrictDto> districtDtoList = districtService.getAll(divisionCodeOfUserDetail);
         return new ResponseEntity<List<DistrictDto>>(districtDtoList, HttpStatus.OK);
     }
 
@@ -52,15 +53,12 @@ public class DistrictController {
     @Secured("ROLE_A2")
     @GetMapping("/by-province")
     public ResponseEntity<List<DistrictDto>> getAllByProvinceCode() {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//            CustomUserDetail customUserDetail = (CustomUserDetail) authentication.getPrincipal();
-//            String provinceCode = customUserDetail.getUser().getDivision().getCode();
         String provinceCode = SecurityUtils.getDivisionCodeCurrentUserLogin();
         List<DistrictDto> list = districtService.getAllByProvinceCode(provinceCode);
         return ResponseEntity.ok().body(list);
     }
 
-//    @PreAuthorize("hasAuthority('WRITE')")
+    @PreAuthorize("hasAuthority('WRITE')")
     @PostMapping("/save")
     public ResponseEntity<DistrictDto> createDistrict(@RequestBody DistrictDto district) {
         String divisionCode = SecurityUtils.getDivisionCodeCurrentUserLogin();
@@ -68,7 +66,7 @@ public class DistrictController {
         return new ResponseEntity<>(districtDto, HttpStatus.CREATED);
     }
 
-//    @PreAuthorize("hasAuthority('WRITE')")
+    @PreAuthorize("hasAuthority('WRITE')")
     @PutMapping("/save/{districtCode}")
     public ResponseEntity<DistrictDto> updateDistrict(@PathVariable String districtCode,
                                                       @RequestBody DistrictDto district) {

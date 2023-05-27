@@ -16,4 +16,6 @@ public interface HamletService {
 
     HamletDto updateHamlet(String hamletCodeNeedUpdate, CustomHamletRequest hamlet);
     void nono();
+
+    List<HamletDto> getAll(String divisionCodeOfUserDetail);
 }

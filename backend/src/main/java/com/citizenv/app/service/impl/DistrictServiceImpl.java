@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +50,18 @@ public class DistrictServiceImpl implements DistrictService {
         List<District> entities = repository.findAll();
         return entities.stream().map(l-> mapper.map(l, DistrictDto.class)).collect(Collectors.toList());
     }
+
+    @Override
+    public List<DistrictDto> getAll(String divisionCodeOfUserDetail) {
+        List<District> list = new ArrayList<>();
+        if (divisionCodeOfUserDetail == null) {
+            list.addAll(repository.findAll());
+        } else {
+            list.addAll(repository.findAllBySupDivisionCode(divisionCodeOfUserDetail));
+        }
+        return list.stream().map(district -> mapper.map(district, DistrictDto.class)).collect(Collectors.toList());
+    }
+
     @Override
     public DistrictDto getById(Long districtId) {
         District district = repository.findById(districtId).orElseThrow(
@@ -121,7 +134,7 @@ public class DistrictServiceImpl implements DistrictService {
 
         if (!foundDistrict.getName().equals(district.getCode())) {
             String provinceCode = districtCode.substring(0, 4);
-            administrativeDivisionRepository.findByName(district.getName(), provinceCode).ifPresent(
+            administrativeDivisionRepository.findByName(district.getName(), district.getProvince().getCode()).ifPresent(
                     p -> {throw new InvalidException(Constant.ERR_MESSAGE_UNIT_NAME_ALREADY_EXISTS);}
             );
         }

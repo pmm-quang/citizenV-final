@@ -35,11 +35,10 @@ public class WardController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<WardDto>> getAll() {
-//        CustomUserDetail userDetail = getUserDetail();
-//        List<WardDto> wardDtoList = wardService.getAll(userDetail);
-        List<WardDto> wardDtoList = wardService.getAll();
-        System.out.println(wardDtoList.size());
+    public ResponseEntity<?> getAll() {
+        String divisionCodeOfUserDetail = SecurityUtils.getDivisionCodeCurrentUserLogin();
+//        System.out.println(wardDtoList.size());
+        List<WardDto> wardDtoList = wardService.getAll(divisionCodeOfUserDetail);
         return new ResponseEntity<List<WardDto>>(wardDtoList, HttpStatus.OK);
     }
 
@@ -50,62 +49,39 @@ public class WardController {
     }
 
     @GetMapping("/by-district/{districtCode}")
-    public ResponseEntity<Object> getAllByDistrictCode(@PathVariable String districtCode) {
+    public ResponseEntity<?> getAllByDistrictCode(@PathVariable String districtCode) {
         List<WardDto> list = wardService.getByDistrictCode(districtCode);
         return ResponseEntity.ok().body(list);
     }
 
     @GetMapping("/by-district")
-    public ResponseEntity<List<WardDto>> getAllByDistrictCode() {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        CustomUserDetail userDetail = (CustomUserDetail) authentication.getPrincipal();
-//        String districtCode = userDetail.getUser().getDivision().getCode();
+    public ResponseEntity<?> getAllByDistrictCode() {
         String districtCode = SecurityUtils.getDivisionCodeCurrentUserLogin();
         List<WardDto> list = wardService.getByDistrictCode(districtCode);
         return ResponseEntity.ok().body(list);
     }
 
     @GetMapping("/by-administrative-unit/{admUnitID}")
-    public ResponseEntity<List<WardDto>> getAllByAdministrativeUnitID(@PathVariable int admUnitID) {
+    public ResponseEntity<?> getAllByAdministrativeUnitID(@PathVariable int admUnitID) {
         List<WardDto> list= wardService.getByAdministrativeUnitId(admUnitID);
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
 
-//    @PreAuthorize("hasAuthority('WRITE')")
+    @PreAuthorize("hasAuthority('WRITE')")
     @PostMapping("/save")
-    public ResponseEntity<WardDto> createWard(@RequestBody CustomWardRequest ward) {
-//        CustomUserDetail userDetail = getUserDetail();
-//        String divisionCodeOfUserDetail = userDetail.getUser().getDivision().getCode();
-//        String districtCode = ward.getDistrictCode();
-//        if (ward.getCode() != null) {
-//            if (divisionCodeOfUserDetail == null || ward.getCode().indexOf(divisionCodeOfUserDetail) != 0) {
-//                throw new InvalidException("Khong co quyen tao ward voi ma nay");
-//            }
-//        }
+    public ResponseEntity<?> createWard(@RequestBody CustomWardRequest ward) {
         String divisionCodeOfUserDetail = SecurityUtils.getDivisionCodeCurrentUserLogin();
-        WardDto wardDto = wardService.createWard(divisionCodeOfUserDetail,ward);
-       return ResponseEntity.status(201).body(wardDto);
+        String message = wardService.createWard(divisionCodeOfUserDetail,ward);
+       return ResponseEntity.status(201).body(message);
     }
 
-//    @PreAuthorize("hasAuthority('WRITE')")
+    @PreAuthorize("hasAuthority('WRITE')")
     @PutMapping("/save/{wardCode}/")
-    public ResponseEntity<WardDto> updateWard(@PathVariable String wardCode,
+    public ResponseEntity<?> updateWard(@PathVariable String wardCode,
                                               @RequestBody CustomWardRequest ward) {
-//        CustomUserDetail userDetail = getUserDetail();
-//        String divisionCodeOfUserDetail = userDetail.getUser().getDivision().getCode();
-//        String districtCode = ward.getDistrictCode();
-//        if (wardCode != null) {
-//            if (divisionCodeOfUserDetail == null || ward.getCode().indexOf(divisionCodeOfUserDetail) != 0) {
-//                throw new InvalidException("Khong co quyen chinh sua ward voi ma nay");
-//            }
-//        }
-       WardDto wardDto = wardService.updateWard(wardCode, ward);
-       return ResponseEntity.ok().body(wardDto);
+       String message = wardService.updateWard(wardCode, ward);
+       return ResponseEntity.ok().body(message);
     }
 
-//    private CustomUserDetail getUserDetail() {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        return (CustomUserDetail) authentication.getPrincipal();
-//    }
 }

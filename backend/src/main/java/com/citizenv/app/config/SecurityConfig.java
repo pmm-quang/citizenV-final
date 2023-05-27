@@ -5,6 +5,7 @@ import com.citizenv.app.secirity.jwt.JwtFilter;
 import com.citizenv.app.secirity.jwt.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -67,18 +68,18 @@ public class SecurityConfig {
                 .authorizeRequests()
                 .antMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
                 .antMatchers("/api/v1/auth/login").permitAll()
-//                .antMatchers(HttpMethod.GET, "/api/v1/province/**").hasAuthority("READ")
-//                .antMatchers( "**/province/save", "**/province/save/**").hasRole("A1")
-//                .antMatchers("**/district/save", "**/district/save/**", "**/district/by-province").hasRole("A2")
-//                .antMatchers("**/ward/save", "**/ward/save/**", "**/ward/by-district").hasRole("A3")
-//                .antMatchers("**/hamlet/save", "**/hamlet/save/**", "**/hamlet/by-ward").hasRole("B1")
-//                .antMatchers("**/citizen/save","**/citizen/save/**").hasAnyRole("B1", "B2")
-//                .antMatchers("**/user/save").hasAnyRole("A1", "A2", "A3", "B1")
-//                .antMatchers("**/user/change-password/**").hasAnyRole("A1", "A2", "A3", "B1", "B2")
-//                .anyRequest().authenticated();
+                .antMatchers(HttpMethod.GET, "/api/v1/province/**").hasAuthority("READ")
+                .antMatchers( "**/province/save", "**/province/save/**").hasRole("A1")
+                .antMatchers("**/district/save", "**/district/save/**", "**/district/by-province").hasRole("A2")
+                .antMatchers("**/ward/save", "**/ward/save/**", "**/ward/by-district").hasRole("A3")
+                .antMatchers("**/hamlet/save", "**/hamlet/save/**", "**/hamlet/by-ward").hasRole("B1")
+                .antMatchers("**/citizen/save","**/citizen/save/**").hasAnyRole("B1", "B2")
+                .antMatchers("**/user/save").hasAnyRole("A1", "A2", "A3", "B1")
+                .antMatchers("**/user/change-password/**").hasAnyRole("A1", "A2", "A3", "B1", "B2")
+                .anyRequest().authenticated();
   //      http.authenticationProvider(authenticationProvider());
                 // .anyRequest().authenticated();
-               .anyRequest().permitAll();
+//               .anyRequest().permitAll();
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 //                .and()
