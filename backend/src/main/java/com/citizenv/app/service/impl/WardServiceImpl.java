@@ -68,7 +68,7 @@ public class WardServiceImpl implements WardService {
     @Override
     public WardDto getByCode(String code) {
         Ward foundWard = repo.findByCode(code).orElseThrow(
-                () -> new ResourceNotFoundException("Ward", "WardCode", code)
+                () -> new ResourceNotFoundException("Xã/phường/thị trấn", "mã đơn vị", code)
         );
         return mapper.map(foundWard, WardDto.class);
     }
@@ -76,7 +76,7 @@ public class WardServiceImpl implements WardService {
     @Override
     public List<WardDto> getByDistrictCode(String districtCode) {
         District foundDistrict = districtRepo.findByCode(districtCode).orElseThrow(
-                () -> new ResourceNotFoundException("District", "DistrictCode", districtCode)
+                () -> new ResourceNotFoundException("Quận/huyện/thị xã", "mã đơn vị", districtCode)
         );
         List<Ward> list = repo.findAllByDistrict(foundDistrict);
         List<WardDto> dtoList = list.stream().map(ward -> mapper.map(ward, WardDto.class)).collect(Collectors.toList());
@@ -86,7 +86,7 @@ public class WardServiceImpl implements WardService {
     @Override
     public List<WardDto> getByAdministrativeUnitId(int admId) {
         AdministrativeUnit foundAdmUnit = admUnitRepo.findById(admId).orElseThrow(
-                () -> new ResourceNotFoundException("AdministrativeUnit", "AdministrativeUnitID", String.valueOf(admId))
+                () -> new ResourceNotFoundException("Đơn vị hành chính", "id", String.valueOf(admId))
         );
         List<Ward> list = repo.findAllByAdministrativeUnit(foundAdmUnit);
         return list.stream().map(ward -> mapper.map(ward, WardDto.class)).collect(Collectors.toList());
@@ -95,7 +95,7 @@ public class WardServiceImpl implements WardService {
     @Override
     public WardDto createWard(String divisionCode, CustomWardRequest ward) {
         repo.findByCode(ward.getCode()).ifPresent(w -> {
-            throw new ResourceFoundException("Ward", "WardCode", ward.getCode());
+            throw new ResourceFoundException("Xã/phường/thị trấn", "mã đơn vị", ward.getCode());
         });
         admDivisionRepo.findByName(ward.getName(), divisionCode).ifPresent(
                 division -> {throw new InvalidException(Constant.ERR_MESSAGE_UNIT_NAME_ALREADY_EXISTS);}
@@ -108,11 +108,11 @@ public class WardServiceImpl implements WardService {
     @Override
     public WardDto updateWard(String wardNeedUpdateCode, CustomWardRequest ward) {
         Ward foundWard = repo.findByCode(wardNeedUpdateCode).orElseThrow(
-                () -> new ResourceNotFoundException("Ward", "WardCode", wardNeedUpdateCode)
+                () -> new ResourceNotFoundException("Xã/phường/thị trấn", "mã đơn vị", wardNeedUpdateCode)
         );
         if (ward.getCode()!= null && !ward.getCode().equals(wardNeedUpdateCode)) {
             repo.findByCode(ward.getCode()).ifPresent(
-                    w -> {throw new ResourceFoundException("Ward", "WardCode", ward.getCode());}
+                    w -> {throw new ResourceFoundException("Xã/phường/thị trấn", "mã đơn vị", ward.getCode());}
             );
         }
         Ward createWard = validate(ward);
@@ -147,11 +147,11 @@ public class WardServiceImpl implements WardService {
         }
         Integer admUnitId = ward.getAdministrativeUnitId();
         AdministrativeUnit foundAdmUnit = admUnitRepo.findById(admUnitId).orElseThrow(
-                () -> new ResourceNotFoundException("AdministrativeUnit","AdministrativeUnitId", String.valueOf(admUnitId))
+                () -> new ResourceNotFoundException("Đơn vị hành chính","id", String.valueOf(admUnitId))
         );
 
         District foundDistrict = districtRepo.findByCode(districtCode).orElseThrow(
-                () -> new ResourceNotFoundException("District", "DistrictCode", districtCode)
+                () -> new ResourceNotFoundException("Quận/huyện/thị xã", "mã đơn vị", districtCode)
         );
 
         if (!Utils.AdministrativeUnitsLv3.containsKey(admUnitId)) {

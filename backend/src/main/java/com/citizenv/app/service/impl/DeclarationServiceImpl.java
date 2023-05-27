@@ -144,13 +144,13 @@ public class DeclarationServiceImpl implements DeclarationService {
     @Override
     public DeclarationDto setCompleted(String username) {
         User foundUser = userRepo.findByUsername(username).orElseThrow(
-                () -> new ResourceNotFoundException("User", "Username", username)
+                () -> new ResourceNotFoundException("Tài khoản", "username", username)
         );
         List<Long> roleId = foundUser.getRoles().stream().map(Role::getId).collect(Collectors.toList());
 
         if (!foundUser.getDeclaration().getStatus().equals(Constant.DECLARATION_STATUS_DECLARING) ||
                 !roleId.contains(Constant.EDITOR_ROLE_ID)) {
-            throw new InvalidException("Unable to perform this action");
+            throw new InvalidException("Không thể thực hiện hành động này");
         }
         foundUser.getDeclaration().setStatus(Constant.DECLARATION_STATUS_COMPLETED);
         userRepo.deleteUserRole(foundUser.getId(), Constant.EDITOR_ROLE_ID);
@@ -192,10 +192,10 @@ public class DeclarationServiceImpl implements DeclarationService {
     @Override
     public DeclarationDto openDeclaration(String username, DeclarationDto declaration) {
         User foundUser = userRepo.findByUsername(username).orElseThrow(
-                () -> new ResourceNotFoundException("User", "Username", username)
+                () -> new ResourceNotFoundException("Tài khoản", "username", username)
         );
         if (foundUser.getDeclaration().getStatus().equals(Constant.DECLARATION_STATUS_DECLARING)) {
-            throw new InvalidException("Account has been granted permission to declare, cannot perform this action");
+            throw new InvalidException("Đã mở quyền khai báo, không thể thực hiện hành động này");
         }
         LocalDate startDateDto = declaration.getStartTime();
         LocalDate endDateDto = declaration.getEndTime();
@@ -203,7 +203,7 @@ public class DeclarationServiceImpl implements DeclarationService {
         LocalDateTime endTime  = LocalDateTime.of(endDateDto, LocalTime.of(23, 59, 59));
         LocalDateTime now = LocalDateTime.now();
         if (endTime.isBefore(now) || (endTime.isBefore(startTime))) {
-            throw new InvalidException("The start and end dates are incorrect");
+            throw new InvalidException("Ngày bắt đầu hoặc ngày kết thúc không hợp lệ");
         }
         foundUser.getDeclaration().setStartTime(Timestamp.valueOf(startTime));
         foundUser.getDeclaration().setEndTime(Timestamp.valueOf(endTime));
@@ -222,7 +222,7 @@ public class DeclarationServiceImpl implements DeclarationService {
     @Override
     public void lockDeclaration(String username) {
         User foundUser = userRepo.findByUsername(username).orElseThrow(
-                ()-> new ResourceNotFoundException("User", "Username", username)
+                ()-> new ResourceNotFoundException("Tài khoản", "username", username)
         );
         foundUser.getDeclaration().setStatus(Constant.DECLARATION_STATUS_LOCKED);
         userRepo.deleteUserRole(foundUser.getId(), Constant.EDITOR_ROLE_ID);

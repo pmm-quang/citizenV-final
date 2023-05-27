@@ -36,20 +36,18 @@ public class  GlobalExceptionHandler {
     }
 
     @ExceptionHandler(InvalidException.class)
-    public ResponseEntity<ErrorResponse> validateException(Exception e) {
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage());
-        return ResponseEntity.badRequest().body(errorResponse);
+    public ResponseEntity<String> validateException(Exception e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorResponse> accessDenied(Exception e) {
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.FORBIDDEN.value(), e.getMessage());
-        return ResponseEntity.status(403).body(errorResponse);
+    public ResponseEntity<String> accessDenied(Exception e) {
+        return ResponseEntity.status(403).body(e.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleUnwantedException(Exception e) {
         e.printStackTrace();
-        return ResponseEntity.status(500).body("Unknown error (General exception)");
+        return ResponseEntity.status(500).body("Bố mày không biết lỗi gì");
     }
 }

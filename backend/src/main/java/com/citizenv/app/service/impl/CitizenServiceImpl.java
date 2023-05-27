@@ -103,14 +103,14 @@ public class CitizenServiceImpl implements CitizenService {
     @Override
     public CitizenDto getByNationalId(String nationalId) {
         Citizen citizen = repo.findByNationalId(nationalId).orElseThrow(
-                () -> new ResourceNotFoundException("Citizen", "NationalId", nationalId));
+                () -> new ResourceNotFoundException("Người dân", "mã định danh", nationalId));
         return mapper.map(citizen, CitizenDto.class);
     }
 
     @Override
     public List<CitizenDto> getAllByHamletCode(String hamletCode) {
         Hamlet foundHamlet = hamletRepo.findByCode(hamletCode).orElseThrow(
-                ()-> new ResourceNotFoundException("Hamlet", "HamletCode", hamletCode)
+                ()-> new ResourceNotFoundException("Thôn/xóm/bản/tổ dân phố", "mã định danh" , hamletCode)
         );
 //        List<Citizen> entities = repo.findAllByHamletCode(hamletCode, "1");
         List<Citizen> entities = repo.findAllByHamletCode(hamletCode, 2);
@@ -120,7 +120,7 @@ public class CitizenServiceImpl implements CitizenService {
     @Override
     public Map<String, Object> getAllByHamletCode(String hamletCode, int page) {
         Hamlet foundHamlet = hamletRepo.findByCode(hamletCode).orElseThrow(
-                ()-> new ResourceNotFoundException("Hamlet", "HamletCode", hamletCode)
+                ()-> new ResourceNotFoundException("Thôn/xóm/bản/tổ dân phố", "mã định danh", hamletCode)
         );
         Page<Citizen> citizensPage = repo.findAllByHamletCode(hamletCode, 2, PageRequest.of(page - 1, 15));
         return getStringObjectMap(page, citizensPage);
@@ -129,7 +129,7 @@ public class CitizenServiceImpl implements CitizenService {
     @Override
     public Map<String, Object> getAllByDistrictCode(String districtCode, int page) {
         District foundDistrict = districtRepo.findByCode(districtCode).orElseThrow(
-                () -> new ResourceNotFoundException("District", "DistrictCode", districtCode)
+                () -> new ResourceNotFoundException("Huyện/thị xã/thành phố", "mã định danh", districtCode)
         );
         Page<Citizen> citizensPage = repo.findAllByDistrictCode(districtCode, 2, PageRequest.of(page - 1, 15));
         return getStringObjectMap(page, citizensPage);
@@ -138,7 +138,7 @@ public class CitizenServiceImpl implements CitizenService {
     @Override
     public Map<String, Object> getAllByProvinceCode(String provinceCode, int page) {
         Province foundProvince = provinceRepo.findByCode(provinceCode).orElseThrow(
-                () -> new ResourceNotFoundException("Province", "ProvinceCode", provinceCode)
+                () -> new ResourceNotFoundException("Tỉnh/thành phố", "mã định danh", provinceCode)
         );
         Page<Citizen> citizensPage = repo.findAllByProvinceCode(provinceCode, 2, PageRequest.of(page - 1, 15));
         return getStringObjectMap(page, citizensPage);
@@ -150,7 +150,7 @@ public class CitizenServiceImpl implements CitizenService {
         String nId = citizen.getNationalId();
         repo.findByNationalId(nId).ifPresent(
                 citizen1 -> {
-                    throw new ResourceFoundException("Citizen", "NationalId", nId);
+                    throw new ResourceFoundException("Nguời dân", "mã định danh", nId);
                 }
         );
 
@@ -167,7 +167,7 @@ public class CitizenServiceImpl implements CitizenService {
                     () -> new ResourceNotFoundException("AddressType", "AddressTypeId","" + adTypeId)
             );
             Hamlet foundHamlet = hamletRepo.findByCode(hamletCode).orElseThrow(
-                    () -> new ResourceNotFoundException("Hamlet", "HamletCode", hamletCode)
+                    () -> new ResourceNotFoundException("Thôn/xóm/bản/tổ dân phố", "mã định danh", hamletCode)
             );
             if (adTypeId == 1) {
                 hometown.setParam(c, foundHamlet, foundAddressType);
@@ -179,7 +179,7 @@ public class CitizenServiceImpl implements CitizenService {
         }
         if (citizen.getAddresses().size() == 2) {
             AddressType foundAddressType = addressTypeRepo.findById(3).orElseThrow(
-                    () -> new ResourceNotFoundException("AddressType", "AddressTypeId","" + 3)
+                    () -> new ResourceNotFoundException("Loại địa chỉ cư trú", "id","" + 3)
             );
             temporaryAddress.setCitizen(c);
             temporaryAddress.setAddressType(foundAddressType);
@@ -206,11 +206,11 @@ public class CitizenServiceImpl implements CitizenService {
     @Override
     public CitizenDto updateCitizen(String nationalId, CustomCitizenRequest citizen) {
         Citizen foundCitizen = repo.findByNationalId(nationalId).orElseThrow(
-                () -> new ResourceNotFoundException("Citizen", "NationalId", nationalId)
+                () -> new ResourceNotFoundException("Người dân", "mã số định danh", nationalId)
         );
         if (!nationalId.equals(citizen.getNationalId())) {
             repo.findByNationalId(citizen.getNationalId()).ifPresent(citizen1 -> {
-                throw new ResourceFoundException("Citizen", "NationalId", citizen.getNationalId());
+                throw new ResourceFoundException("Người dân", "mã số định danh", citizen.getNationalId());
             });
         }
         Citizen c = validate(citizen);
@@ -223,14 +223,14 @@ public class CitizenServiceImpl implements CitizenService {
                 if (ad.getAddressType().getId().equals(cad.getAddressType())) {
                     if ((ad.getAddressType().getId() != 3) && (!ad.getHamlet().getCode().equals(cad.getHamletCode()))) {
                         Hamlet foundHamlet = hamletRepo.findByCode(cad.getHamletCode()).orElseThrow(
-                                () -> new ResourceNotFoundException("Hamlet", "HamletCode", cad.getHamletCode())
+                                () -> new ResourceNotFoundException("Thôn/xóm/bản/tổ dân phố", "mã định danh", cad.getHamletCode())
                         );
                        ad.setHamlet(foundHamlet);
                     }
                     if (ad.getAddressType().getId() == 3) {
                         if (cad.getHamletCode() != null) {
                             Hamlet foundHamlet = hamletRepo.findByCode(cad.getHamletCode()).orElseThrow(
-                                    () -> new ResourceNotFoundException("Hamlet", "HamletCode", cad.getHamletCode())
+                                    () -> new ResourceNotFoundException("Thôn/xóm/bản/tổ dân phố", "mã định danh", cad.getHamletCode())
                             );
                             ad.setHamlet(foundHamlet);
                         } else {
@@ -314,7 +314,7 @@ public class CitizenServiceImpl implements CitizenService {
     @Override
     public List<CitizenDto> getAllByWardCode(String wardCode) {
         Ward foundWard = wardRepo.findByCode(wardCode).orElseThrow(
-                () -> new ResourceNotFoundException("Ward", "WardCode", wardCode)
+                () -> new ResourceNotFoundException("Xã/phường/thị trấn", "mã định danh", wardCode)
         );
         List<Citizen> entities = repo.findAllByWardCode(wardCode, 2);
         return entities.stream().map(l-> mapper.map(l, CitizenDto.class)).collect(Collectors.toList());
@@ -323,7 +323,7 @@ public class CitizenServiceImpl implements CitizenService {
     @Override
     public Map<String, Object> getAllByWardCode(String wardCode, int page) {
         Ward foundWard = wardRepo.findByCode(wardCode).orElseThrow(
-                () -> new ResourceNotFoundException("Ward", "WardCode", wardCode)
+                () -> new ResourceNotFoundException("Xã/phường/thị trấn", "mã định danh", wardCode)
         );
         Page<Citizen> citizensPage = repo.findAllByWardCode(wardCode, 2, PageRequest.of(page - 1, 15));
         return getStringObjectMap(page, citizensPage);
@@ -332,7 +332,7 @@ public class CitizenServiceImpl implements CitizenService {
     @Override
     public List<CitizenDto> getAllByDistrictCode(String districtCode) {
         District foundDistrict = districtRepo.findByCode(districtCode).orElseThrow(
-                () -> new ResourceNotFoundException("District", "DistrictCode", districtCode)
+                () -> new ResourceNotFoundException("Quận/huyện/thị xã", "mã định danh", districtCode)
         );
         List<Citizen> entities = repo.findAllByDistrictCode(districtCode, 2);
         return entities.stream().map(l-> mapper.map(l, CitizenDto.class)).collect(Collectors.toList());
@@ -341,7 +341,7 @@ public class CitizenServiceImpl implements CitizenService {
     @Override
     public List<CitizenDto> getAllByProvinceCode(String provinceCode) {
         Province foundProvince = provinceRepo.findByCode(provinceCode).orElseThrow(
-                () -> new ResourceNotFoundException("Province", "ProvinceCode", provinceCode)
+                () -> new ResourceNotFoundException("Tỉnh/thành phố", "mã định danh", provinceCode)
         );
         List<Citizen> entities = repo.findAllByProvinceCode(provinceCode, 2);
         return entities.stream().map(l-> mapper.map(l, CitizenDto.class)).collect(Collectors.toList());
@@ -354,7 +354,7 @@ public class CitizenServiceImpl implements CitizenService {
     @Override
     public void deleteCitizen(String citizenId) {
         Citizen foundCitizen = repo.findById(citizenId).orElseThrow(
-                () -> new ResourceNotFoundException("Citizen", "CitizenId", citizenId)
+                () -> new ResourceNotFoundException("Người dân", "mã số định danh", citizenId)
         );
         repo.delete(foundCitizen);
     }
@@ -422,14 +422,14 @@ public class CitizenServiceImpl implements CitizenService {
         Ethnicity foundEthnicity = null;
         if (ethnicityId != null) {
             foundEthnicity = ethnicityRepo.findById(ethnicityId).orElseThrow(
-                    () -> new ResourceNotFoundException("Ethnicity", "EthnicityId", "" + ethnicityId)
+                    () -> new ResourceNotFoundException("Dân tộc", "id", "" + ethnicityId)
             );
         }
 
         Religion foundReligion = null;
         if (religion != null) {
             foundReligion = religionRepo.findById(religion.getId()).orElseThrow(
-                    () -> new ResourceNotFoundException("Religion", "ReligionId","" + religion.getId())
+                    () -> new ResourceNotFoundException("Tôn giáo", "id","" + religion.getId())
             );
         }
         Citizen c = new Citizen();
@@ -494,7 +494,7 @@ public class CitizenServiceImpl implements CitizenService {
                             model.setSex(cell.getStringCellValue());
                             if (!Utils.validateSex(model.getSex())) {
                                 RowInvalid.append(rowNum);
-                                throw new InvalidException("Invalid Gioi Tinh in row: " + (rowNum +1) + " and column: " + (colNum + 1));
+                                throw new InvalidException("Lỗi trên cột 'Giới tính' tại hàng: " + (rowNum +1) + " và cột: " + (colNum + 1));
                             } else {
                                 citizen.setSex(cell.getStringCellValue());
                             }
@@ -505,7 +505,7 @@ public class CitizenServiceImpl implements CitizenService {
                                 Utils.BloodType.valueOf(cell.getStringCellValue());
                                 citizen.setBloodType(cell.getStringCellValue());
                             } catch (Exception e) {
-                                throw new InvalidException("Invalid Nhom Mau in row: " + (rowNum +1) + " and column: " + (colNum + 1));
+                                throw new InvalidException("Lỗi trên cột 'Nhóm máu' tại hàng: " + (rowNum +1) + " và cột: " + (colNum + 1));
                             }
                             break;
                         case 6:
@@ -517,7 +517,7 @@ public class CitizenServiceImpl implements CitizenService {
                             int finalRowNum = rowNum;
                             int finalColNum = colNum;
                             Ethnicity ethnicity = ethnicityRepo.findByName(cell.getStringCellValue()).orElseThrow(
-                                    () -> new InvalidException("Invalid in Dan Toc in row: " + (finalRowNum+1) + " and column: " + (finalColNum + 1))
+                                    () -> new InvalidException("Lỗi trên cột 'Dân tộc' tại hàng: " + (finalRowNum+1) + " và cột: " + (finalColNum + 1))
                             );
                             citizen.setEthnicity(ethnicity);
                             break;
@@ -527,7 +527,7 @@ public class CitizenServiceImpl implements CitizenService {
                                 finalRowNum = rowNum;
                                 finalColNum = colNum;
                                 Religion religion = religionRepo.findByName(cell.getStringCellValue()).orElseThrow(
-                                        () -> new InvalidException("Invalid in Ton Giao in row: " + (finalRowNum+1) + " and column: " + (finalColNum + 1))
+                                        () -> new InvalidException("Lỗi trên cột 'Tôn giáo' tại hàng: " + (finalRowNum+1) + " và cột: " + (finalColNum + 1))
                                 );
                                 citizen.setReligion(religion);
                             }
@@ -549,12 +549,12 @@ public class CitizenServiceImpl implements CitizenService {
                         case 12: case 13: case 14:
                             String adr = cell.getStringCellValue();
                             if (colNum != 13 && adr.equals("")) {
-                                throw new InvalidException("Invalid in row: " + (rowNum +1) + " and column: " + (colNum + 1));
+                                throw new InvalidException("Lỗi tại hàng: " + (rowNum +1) + " và cột: " + (colNum + 1));
                             }
                             if (!adr.equals("")) {
                                 String[] listNameOfAdr = adr.split(" - ");
                                 if (listNameOfAdr.length != 4) {
-                                    throw new InvalidException("Invalid in row: " + (rowNum +1) + " and column: " + (colNum + 1));
+                                    throw new InvalidException("Lỗi tại hàng: " + (rowNum +1) + " và cột: " + (colNum + 1));
                                 }
                                 List<Hamlet> hamlet = hamletRepo.findHamletFromExcel(listNameOfAdr[3], listNameOfAdr[2],
                                         listNameOfAdr[1], listNameOfAdr[0]);

@@ -70,14 +70,14 @@ public class ProvinceServiceImpl implements ProvinceService {
     @Override
     public ProvinceDto getById(Long provinceId) {
         Province province = repository.findById(provinceId).orElseThrow(
-                () -> new ResourceNotFoundException("Province", "provinceId", String.valueOf(provinceId)));
+                () -> new ResourceNotFoundException("Tỉnh/thành phố", "mã định danh", String.valueOf(provinceId)));
         return mapper.map(province, ProvinceDto.class);
     }
 
     @Override
     public ProvinceDto getByCode(String code) {
         Province foundProvince = repository.findByCode(code).orElseThrow(
-                () -> new ResourceNotFoundException("Province", "provinceCode", code)
+                () -> new ResourceNotFoundException("Tỉnh/thành phố", "mã định danh", code)
         );
         return mapper.map(foundProvince, ProvinceDto.class);
     }
@@ -85,7 +85,7 @@ public class ProvinceServiceImpl implements ProvinceService {
     @Override
     public List<ProvinceDto> getAllByAdministrativeUnitId(int admUnitId) {
         AdministrativeUnit foundAdmUnit = administrativeUnitRepository.findById(admUnitId).orElseThrow(
-                () -> new ResourceNotFoundException("AdministrativeUnit", "AdministrativeUnitID",String.valueOf(admUnitId))
+                () -> new ResourceNotFoundException("Đơn vị hành chính", "id",String.valueOf(admUnitId))
         );
         List<Province> list = repository.findAllByAdministrativeUnit(foundAdmUnit);
         List<ProvinceDto> dtoList = list.stream().map(province -> mapper.map(province, ProvinceDto.class)).collect(Collectors.toList());
@@ -95,7 +95,7 @@ public class ProvinceServiceImpl implements ProvinceService {
     @Override
     public List<ProvinceDto> getAllByAdministrativeRegionId(int admRegionId) {
         AdministrativeRegion foundAdmRegion = administrativeRegionRepository.findById(admRegionId).orElseThrow(
-                () -> new ResourceNotFoundException("AdministrativeRegion", "AdministrativeRegionID", String.valueOf(admRegionId))
+                () -> new ResourceNotFoundException("Khu vực hành chính", "id", String.valueOf(admRegionId))
         );
         List<Province> list = repository.findAllByAdministrativeRegion(foundAdmRegion);
         List<ProvinceDto> dtoList = list.stream().map(province -> mapper.map(province, ProvinceDto.class)).collect(Collectors.toList());
@@ -107,7 +107,7 @@ public class ProvinceServiceImpl implements ProvinceService {
     public ProvinceDto createProvince(ProvinceDto province) {
         String provinceCode = province.getCode();
         repository.findByCode(provinceCode).ifPresent(p -> {
-            throw new ResourceFoundException("Province", "ProvinceCode", provinceCode);
+            throw new ResourceFoundException("Tỉnh/thành phố", "mã định danh", provinceCode);
         });
 
         Map<String, Object> map = validate(province);
@@ -130,12 +130,12 @@ public class ProvinceServiceImpl implements ProvinceService {
     @Override
     public ProvinceDto updateProvince(String provinceCodeNeedUpdate, ProvinceDto province) {
         Province foundProvince = repository.findByCode(provinceCodeNeedUpdate).orElseThrow(
-                () -> new ResourceNotFoundException("Province", "ProvinceCode", provinceCodeNeedUpdate));
+                () -> new ResourceNotFoundException("Tỉnh/thành phố", "mã định danh", provinceCodeNeedUpdate));
 
         String provinceCode = province.getCode();
         if (!provinceCodeNeedUpdate.equals(provinceCode)) {
             repository.findByCode(provinceCode).ifPresent(
-                    p -> {throw new ResourceFoundException("Province", "ProvinceCode", provinceCode);}
+                    p -> {throw new ResourceFoundException("Tỉnh/thành phố", "mã định danh", provinceCode);}
             );
         }
 
@@ -162,17 +162,17 @@ public class ProvinceServiceImpl implements ProvinceService {
     @Transactional
     public String deleteById(Long provinceId) {
         repository.delete(repository.findById(provinceId)
-                .orElseThrow(() -> new ResourceNotFoundException("Province", "provinceId", String.valueOf(provinceId))));
+                .orElseThrow(() -> new ResourceNotFoundException("Tỉnh/thành phố", "mã định danh", String.valueOf(provinceId))));
         return "Deleted";
     }
 
     private Map<String, Object> validate(ProvinceDto province) {
         Integer admUnitId = province.getAdministrativeUnit().getId();
         AdministrativeUnit admUnit = administrativeUnitRepository.findById(admUnitId)
-                .orElseThrow(() -> new ResourceNotFoundException("AdministrativeUnit", "AdministrativeUnitId", String.valueOf(admUnitId)));
+                .orElseThrow(() -> new ResourceNotFoundException("Đơn vị hành chính", "id", String.valueOf(admUnitId)));
         Integer admRegionId = province.getAdministrativeRegion().getId();
         AdministrativeRegion admRegion = administrativeRegionRepository.findById(admRegionId)
-                .orElseThrow(() -> new ResourceNotFoundException("AdministrativeRegion", "AdministrativeRegionId", String.valueOf(admRegionId)));
+                .orElseThrow(() -> new ResourceNotFoundException("Khu vực hành chính", "id", String.valueOf(admRegionId)));
 
 //        if(!Utils.validateName(province.getName())) {
 //            throw new InvalidException("Ten khong dung dinh dang");

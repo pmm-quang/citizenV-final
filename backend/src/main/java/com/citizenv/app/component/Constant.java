@@ -27,4 +27,8 @@ public final class Constant {
     public static final String ERR_MESSAGE_ADMINISTRATIVE_UNIT_INVALID = "Loại đơn vị hành chính không hợp lệ";
 
     public static final String ERR_MESSAGE_NOT_ENTERED_THE_REQUIRED_INFO = "Chưa nhập đủ thông tin cần thiết";
+
+    public static final String ERR_MESSAGE_USERNAME_AND_UNIT_CODE_DO_NOT_MATCH = "Tên tài khoản và mã đơn vị không trùng khớp";
+
+    public static final String ACCESS_DENIED_MESSAGE_DO_NOT_HAVE_PERMISSION_TO_CREATE_ACCOUNT = "Không có quyền tạo tài khoản cho đơn vị";
 }

@@ -5,12 +5,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ResourceNotFoundException extends ResourceException {
+public class ResourceNotFoundException extends RuntimeException {
 
     public ResourceNotFoundException(String resourceName, String fieldName, String fieldValue) {
-        super(String.format("%s not found with %s : %s\n", resourceName, fieldName, fieldValue));
-        this.fieldName = fieldName;
-        this.fieldValue = fieldValue;
-        this.resourceName = resourceName;
+        super(String.format("%s với %s : %s đã tồn tại\n", resourceName, fieldName, fieldValue));
     }
 }

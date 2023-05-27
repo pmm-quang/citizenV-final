@@ -26,20 +26,23 @@ import java.util.stream.Collectors;
 
 @Service
 public class DistrictServiceImpl implements DistrictService {
-    @Autowired
-    private ModelMapper mapper;
+    private final ModelMapper mapper;
 
-    @Autowired
-    private DistrictRepository repository;
+    private final DistrictRepository repository;
 
-    @Autowired
-    private ProvinceRepository provinceRepository;
+    private final ProvinceRepository provinceRepository;
 
-    @Autowired
-    private AdministrativeUnitRepository administrativeUnitRepository;
+    private final AdministrativeUnitRepository administrativeUnitRepository;
 
-    @Autowired
-    private AdministrativeDivisionRepository administrativeDivisionRepository;
+    private final AdministrativeDivisionRepository administrativeDivisionRepository;
+
+    public DistrictServiceImpl(ModelMapper mapper, DistrictRepository repository, ProvinceRepository provinceRepository, AdministrativeUnitRepository administrativeUnitRepository, AdministrativeDivisionRepository administrativeDivisionRepository) {
+        this.mapper = mapper;
+        this.repository = repository;
+        this.provinceRepository = provinceRepository;
+        this.administrativeUnitRepository = administrativeUnitRepository;
+        this.administrativeDivisionRepository = administrativeDivisionRepository;
+    }
 
     @Override
     public List<DistrictDto> getAll() {
@@ -56,7 +59,7 @@ public class DistrictServiceImpl implements DistrictService {
     @Override
     public DistrictDto getByCode(String code) {
         District district = repository.findByCode(code).orElseThrow(
-                () -> new ResourceNotFoundException("District", "DistrictCode", code)
+                () -> new ResourceNotFoundException("Quận/huyện/thị xã", "mã định danh", code)
         );
         return mapper.map(district, DistrictDto.class);
     }
@@ -64,7 +67,7 @@ public class DistrictServiceImpl implements DistrictService {
     @Override
     public List<DistrictDto> getAllByProvinceCode(String provinceCode) {
         Province foundProvince = provinceRepository.findByCode(provinceCode).orElseThrow(
-                () -> new ResourceNotFoundException("Province", "ProvinceCode", provinceCode)
+                () -> new ResourceNotFoundException("Tỉnh/thành phố", "mã định danh", provinceCode)
         );
         List<District> list = repository.findAllByProvince(foundProvince);
         List<DistrictDto> dtoList = list.stream().map(district -> mapper.map(district, DistrictDto.class)).collect(Collectors.toList());
@@ -74,7 +77,7 @@ public class DistrictServiceImpl implements DistrictService {
     @Override
     public List<DistrictDto> getAllByAdministrativeUnitId(int admUnitId) {
         AdministrativeUnit foundAdmUnit = administrativeUnitRepository.findById(admUnitId).orElseThrow(
-                ()-> new ResourceNotFoundException("AdministrativeUnit", "AdministrativeUnitId", String.valueOf(admUnitId))
+                ()-> new ResourceNotFoundException("Đơn vị hành chính", "id", String.valueOf(admUnitId))
         );
         List<District> list = repository.findAllByAdministrativeUnit(foundAdmUnit);
         List<DistrictDto> dtoList = list.stream().map(district -> mapper.map(district, DistrictDto.class)).collect(Collectors.toList());
@@ -87,7 +90,7 @@ public class DistrictServiceImpl implements DistrictService {
     public DistrictDto createDistrict(String divisionCodeOfUserDetail, DistrictDto district) {
         String newDistrictCode = district.getCode();
         repository.findByCode(newDistrictCode).ifPresent(
-                foundDistrict -> {throw new ResourceFoundException("District", "DistrictCode", newDistrictCode);});
+                foundDistrict -> {throw new ResourceFoundException("Quận/huyện/thị xã", "mã định danh", newDistrictCode);});
 
         administrativeDivisionRepository.findByName(district.getName(), divisionCodeOfUserDetail).ifPresent(
                 division -> {throw new InvalidException(Constant.ERR_MESSAGE_UNIT_NAME_ALREADY_EXISTS);}
@@ -107,12 +110,12 @@ public class DistrictServiceImpl implements DistrictService {
     public DistrictDto updateDistrict(String districtCodeNeedUpdate, DistrictDto district) {
         String districtCode = district.getCode();
         District foundDistrict = repository.findByCode(districtCodeNeedUpdate).orElseThrow(
-                () -> new ResourceNotFoundException("District", "DistrictCode", districtCodeNeedUpdate)
+                () -> new ResourceNotFoundException("Quận/huyện/thị xã", "mã định danh", districtCodeNeedUpdate)
         );
 
         if (!districtCode.equals(districtCodeNeedUpdate)) {
             repository.findByCode(districtCode).ifPresent(
-                    fd -> {throw new ResourceFoundException("District", "DistrictCodeUpdate", districtCode);}
+                    fd -> {throw new ResourceFoundException("Quận/huyện/thị xã", "mã định danh", districtCode);}
             );
         }
 
@@ -164,12 +167,12 @@ public class DistrictServiceImpl implements DistrictService {
         }
 //        String provinceCode = district.getProvince().getCode();
         Province foundProvince = provinceRepository.findByCode(provinceCode).orElseThrow(
-                ()-> new ResourceNotFoundException("Province", "ProvinceCode", provinceCode)
+                ()-> new ResourceNotFoundException("Tỉnh/thành phố", "mã định danh", provinceCode)
         );
 
 //        int admUnitId = district.getAdministrativeUnit().getId();
         AdministrativeUnit foundAdmUnit = administrativeUnitRepository.findById(admUnitId).orElseThrow(
-                () -> new ResourceNotFoundException("AdministrativeUnit", "AdministrativeUnitId", String.valueOf(admUnitId))
+                () -> new ResourceNotFoundException("Đơn vị hành chính", "id", String.valueOf(admUnitId))
         );
         Map<String, Object> map = new HashMap<>();
         map.put("province", foundProvince);

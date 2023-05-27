@@ -170,12 +170,12 @@ public class UserServiceImpl implements UserService {
                     && (divisionCodeOfNewUser.length() == 8));
         }
         if (!checkAuth) {
-            throw new AccessDeniedException("Khong co quyen tao tai khoan cho don vi co ma : " + divisionOfNewUser.getCode());
+            throw new AccessDeniedException("Không có quyền tạo tài khoản cho đơn vị có mã: " + divisionOfNewUser.getCode());
         }
 
         if (newUsername.equals(divisionOfNewUser.getCode())) {
             repository.findByUsername(newUsername).ifPresent(user1 -> {
-                throw new ResourceFoundException("User", "username",newUsername);
+                throw new ResourceFoundException("Tài khoản", "username",newUsername);
             });
             AdministrativeDivision division = divisionRepo.findByCode(divisionOfNewUser.getCode()).orElseThrow(
                     () -> new ResourceNotFoundException("division", "divisionCode", divisionOfNewUser.getCode())
@@ -240,16 +240,16 @@ public class UserServiceImpl implements UserService {
             }
         }
         if (!check) {
-            throw new AccessDeniedException("Khong co quyen tao tai khoan voi don vi co ma: " + divisionCodeOfNewUser);
+            throw new AccessDeniedException("Không có quyền tạo tài khoản cho đơn vị có mã: " + divisionCodeOfNewUser);
         }
         if (!divisionCodeOfNewUser.equals(newUsername)) {
-            throw new InvalidException("Ten tai khoan va ma don vi khong trung khop");
+            throw new InvalidException(Constant.ERR_MESSAGE_USERNAME_AND_UNIT_CODE_DO_NOT_MATCH);
         }
         repository.findByUsername(newUsername).ifPresent(user1 -> {
-            throw new ResourceFoundException("User", "username",newUsername);
+            throw new ResourceFoundException("Tài khoản", "username",newUsername);
         });
         AdministrativeDivision division = divisionRepo.findByCode(divisionOfNewUser.getCode()).orElseThrow(
-                () -> new ResourceNotFoundException("division", "divisionCode", divisionOfNewUser.getCode())
+                () -> new ResourceNotFoundException("Đơn vị hành chính", "mã đơn vị", divisionOfNewUser.getCode())
         );
 
         User userDetail = repository.findByUsername(usernameUserDetail).orElseThrow(
@@ -278,7 +278,7 @@ public class UserServiceImpl implements UserService {
         newUser.setRoles(roles);
         Declaration declaration = new Declaration();
 //        declaration.setStartTime(Timestamp.valueOf(LocalDateTime.now()));
-        declaration.setStatus("Chưa cấp quyền khai báo");
+        declaration.setStatus(Constant.DECLARATION_STATUS_NOT_GRANT_YET);
         User createUser = repository.save(newUser);
         createUser.setDeclaration(declaration); // Thiết lập quan hệ giữa User và Declaration
         User savedUser = repository.save(createUser); // Lưu lại đối tượng User để cập nhật quan hệ với Declaration
@@ -295,15 +295,15 @@ public class UserServiceImpl implements UserService {
         boolean checkAuth = true;
 
         if (divisionOfNewUser == null || newUsername == null) {
-            throw new InvalidException("Chua nhap du thong tin can thiet");
+            throw new InvalidException(Constant.ERR_MESSAGE_NOT_ENTERED_THE_REQUIRED_INFO);
         }
         String divisionCodeOfNewUser = divisionOfNewUser.getCode();
         if (newUsername.equals(divisionOfNewUser.getCode())) {
             repository.findByUsername(newUsername).ifPresent(user1 -> {
-                throw new ResourceFoundException("User", "username",newUsername);
+                throw new ResourceFoundException("Tài khoản", "username",newUsername);
             });
             AdministrativeDivision division = divisionRepo.findByCode(divisionOfNewUser.getCode()).orElseThrow(
-                    () -> new ResourceNotFoundException("division", "divisionCode", divisionOfNewUser.getCode())
+                    () -> new ResourceNotFoundException("Đơn vị hành chính", "mã đơn vị", divisionOfNewUser.getCode())
             );
             User newUser = new User();
             newUser.setUsername(newUsername);
@@ -319,7 +319,7 @@ public class UserServiceImpl implements UserService {
             }
             Long finalRoleId = roleId;
             Role role = roleRepo.findById(finalRoleId).orElseThrow(
-                    () -> new ResourceNotFoundException("Role", "roleId", String.valueOf(finalRoleId))
+                    () -> new ResourceNotFoundException("Vai trò", "id", String.valueOf(finalRoleId))
             );
             List<Role> roles = new ArrayList<>();
             roles.add(role);
@@ -333,7 +333,7 @@ public class UserServiceImpl implements UserService {
             declarationRepo.save(declaration);
             return mapper.map(createUser, UserDto.class);
         } else {
-            throw  new InvalidException("username va ma don vi khong trung khop");
+            throw  new InvalidException(Constant.ERR_MESSAGE_USERNAME_AND_UNIT_CODE_DO_NOT_MATCH);
         }
     }
 

@@ -52,7 +52,7 @@ public class HamletServiceImpl implements HamletService {
     @Override
     public HamletDto getByCode(String hamletCode) {
         Hamlet foundHamlet = repository.findByCode(hamletCode).orElseThrow(
-                () -> new ResourceNotFoundException("Hamlet", "HamletCode", hamletCode));
+                () -> new ResourceNotFoundException("Thôn/xóm/bản/tổ dân phố", "mã định danh", hamletCode));
 
         return mapper.map(foundHamlet, HamletDto.class);
     }
@@ -60,7 +60,7 @@ public class HamletServiceImpl implements HamletService {
     @Override
     public List<HamletDto> getAllByWardCode(String wardCode) {
         Ward ward = wardRepository.findByCode(wardCode).orElseThrow(
-                () -> new ResourceNotFoundException("Ward", "WardCode", wardCode)
+                () -> new ResourceNotFoundException("Xã/phường/thị trấn", "mã định danh", wardCode)
         );
         List<Hamlet> hamlets = repository.findAllByWard(ward);
         List<HamletDto> hamletDtos = hamlets.stream().map(hamlet -> mapper.map(hamlet, HamletDto.class)).collect(Collectors.toList());
@@ -70,7 +70,7 @@ public class HamletServiceImpl implements HamletService {
     @Override
     public List<HamletDto> getAllByAdministrativeUnitId(int administrativeUnitID) {
         AdministrativeUnit administrativeUnit = administrativeUnitRepository.findById(administrativeUnitID)
-                .orElseThrow(() -> new ResourceNotFoundException("AdministrativeUnit","AdministrativeUnitID", String.valueOf(administrativeUnitID)));
+                .orElseThrow(() -> new ResourceNotFoundException("Đơn vị hành chính","id", String.valueOf(administrativeUnitID)));
         List<Hamlet> hamlets = repository.findAllByAdministrativeUnit(administrativeUnit);
         List<HamletDto> hamletDtos = hamlets.stream().map(hamlet -> mapper.map(hamlet, HamletDto.class)).collect(Collectors.toList());
         return hamletDtos;
@@ -82,7 +82,7 @@ public class HamletServiceImpl implements HamletService {
        String hamletCode = hamlet.getCode();
        if (hamletCode != null) {
            repository.findByCode(hamletCode).ifPresent(h -> {
-               throw new ResourceFoundException("Hamlet", "HamletCode", hamletCode);
+               throw new ResourceFoundException("Thôn/xóm/bản/tổ dân phố", "mã định danh", hamletCode);
            });
        }
        if (hamlet.getName() != null && hamlet.getWardCode() != null) {
@@ -99,11 +99,11 @@ public class HamletServiceImpl implements HamletService {
     @Override
     public HamletDto updateHamlet(String hamletCodeNeedUpdate, CustomHamletRequest hamlet) {
         Hamlet foundHamlet =  repository.findByCode(hamletCodeNeedUpdate).orElseThrow(
-                () -> new ResourceNotFoundException("Hamlet", "HamletCode", hamletCodeNeedUpdate)
+                () -> new ResourceNotFoundException("Thôn/xóm/bản/tổ dân phố", "mã định danh", hamletCodeNeedUpdate)
         );
         if (hamlet.getCode() != null && !hamletCodeNeedUpdate.equals(hamlet.getCode())) {
             repository.findByCode(hamlet.getCode()).ifPresent(h -> {
-                throw new ResourceFoundException("Hamlet", "HamletCode", hamlet.getCode());});
+                throw new ResourceFoundException("Thôn/xóm/bản/tổ dân phố", "mã định danh", hamlet.getCode());});
         }
         if (hamlet.getName() != null && hamlet.getWardCode() != null && !hamlet.getName().equals(foundHamlet.getName())) {
             String wardCode = hamlet.getWardCode();
@@ -142,10 +142,10 @@ public class HamletServiceImpl implements HamletService {
             throw new InvalidException(Constant.ERR_MESSAGE_UNIT_CODE_INVALID);
         }
         AdministrativeUnit foundAdmUnit = administrativeUnitRepository.findById(admUnitId).orElseThrow(
-                () -> new ResourceNotFoundException("AdministrativeUnit", "AdministrativeUnitId", String.valueOf(admUnitId))
+                () -> new ResourceNotFoundException("Đơn vị hành chính", "id", String.valueOf(admUnitId))
         );
         Ward foundWard  = wardRepository.findByCode(wardCode).orElseThrow(
-                () -> new ResourceNotFoundException("Ward", "WardCode", wardCode)
+                () -> new ResourceNotFoundException("Xã/phường/thị trấn", "mã định danh", wardCode)
         );
         Hamlet newHamlet = new Hamlet();
         newHamlet.setName(hamletName);
