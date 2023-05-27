@@ -21,7 +21,7 @@ public class Scheduler {
     }
 
     @Transactional
-    @Scheduled(cron = "0 27 1 * * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     public void processExpiredDeclarationRights() {
         System.out.println("Starting....");
         List<Declaration> list = declarationRepo.findAll();

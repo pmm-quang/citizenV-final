@@ -337,4 +337,8 @@ public class Utils {
         }
         return validateProvinceCode && validateSex && validateBirth;
     }
+    public static boolean validateFormatDivisionCode(String divisionCode) {
+        String pattern = "^[0-9]+$";
+        return Pattern.compile(pattern).matcher(divisionCode).matches();
+    }
 }

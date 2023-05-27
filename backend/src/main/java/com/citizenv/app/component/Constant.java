@@ -21,4 +21,10 @@ public final class Constant {
     public static final String URBAN_AREA = "Thành thị";
     public static final String RURAL_AREA = "Nông thôn";
 
+    public static final String ERR_MESSAGE_UNIT_NAME_ALREADY_EXISTS = "Tên đơn vị đã tồn tại";
+    public static final String ERR_MESSAGE_UNIT_CODE_ALREADY_EXISTS = "Mã đơn vị đã tồn tại";
+    public static final String ERR_MESSAGE_UNIT_CODE_INVALID = "Mã đơn vị không hợp lệ";
+    public static final String ERR_MESSAGE_ADMINISTRATIVE_UNIT_INVALID = "Loại đơn vị hành chính không hợp lệ";
+
+    public static final String ERR_MESSAGE_NOT_ENTERED_THE_REQUIRED_INFO = "Chưa nhập đủ thông tin cần thiết";
 }

@@ -1,5 +1,6 @@
 package com.citizenv.app.service.impl;
 
+import com.citizenv.app.component.Constant;
 import com.citizenv.app.component.Utils;
 import com.citizenv.app.entity.AdministrativeUnit;
 import com.citizenv.app.entity.Hamlet;
@@ -9,12 +10,12 @@ import com.citizenv.app.exception.ResourceFoundException;
 import com.citizenv.app.exception.ResourceNotFoundException;
 import com.citizenv.app.payload.HamletDto;
 import com.citizenv.app.payload.custom.CustomHamletRequest;
+import com.citizenv.app.repository.AdministrativeDivisionRepository;
 import com.citizenv.app.repository.AdministrativeUnitRepository;
 import com.citizenv.app.repository.HamletRepository;
 import com.citizenv.app.repository.WardRepository;
 import com.citizenv.app.service.HamletService;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,15 +25,19 @@ import java.util.stream.Collectors;
 @Service
 public class HamletServiceImpl implements HamletService {
 
-    @Autowired
-    private HamletRepository repository;
-    @Autowired
-    private WardRepository wardRepository;
-    @Autowired
-    private AdministrativeUnitRepository administrativeUnitRepository;
-    @Autowired
-    private ModelMapper mapper;
+    private final HamletRepository repository;
+    private final WardRepository wardRepository;
+    private final AdministrativeUnitRepository administrativeUnitRepository;
+    private final ModelMapper mapper;
+    private final AdministrativeDivisionRepository admDivisionRepo;
 
+    public HamletServiceImpl(HamletRepository repository, WardRepository wardRepository, AdministrativeUnitRepository administrativeUnitRepository, ModelMapper mapper, AdministrativeDivisionRepository admDivisionRepo) {
+        this.repository = repository;
+        this.wardRepository = wardRepository;
+        this.administrativeUnitRepository = administrativeUnitRepository;
+        this.mapper = mapper;
+        this.admDivisionRepo = admDivisionRepo;
+    }
 
     private StringBuilder sb = new StringBuilder();
 
@@ -72,35 +77,22 @@ public class HamletServiceImpl implements HamletService {
     }
 
     @Override
-    public HamletDto createHamlet(CustomHamletRequest hamlet) {
+    public HamletDto createHamlet(String divisionCode, CustomHamletRequest hamlet) {
+        hamlet.setWardCode(divisionCode);
        String hamletCode = hamlet.getCode();
-       repository.findByCode(hamletCode).ifPresent(h -> {
-           throw new ResourceFoundException("Hamlet", "HamletCode", hamletCode);
-       });
+       if (hamletCode != null) {
+           repository.findByCode(hamletCode).ifPresent(h -> {
+               throw new ResourceFoundException("Hamlet", "HamletCode", hamletCode);
+           });
+       }
+       if (hamlet.getName() != null && hamlet.getWardCode() != null) {
+           admDivisionRepo.findByName(hamlet.getName(), hamlet.getName()).ifPresent(
+                   division -> {throw new InvalidException(Constant.ERR_MESSAGE_UNIT_NAME_ALREADY_EXISTS);}
+           );
+       }
        Hamlet createHamlet = validate(hamlet);
        Hamlet newHamlet = repository.save(createHamlet);
        return mapper.map(newHamlet, HamletDto.class);
-    }
-
-    @Transactional
-    @Override
-    public HamletDto updateHamlet(String hamletCodeNeedUpdate, HamletDto hamlet) {
-        String hamletCode = hamlet.getCode();
-
-        Hamlet foundHamlet =  repository.findByCode(hamletCodeNeedUpdate).orElseThrow(
-                () -> new ResourceNotFoundException("Hamlet", "HamletCode", hamletCodeNeedUpdate)
-        );
-
-        if (!hamletCodeNeedUpdate.equals(hamletCode)) {
-            repository.findByCode(hamletCode).ifPresent(h -> {
-                throw new ResourceFoundException("Hamlet", "HamletCode", hamletCode);});
-        }
-        Hamlet createHamlet = validate(hamlet.getCode(), hamlet.getName(), hamlet.getWard().getCode(), hamlet.getAdministrativeUnit().getId());
-        foundHamlet.setCode(createHamlet.getCode());
-        foundHamlet.setName(createHamlet.getName());
-        foundHamlet.setWard(createHamlet.getWard());
-        foundHamlet.setAdministrativeUnit(createHamlet.getAdministrativeUnit());
-        return mapper.map(foundHamlet, HamletDto.class);
     }
 
     @Transactional
@@ -109,9 +101,15 @@ public class HamletServiceImpl implements HamletService {
         Hamlet foundHamlet =  repository.findByCode(hamletCodeNeedUpdate).orElseThrow(
                 () -> new ResourceNotFoundException("Hamlet", "HamletCode", hamletCodeNeedUpdate)
         );
-        if (!hamletCodeNeedUpdate.equals(hamlet.getCode())) {
+        if (hamlet.getCode() != null && !hamletCodeNeedUpdate.equals(hamlet.getCode())) {
             repository.findByCode(hamlet.getCode()).ifPresent(h -> {
                 throw new ResourceFoundException("Hamlet", "HamletCode", hamlet.getCode());});
+        }
+        if (hamlet.getName() != null && hamlet.getWardCode() != null && !hamlet.getName().equals(foundHamlet.getName())) {
+            String wardCode = hamlet.getWardCode();
+            admDivisionRepo.findByName(hamlet.getName(),wardCode).ifPresent(
+                    division -> {throw new InvalidException(Constant.ERR_MESSAGE_UNIT_NAME_ALREADY_EXISTS);}
+            );
         }
         Hamlet createHamlet = validate(hamlet);
         foundHamlet.setCode(createHamlet.getCode());
@@ -126,38 +124,22 @@ public class HamletServiceImpl implements HamletService {
         String hamletCode = hamlet.getCode();
         String wardCode = hamlet.getWardCode();
         Integer admUnitId = hamlet.getAdministrativeUnitId();
-//        if (!Utils.validateName(hamletName)) {
-//            throw new InvalidException("Ten don vi khong dung dinh dang");
-//        }
-        if (!Utils.AdministrativeUnitsLv4.containsKey(admUnitId)) {
-            throw new InvalidException("Don vi hanh chinh khong hop le");
-        }
-        if (hamletCode.indexOf(wardCode) != 0) {
-            throw new InvalidException("Ma don vi khong hop le");
-        }
-        AdministrativeUnit foundAdmUnit = administrativeUnitRepository.findById(admUnitId).orElseThrow(
-                () -> new ResourceNotFoundException("AdministrativeUnit", "AdministrativeUnitId", String.valueOf(admUnitId))
-        );
-        Ward foundWard  = wardRepository.findByCode(wardCode).orElseThrow(
-                () -> new ResourceNotFoundException("Ward", "WardCode", wardCode)
-        );
-        Hamlet newHamlet = new Hamlet();
-        newHamlet.setName(hamletName);
-        newHamlet.setCode(hamletCode);
-        newHamlet.setAdministrativeUnit(foundAdmUnit);
-        newHamlet.setWard(foundWard);
-        return newHamlet;
-    }
 
-    private Hamlet validate(String hamletCode, String hamletName, String wardCode, Integer admUnitId) {
+        boolean checkNull = (hamletCode == null || hamletCode.equals("")
+                || hamletName == null || hamletName.equals("")
+                || wardCode == null || wardCode.equals("") ||
+                admUnitId == null);
+        if (checkNull) {
+            throw new InvalidException(Constant.ERR_MESSAGE_NOT_ENTERED_THE_REQUIRED_INFO);
+        }
 //        if (!Utils.validateName(hamletName)) {
 //            throw new InvalidException("Ten don vi khong dung dinh dang");
 //        }
         if (!Utils.AdministrativeUnitsLv4.containsKey(admUnitId)) {
-            throw new InvalidException("Don vi hanh chinh khong hop le");
+            throw new InvalidException(Constant.ERR_MESSAGE_ADMINISTRATIVE_UNIT_INVALID);
         }
-        if (hamletCode.indexOf(wardCode) != 0) {
-            throw new InvalidException("Ma don vi khong hop le");
+        if (hamletCode.indexOf(wardCode) != 0 || !Utils.validateFormatDivisionCode(wardCode)) {
+            throw new InvalidException(Constant.ERR_MESSAGE_UNIT_CODE_INVALID);
         }
         AdministrativeUnit foundAdmUnit = administrativeUnitRepository.findById(admUnitId).orElseThrow(
                 () -> new ResourceNotFoundException("AdministrativeUnit", "AdministrativeUnitId", String.valueOf(admUnitId))

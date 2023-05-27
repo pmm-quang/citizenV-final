@@ -12,9 +12,8 @@ public interface HamletService {
     List<HamletDto> getAllByWardCode(String wardCode);
 
     List<HamletDto> getAllByAdministrativeUnitId(int administrativeUnitID);
-    HamletDto createHamlet(CustomHamletRequest hamlet);
+    HamletDto createHamlet(String divisionCode, CustomHamletRequest hamlet);
 
-    HamletDto updateHamlet(String hamletCode, HamletDto hamlet);
     HamletDto updateHamlet(String hamletCodeNeedUpdate, CustomHamletRequest hamlet);
     void nono();
 }

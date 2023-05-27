@@ -1,5 +1,6 @@
 package com.citizenv.app.service.impl;
 
+import com.citizenv.app.component.Constant;
 import com.citizenv.app.component.Utils;
 import com.citizenv.app.entity.AdministrativeRegion;
 import com.citizenv.app.entity.AdministrativeUnit;
@@ -9,6 +10,7 @@ import com.citizenv.app.exception.InvalidException;
 import com.citizenv.app.exception.ResourceFoundException;
 import com.citizenv.app.exception.ResourceNotFoundException;
 import com.citizenv.app.payload.ProvinceDto;
+import com.citizenv.app.repository.AdministrativeDivisionRepository;
 import com.citizenv.app.repository.AdministrativeRegionRepository;
 import com.citizenv.app.repository.AdministrativeUnitRepository;
 import com.citizenv.app.repository.ProvinceRepository;
@@ -33,17 +35,19 @@ public class ProvinceServiceImpl implements ProvinceService {
 
     Logger logger = LogManager.getRootLogger();
     StringBuilder sb = new StringBuilder();
-    @Autowired
-    private ModelMapper mapper;
+    private final ModelMapper mapper;
+    private final AdministrativeRegionRepository administrativeRegionRepository;
+    private final AdministrativeUnitRepository administrativeUnitRepository;
+    private final ProvinceRepository repository;
+    private final AdministrativeDivisionRepository administrativeDivisionRepository;
 
-    @Autowired
-    private AdministrativeRegionRepository administrativeRegionRepository;
-
-    @Autowired
-    private AdministrativeUnitRepository administrativeUnitRepository;
-
-    @Autowired
-    private ProvinceRepository repository;
+    public ProvinceServiceImpl(ModelMapper mapper, AdministrativeRegionRepository administrativeRegionRepository, AdministrativeUnitRepository administrativeUnitRepository, ProvinceRepository repository, AdministrativeDivisionRepository administrativeDivisionRepository) {
+        this.mapper = mapper;
+        this.administrativeRegionRepository = administrativeRegionRepository;
+        this.administrativeUnitRepository = administrativeUnitRepository;
+        this.repository = repository;
+        this.administrativeDivisionRepository = administrativeDivisionRepository;
+    }
 
     @Override
     public List<ProvinceDto> getAll() {
@@ -98,6 +102,7 @@ public class ProvinceServiceImpl implements ProvinceService {
         return dtoList;
     }
 
+    @Transactional
     @Override
     public ProvinceDto createProvince(ProvinceDto province) {
         String provinceCode = province.getCode();
@@ -105,8 +110,15 @@ public class ProvinceServiceImpl implements ProvinceService {
             throw new ResourceFoundException("Province", "ProvinceCode", provinceCode);
         });
 
-
         Map<String, Object> map = validate(province);
+
+        List<Province> list = repository.findAll();
+        for (Province p: list) {
+            if (p.getName().equals(province.getName())) {
+                throw new InvalidException(Constant.ERR_MESSAGE_UNIT_NAME_ALREADY_EXISTS);
+            }
+        }
+
         Province newProvince = mapper.map(province, Province.class);
         newProvince.setAdministrativeUnit((AdministrativeUnit) map.get("admUnit"));
         newProvince.setAdministrativeRegion((AdministrativeRegion) map.get("admRegion"));
@@ -127,6 +139,11 @@ public class ProvinceServiceImpl implements ProvinceService {
             );
         }
 
+        if (!foundProvince.getName().equals(province.getName())) {
+            repository.findByName(province.getName()).ifPresent(
+                    province1 -> {throw new InvalidException(Constant.ERR_MESSAGE_UNIT_NAME_ALREADY_EXISTS);}
+            );
+        }
         Map<String, Object> map = validate(province);
         AdministrativeUnit foundAdmUnit = (AdministrativeUnit) map.get("admUnit");
         AdministrativeRegion foundAdmRegion = (AdministrativeRegion) map.get("admRegion");
@@ -134,13 +151,15 @@ public class ProvinceServiceImpl implements ProvinceService {
         foundProvince.setName(province.getName());
         foundProvince.setAdministrativeRegion(foundAdmRegion);
         foundProvince.setAdministrativeUnit(foundAdmUnit);
-//        mapper.map(province, foundProvince);
-//        foundProvince.setAdministrativeUnit(foundAdmUnit);
-//        foundProvince.setAdministrativeRegion(foundAdmRegion);
+
+        if (!provinceCodeNeedUpdate.equals(provinceCode)) {
+            administrativeDivisionRepository.updateCodeOfSubDivision(provinceCode, 3, provinceCodeNeedUpdate);
+        }
         return mapper.map(foundProvince, ProvinceDto.class);
     }
 
 
+    @Transactional
     public String deleteById(Long provinceId) {
         repository.delete(repository.findById(provinceId)
                 .orElseThrow(() -> new ResourceNotFoundException("Province", "provinceId", String.valueOf(provinceId))));
@@ -155,17 +174,15 @@ public class ProvinceServiceImpl implements ProvinceService {
         AdministrativeRegion admRegion = administrativeRegionRepository.findById(admRegionId)
                 .orElseThrow(() -> new ResourceNotFoundException("AdministrativeRegion", "AdministrativeRegionId", String.valueOf(admRegionId)));
 
-        List<Province> list = repository.findAll();
-        for (Province p: list) {
-            if (p.getName().equals(province.getName())) {
-                throw new InvalidException("Ten don vi da ton tai");
-            }
-        }
 //        if(!Utils.validateName(province.getName())) {
 //            throw new InvalidException("Ten khong dung dinh dang");
 //        }
+        if (!Utils.validateFormatDivisionCode(province.getCode())) {
+            throw new InvalidException(Constant.ERR_MESSAGE_UNIT_CODE_INVALID);
+        }
+
         if (!Utils.AdministrativeUnitsLv1.containsKey(admUnitId)) {
-            throw new InvalidException("Don vi hanh chinh khong hop le");
+            throw new InvalidException(Constant.ERR_MESSAGE_ADMINISTRATIVE_UNIT_INVALID);
         }
         Map<String, Object> map = new HashMap<>();
         map.put("admUnit", admUnit);

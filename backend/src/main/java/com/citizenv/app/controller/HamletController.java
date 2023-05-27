@@ -61,10 +61,11 @@ public class HamletController {
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAuthority('WRITE')")
+//    @PreAuthorize("hasAuthority('WRITE')")
     @PostMapping("/save")
     public ResponseEntity<HamletDto> createHamlet(@RequestBody CustomHamletRequest hamlet) {
-        HamletDto hamletDto = service.createHamlet(hamlet);
+        String divisionCode = SecurityUtils.getDivisionCodeCurrentUserLogin();
+        HamletDto hamletDto = service.createHamlet(divisionCode,hamlet);
         return ResponseEntity.status(201).body(hamletDto);
     }
 

@@ -63,7 +63,8 @@ public class DistrictController {
 //    @PreAuthorize("hasAuthority('WRITE')")
     @PostMapping("/save")
     public ResponseEntity<DistrictDto> createDistrict(@RequestBody DistrictDto district) {
-        DistrictDto districtDto = districtService.createDistrict(district);
+        String divisionCode = SecurityUtils.getDivisionCodeCurrentUserLogin();
+        DistrictDto districtDto = districtService.createDistrict(divisionCode,district);
         return new ResponseEntity<>(districtDto, HttpStatus.CREATED);
     }
 

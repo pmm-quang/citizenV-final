@@ -1,5 +1,6 @@
 package com.citizenv.app.service.impl;
 
+import com.citizenv.app.component.Constant;
 import com.citizenv.app.component.Utils;
 import com.citizenv.app.entity.AdministrativeUnit;
 import com.citizenv.app.entity.District;
@@ -8,6 +9,7 @@ import com.citizenv.app.exception.InvalidException;
 import com.citizenv.app.exception.ResourceFoundException;
 import com.citizenv.app.exception.ResourceNotFoundException;
 import com.citizenv.app.payload.DistrictDto;
+import com.citizenv.app.repository.AdministrativeDivisionRepository;
 import com.citizenv.app.repository.AdministrativeUnitRepository;
 import com.citizenv.app.repository.DistrictRepository;
 import com.citizenv.app.repository.ProvinceRepository;
@@ -20,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,6 +37,9 @@ public class DistrictServiceImpl implements DistrictService {
 
     @Autowired
     private AdministrativeUnitRepository administrativeUnitRepository;
+
+    @Autowired
+    private AdministrativeDivisionRepository administrativeDivisionRepository;
 
     @Override
     public List<DistrictDto> getAll() {
@@ -78,14 +82,17 @@ public class DistrictServiceImpl implements DistrictService {
     }
 
 
+    @Transactional
     @Override
-    public DistrictDto createDistrict(DistrictDto district) {
+    public DistrictDto createDistrict(String divisionCodeOfUserDetail, DistrictDto district) {
         String newDistrictCode = district.getCode();
         repository.findByCode(newDistrictCode).ifPresent(
                 foundDistrict -> {throw new ResourceFoundException("District", "DistrictCode", newDistrictCode);});
 
-
-        Map<String, Object> map = vaidate(district);
+        administrativeDivisionRepository.findByName(district.getName(), divisionCodeOfUserDetail).ifPresent(
+                division -> {throw new InvalidException(Constant.ERR_MESSAGE_UNIT_NAME_ALREADY_EXISTS);}
+        );
+        Map<String, Object> map = validate(district);
         Province foundProvince = (Province) map.get("province");
         AdministrativeUnit foundAdmUnit = (AdministrativeUnit) map.get("admUnit");
         District createDistrict = mapper.map(district, District.class);
@@ -93,7 +100,6 @@ public class DistrictServiceImpl implements DistrictService {
         createDistrict.setAdministrativeUnit(foundAdmUnit);
         District newDistrict = repository.save(createDistrict);
         return mapper.map(newDistrict, DistrictDto.class);
-
     }
 
     @Transactional
@@ -110,13 +116,23 @@ public class DistrictServiceImpl implements DistrictService {
             );
         }
 
-        Map<String, Object> map = vaidate(district);
+        if (!foundDistrict.getName().equals(district.getCode())) {
+            String provinceCode = districtCode.substring(0, 4);
+            administrativeDivisionRepository.findByName(district.getName(), provinceCode).ifPresent(
+                    p -> {throw new InvalidException(Constant.ERR_MESSAGE_UNIT_NAME_ALREADY_EXISTS);}
+            );
+        }
+
+        Map<String, Object> map = validate(district);
         Province foundProvince = (Province) map.get("province");
         AdministrativeUnit foundAdmUnit = (AdministrativeUnit) map.get("admUnit");
         foundDistrict.setCode(district.getCode());
         foundDistrict.setName(district.getName());
         foundDistrict.setProvince(foundProvince);
         foundDistrict.setAdministrativeUnit(foundAdmUnit);
+        if (!districtCode.equals(districtCodeNeedUpdate)) {
+            administrativeDivisionRepository.updateCodeOfSubDivision(district.getCode(), 5, districtCodeNeedUpdate);
+        }
         return mapper.map(foundDistrict, DistrictDto.class);
     }
     @Override
@@ -124,37 +140,28 @@ public class DistrictServiceImpl implements DistrictService {
 
     }
 
-    private boolean validate(DistrictDto district) {
-        String name = district.getName();
-        Integer admUnitId = district.getAdministrativeUnit().getId();
-        String districtCode = district.getCode();
-        String provinceCode = district.getProvince().getCode();
-        if (!Utils.AdministrativeUnitsLv2.containsKey(admUnitId)) {
-            throw new InvalidException("Ma don vi hanh chinh khong chinh xac");
-        }
-        if (districtCode.indexOf(provinceCode) != 0) {
-            throw new InvalidException("Ma dơn vi khong hop le");
-        }
-//        if (!Utils.validateName(name)) {
-//            throw new InvalidException("Ten khong hop le");
-//        }
-        return true;
-    }
 
-    private Map<String, Object> vaidate(DistrictDto district) {
-        String name = district.getName();
+    private Map<String, Object> validate(DistrictDto district) {
         Integer admUnitId = district.getAdministrativeUnit().getId();
         String districtCode = district.getCode();
         String provinceCode = district.getProvince().getCode();
+        boolean checkNull = (districtCode == null || districtCode.equals("") || district.getName() == null
+                || district.getName().equals(""));
+        if (checkNull) {
+            throw new InvalidException(Constant.ERR_MESSAGE_NOT_ENTERED_THE_REQUIRED_INFO);
+        }
         if (!Utils.AdministrativeUnitsLv2.containsKey(admUnitId)) {
-            throw new InvalidException("Ma don vi hanh chinh khong chinh xac");
+            throw new InvalidException(Constant.ERR_MESSAGE_ADMINISTRATIVE_UNIT_INVALID);
         }
         if (districtCode.indexOf(provinceCode) != 0) {
-            throw new InvalidException("Ma dơn vi khong hop le");
+            throw new InvalidException(Constant.ERR_MESSAGE_UNIT_CODE_INVALID);
         }
 //        if (!Utils.validateName(name)) {
 //            throw new InvalidException("Ten khong hop le");
 //        }
+        if (!Utils.validateFormatDivisionCode(districtCode)) {
+            throw new InvalidException(Constant.ERR_MESSAGE_UNIT_CODE_INVALID);
+        }
 //        String provinceCode = district.getProvince().getCode();
         Province foundProvince = provinceRepository.findByCode(provinceCode).orElseThrow(
                 ()-> new ResourceNotFoundException("Province", "ProvinceCode", provinceCode)

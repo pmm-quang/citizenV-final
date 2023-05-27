@@ -83,7 +83,8 @@ public class WardController {
 //                throw new InvalidException("Khong co quyen tao ward voi ma nay");
 //            }
 //        }
-        WardDto wardDto = wardService.createWard(ward);
+        String divisionCodeOfUserDetail = SecurityUtils.getDivisionCodeCurrentUserLogin();
+        WardDto wardDto = wardService.createWard(divisionCodeOfUserDetail,ward);
        return ResponseEntity.status(201).body(wardDto);
     }
 

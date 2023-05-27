@@ -2,8 +2,10 @@ package com.citizenv.app;
 
 import static org.junit.jupiter.api.Assertions.*;
 import com.citizenv.app.component.Utils;
+import com.citizenv.app.entity.AdministrativeDivision;
 import com.citizenv.app.entity.Citizen;
 import com.citizenv.app.entity.Hamlet;
+import com.citizenv.app.repository.AdministrativeDivisionRepository;
 import com.citizenv.app.repository.CitizenRepository;
 import com.citizenv.app.repository.HamletRepository;
 import com.citizenv.app.repository.UserRepository;
@@ -16,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @SpringBootTest
@@ -31,6 +34,8 @@ class BackendApplicationTests {
     private HamletRepository hamletRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private AdministrativeDivisionRepository divisionRepository;
 
     @BeforeEach
     void setUp() {
@@ -73,6 +78,16 @@ class BackendApplicationTests {
     public void TestQueryCount() {
         Long a = userRepository.countSubUserAreDeclaring(1L);
         System.out.println(a);
+    }
+    @Test
+    public void TestQueryFindSameName() {
+        Optional<AdministrativeDivision> division = divisionRepository.findByName("Phúc Xá", "0101");
+        System.out.println(division.get().getName() + division.get().getCode());
+    }
+
+    @Test
+    void TestChangeDivisionCode() {
+        divisionRepository.updateCodeOfSubDivision("01", 3, "99");
     }
 
     @Test
