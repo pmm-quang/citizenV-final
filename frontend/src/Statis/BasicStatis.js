@@ -5,7 +5,7 @@ import Form from 'react-bootstrap/Form';
 import './BasicStatis.css'
 import Table from 'react-bootstrap/Table';
 import axios from 'axios';
-import { Bar, Line, Pie } from 'react-chartjs-2';
+import { Bar, Doughnut, Line, Pie } from 'react-chartjs-2';
 import { AiFillCaretRight } from 'react-icons/ai'
 import { Button } from 'react-bootstrap';
 import Select from 'react-select'
@@ -19,7 +19,8 @@ import {
     Tooltip,
     Legend,
     Colors,
-    ArcElement
+    ArcElement,
+    BarElement
 } from 'chart.js';
 
 ChartJS.register(
@@ -30,7 +31,8 @@ ChartJS.register(
     Title,
     Tooltip,
     Legend,
-    Colors,
+    Colors, 
+    BarElement,
     ArcElement
 );
 
@@ -133,6 +135,10 @@ function BasicStatis() {
                     {
                         label: 'Tổng dân số',
                         data: response.data.map(item => item.population),
+                        strokeColor: "rgba(220,220,220,0.8)",
+                        highlightFill: "rgba(220,220,220,0.75)",
+                        highlightStroke: "rgba(220,220,220,1)",
+                        borderWidth: 1
                     },
                 ],
             })
@@ -156,6 +162,7 @@ function BasicStatis() {
                     {
                         label: 'Tổng dân số',
                         data: response.data[0].details.map((item) => item.population),
+                        borderWidth: 1
                     },
                 ],
             })
@@ -178,6 +185,10 @@ function BasicStatis() {
                     {
                         label: 'Tổng dân số',
                         data: response.data[0].details.map((item) => item.population),
+                        strokeColor: "rgba(220,220,220,0.8)",
+                        highlightFill: "rgba(220,220,220,0.75)",
+                        highlightStroke: "rgba(220,220,220,1)",
+                        borderWidth: 1
                     },
                 ],
             })
@@ -200,6 +211,7 @@ function BasicStatis() {
                     {
                         label: 'Tổng dân số',
                         data: response.data[0].details.map((item) => item.population),
+                        borderWidth: 1
                     },
                 ],
             })
@@ -222,6 +234,10 @@ function BasicStatis() {
                     {
                         label: 'Tổng dân số',
                         data: response.data[0].details.map((item) => item.population),
+                        strokeColor: "rgba(220,220,220,0.8)",
+                        highlightFill: "rgba(220,220,220,0.75)",
+                        highlightStroke: "rgba(220,220,220,1)",
+                        borderWidth: 1
                     },
                 ],
             })

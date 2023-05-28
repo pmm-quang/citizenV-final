@@ -84,3 +84,8 @@
 .detailed-resident-info-table .row-head {
     width: 15vw;
 }
+
+.logoCitizen {
+    max-width: 300px;
+    width: 90%
+}

@@ -26,7 +26,7 @@ function Hamlet() {
     const [nameHamlet, setNameHamlet] = useState('');
     const [idHamlet, setIdHamlet] = useState('');
     const [idUnitHamlet, setIdUnitHamlet] = useState('');
-    const [checkedId, setCheckedId] = useState(-1);
+    const [message, setMessage] = useState()
     const [showWarningCreate, setWarningCreate] = useState(false);
 
     const fetchFullHamlet = async () => {
@@ -66,12 +66,16 @@ function Hamlet() {
             setShowEdit(false)
             const response = await axios('http://localhost:8080/api/v1/hamlet/by-ward/' + user, config);
             setHamlets(response.data);
-        } catch {
+        } catch (error) {
             setShowWarning(true)
+            setWarningCreate(true)
+            let messageEdit = String(error.response.data)
+            if (messageEdit.toUpperCase() === "ACCESS IS DENIED") setMessage("TÀI KHOẢN HIỆN KHÔNG CÓ QUYỀN CHỈNH SỬA")
+            else setMessage(messageEdit.toUpperCase())
         }
     }
 
-    const CreateNewHamlet = async (code) => {
+    const CreateNewHamlet = async () => {
         const hamlet = {
             code: idHamlet,
             name: nameHamlet,
@@ -79,7 +83,7 @@ function Hamlet() {
             administrativeUnitId: Number(idUnitHamlet)
         }
         console.log(hamlet)
-        if (checkedId === 1 && idHamlet !== '' && idUnitHamlet !== '') {
+        if (idHamlet !== '' && idUnitHamlet !== '' && idUnitHamlet !== '') {
             try {
                 await axios.post("http://localhost:8080/api/v1/hamlet/save", hamlet, config)
                 setWarningCreate(true)
@@ -87,27 +91,19 @@ function Hamlet() {
                 const response = await axios('http://localhost:8080/api/v1/hamlet/by-ward/' + user, config);
                 setHamlets(response.data);
                 setShow(false)
-            } catch {
+            } catch (error) {
                 setShowWarning(true)
+                setWarningCreate(true)
+                let messageEdit = String(error.response.data)
+                if (messageEdit.toUpperCase() === "ACCESS IS DENIED") setMessage("TÀI KHOẢN HIỆN KHÔNG CÓ QUYỀN THÊM MỚI")
+                else setMessage(messageEdit.toUpperCase())
             }
         } else {
-            console.log('error')
+            setMessage("CHƯA NHẬP ĐỦ THÔNG TIN CẦN THIẾT 👿")
             setWarningCreate(true)
         }
     }
 
-    const CheckedIdNewHamlet = async () => {
-        setCheckedId(0)
-        if (idHamlet.substring(0, 6) !== user || idHamlet.length < 8) setCheckedId(3)
-        else {
-            try {
-                const response = await axios.get("http://localhost:8080/api/v1/hamlet/" + idHamlet, config)
-                setCheckedId(2)
-            } catch {
-                setCheckedId(1)
-            }
-        }
-    }
 
     useEffect(() => {
         fetchFullHamlet();
@@ -119,10 +115,9 @@ function Hamlet() {
 
     const CreateHamlet = () => {
         setShow(true)
-        setIdHamlet()
-        setNameHamlet()
-        setIdUnitHamlet()
-        setCheckedId(-1)
+        setIdHamlet('')
+        setNameHamlet('')
+        setIdUnitHamlet('')
     }
 
     const ModalHamlet = () => {
@@ -154,26 +149,21 @@ function Hamlet() {
                                 value={idHamlet}
                                 onChange={(e) => {
                                     setIdHamlet(e.target.value)
-                                    setCheckedId(0)
                                     setWarningCreate(false)
-                                    if (e.target.value.length === 0) setCheckedId(-1)
                                 }}
                             />
-                            {(checkedId === 0) ? <div className='checked' onClick={() => CheckedIdNewHamlet()}><BiCheckCircle className="iconChecked" />Kiểm tra</div> : null}
-                            {(checkedId === 2) ? <div className="warningChecked">Mã của đơn vị hành chính vừa nhập đang bị trùng với một đơn vị hành chính đã có sẵn</div> : null}
-                            {(checkedId === 3) ? <div className="warningChecked">Mã của đơn vị hành chính vừa nhập không nằm trong khu vực quản lý</div> : null}
-                            {(checkedId === 1) ? <div className="successChecked">Bạn có thể sử dụng mã vừa nhập</div> : null}
                         </Form.Group>
                         <Form.Group
                             className="mb-3"
                         >
                             <Form.Label>Đơn vị</Form.Label>
-                            <Form.Select value={idUnitHamlet} onChange={(e) => { 
-                                setIdUnitHamlet(e.target.value) 
-                                setWarningCreate(false)}}><option></option><option value={11}>1. Xóm</option><option value={12}>2. Thôn</option><option value={13}>3. Bản</option><option value={14}>4. Tổ dân phố</option></Form.Select>
+                            <Form.Select value={idUnitHamlet} onChange={(e) => {
+                                setIdUnitHamlet(e.target.value)
+                                setWarningCreate(false)
+                            }}><option></option><option value={11}>1. Xóm</option><option value={12}>2. Thôn</option><option value={13}>3. Bản</option><option value={14}>4. Tổ dân phố</option></Form.Select>
                         </Form.Group>
                     </Form>
-                    {(showWarningCreate) ? <div className="noteWarning"><p>THÊM MỚI KHÔNG THÀNH CÔNG</p></div> : null}
+                    {(showWarningCreate) ? <div className="noteWarning"><p>{message}</p></div> : null}
                 </Modal.Body>
 
                 <Modal.Footer>
@@ -187,7 +177,7 @@ function Hamlet() {
                     <Button variant="primary" onClick={() => {
                         CreateNewHamlet()
                     }}>
-                        Lưu
+                        Xác nhận
                     </Button>
                 </Modal.Footer>
             </Modal>
@@ -239,7 +229,7 @@ function Hamlet() {
                                 <option></option><option value={11}>1. Xóm</option><option value={12}>2. Thôn</option><option value={13}>3. Bản</option><option value={14}>4. Tổ dân phố</option></Form.Select>
                         </Form.Group>
                     </Form>
-                    {(showWarning) ? <div className="noteWarning"><p>THAY ĐỔI THÔNG TIN KHÔNG THÀNH CÔNG</p></div> : null}
+                    {(showWarning) ? <div className="noteWarning"><p>{message}</p></div> : null}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => {
@@ -254,14 +244,13 @@ function Hamlet() {
                     </Button>
                     <Button variant="primary" onClick={() => {
                         EditHamlet()
-                        setShowEdit(false)
                         hamlets.map((item) => {
                             if (item.code === idHamlet) {
                                 item.isActive = false;
                             }
                         })
                     }}>
-                        Lưu
+                        Xác nhận
                     </Button>
                 </Modal.Footer>
             </Modal >
@@ -308,7 +297,7 @@ function Hamlet() {
                 setShow(true)
                 setWarningCreate(false)
                 CreateHamlet()
-            }}>+ Khai báo Xóm/Thôn/Bản/Tổ dân phố</Button>
+            }}>Khai báo Xóm/Thôn/Bản/Tổ dân phố</Button>
 
             <div>
                 <TableResidential />

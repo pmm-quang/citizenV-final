@@ -28,6 +28,7 @@ function Ward() {
     const [idUnitWard, setIdUnitWard] = useState('');
     const [checkedId, setCheckedId] = useState(-1);
     const [showWarningCreate, setWarningCreate] = useState(false);
+    const [message, setMessage] = useState()
 
 
     const fetchFullWard = async () => {
@@ -67,7 +68,11 @@ function Ward() {
             setShowEdit(false)
             const response = await axios('http://localhost:8080/api/v1/ward/by-district/' + user, config);
             setWards(response.data);
-        } catch {
+        } catch (error) {
+            setShowWarning(true)
+            let messageEdit = String(error.response.data)
+            if (messageEdit.toUpperCase() === "ACCESS IS DENIED") setMessage("TÀI KHOẢN HIỆN KHÔNG CÓ QUYỀN CHỈNH SỬA")
+            else setMessage(messageEdit.toUpperCase())
             setShowWarning(true)
         }
     }
@@ -79,7 +84,7 @@ function Ward() {
             districtCode: user,
             administrativeUnitId: idUnitWard
         }
-        if (checkedId === 1 && idWard !== '' && idUnitWard !== '') {
+        if (idWard !== '' && idUnitWard !== '' && nameWard !== "") {
             try {
                 await axios.post("http://localhost:8080/api/v1/ward/save", ward, config)
                 setWarningCreate(true)
@@ -87,25 +92,15 @@ function Ward() {
                 const response = await axios('http://localhost:8080/api/v1/ward/by-district/' + user, config);
                 setWards(response.data);
                 setShow(false)
-            } catch {
-                setShowWarning(true)
+            } catch (error){
+                let messageEdit = String(error.response.data)
+                if (messageEdit.toUpperCase() === "ACCESS IS DENIED") setMessage("TÀI KHOẢN HIỆN KHÔNG CÓ QUYỀN THÊM MỚI")
+                else setMessage(messageEdit.toUpperCase())
+                setWarningCreate(true)
             }
         } else {
-            console.log('error')
             setWarningCreate(true)
-        }
-    }
-
-    const CheckedIdNewWard = async () => {
-        setCheckedId(0)
-        if (idWard.substring(0, 4) !== user || idWard.length < 6) setCheckedId(3)
-        else {
-            try {
-                const response = await axios.get("http://localhost:8080/api/v1/ward/" + idWard, config)
-                setCheckedId(2)
-            } catch {
-                setCheckedId(1)
-            }
+            setMessage("CHƯA NHẬP ĐỦ THÔNG TIN CẦN THIẾT 👿")
         }
     }
 
@@ -119,10 +114,9 @@ function Ward() {
 
     const CreateWard = () => {
         setShow(true)
-        setIdWard()
-        setNameWard()
-        setIdUnitWard()
-        setCheckedId(-1)
+        setIdWard('')
+        setNameWard('')
+        setIdUnitWard('')
     }
 
     const ModalWard = () => {
@@ -154,15 +148,9 @@ function Ward() {
                                 value={idWard}
                                 onChange={(e) => {
                                     setIdWard(e.target.value)
-                                    setCheckedId(0)
                                     setWarningCreate(false)
-                                    if (e.target.value.length === 0) setCheckedId(-1)
                                 }}
                             />
-                            {(checkedId === 0) ? <div className='checked' onClick={() => CheckedIdNewWard()}><BiCheckCircle className="iconChecked" />Kiểm tra</div> : null}
-                            {(checkedId === 2) ? <div className="warningChecked">Mã của đơn vị hành chính vừa nhập đang bị trùng với một đơn vị hành chính đã có sẵn</div> : null}
-                            {(checkedId === 3) ? <div className="warningChecked">Mã của đơn vị hành chính vừa nhập không nằm trong khu vực quản lý</div> : null}
-                            {(checkedId === 1) ? <div className="successChecked">Bạn có thể sử dụng mã vừa nhập</div> : null}
                         </Form.Group>
                         <Form.Group
                             className="mb-3"
@@ -173,7 +161,7 @@ function Ward() {
                                 setWarningCreate(false)}}><option></option><option value={8}>1. Phường</option><option value={9}>2. Thị trấn</option><option value={10}>3. Xã</option></Form.Select>
                         </Form.Group>
                     </Form>
-                    {(showWarningCreate) ? <div className="noteWarning"><p>THÊM MỚI KHÔNG THÀNH CÔNG</p></div> : null}
+                    {(showWarningCreate) ? <div className="noteWarning"><p>{message}</p></div> : null}
                 </Modal.Body>
 
                 <Modal.Footer>
@@ -187,7 +175,7 @@ function Ward() {
                     <Button variant="primary" onClick={() => {
                         CreateNewWard()
                     }}>
-                        Lưu
+                        Xác nhận
                     </Button>
                 </Modal.Footer>
             </Modal>
@@ -239,7 +227,7 @@ function Ward() {
                                 <option></option><option value={8}>1. Phường</option><option value={9}>2. Thị trấn</option><option value={10}>3. Xã</option></Form.Select>
                         </Form.Group>
                     </Form>
-                    {(showWarning) ? <div className="noteWarning"><p>THAY ĐỔI THÔNG TIN KHÔNG THÀNH CÔNG</p></div> : null}
+                    {(showWarning) ? <div className="noteWarning"><p>{message}</p></div> : null}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => {
@@ -254,14 +242,13 @@ function Ward() {
                     </Button>
                     <Button variant="primary" onClick={() => {
                         EditWard()
-                        setShowEdit(false)
                         wards.map((item) => {
                             if (item.code === idWard) {
                                 item.isActive = false;
                             }
                         })
                     }}>
-                        Lưu
+                        Xác nhận
                     </Button>
                 </Modal.Footer>
             </Modal >
@@ -271,6 +258,7 @@ function Ward() {
     const listWards = wards.map((post) =>
         <tr key={post.code} value={post.code} onClick={() => {
             fetchDetailWard(post.code)
+            setShowWarning(false)
             post.isActive = true
         }} className="rowTable" style={{ backgroundColor: (post.isActive) ? "yellow" : "white" }}>
             <td>{post.code}</td>
@@ -308,7 +296,7 @@ function Ward() {
                 setShow(true)
                 setWarningCreate(false)
                 CreateWard()
-            }}>+ Khai báo xã/phường/thị trấn</Button>
+            }}>Khai báo xã/phường/thị trấn</Button>
 
             <div>
                 <TableResidential />

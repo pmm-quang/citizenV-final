@@ -5,6 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
+import { Modal } from 'react-bootstrap';
 import { AiOutlineUser, AiOutlineKey } from "react-icons/ai";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -15,27 +16,52 @@ function Login() {
 
   const [username, setUsername] = useState();
   const [password, setPassword] = useState();
-  const [show, setShow] = useState(false)
+  const [showNotifyLogin, setShowNotifyLogin] = useState(false)
 
-  const AcceptLogin = async () => {
-    const response = await axios.post("http://localhost:8080/api/v1/auth/login", {
-      username: username,
-      password: password
-    })
-    console.log(response.data)
-    if (response.data !== null) {
-      navigate('/home')
-      setShow(false)
+  const CheckedLogin = async () => {
+    try {
+      const response = await axios.post("http://localhost:8080/api/v1/auth/login", {
+        username: username,
+        password: password
+      })
+      console.log(response.data)
+      if (response.data !== null) {
+        navigate('/home')
+      }
+      localStorage.setItem("user", JSON.stringify(response.data))
+    } catch (error) {
+      console.log(error.response)
+      setShowNotifyLogin(true)
     }
-    else setShow(true)
-    localStorage.setItem("user", JSON.stringify(response.data))
+  }
+
+  const FailedLogin = () => {
+    return (
+      <Modal show={showNotifyLogin}>
+        <Modal.Header className='headerModal'>
+          <Modal.Title className='titleModal'>ĐĂNG NHẬP KHÔNG THÀNH CÔNG</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Label>Tên đăng nhập hoặc mật khẩu không chính xác</Form.Label>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => {
+            setShowNotifyLogin(false)
+          }}>
+            Đóng
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    )
   }
 
   return (
     <div className="App">
       <div className="Login">
         <div className="flex_login">
-          <img src={logo} className='logoLogin'/>
+          <img src={logo} className='logoLogin' />
         </div>
         <div className="flex_login">
           <div className='formLogin'>
@@ -70,8 +96,7 @@ function Login() {
                     />
                   </InputGroup>
                 </Form.Group>
-                {(show) ? <p className="notifyLogin">Tên tài khoản hoặc mật khẩu không chính xác</p> : null}
-                <Button className='buttonLogin' onClick = {() => AcceptLogin()}>
+                <Button className='buttonLogin' onClick={() => CheckedLogin()}>
                   Đăng nhập
                 </Button>
               </Form>
@@ -79,6 +104,7 @@ function Login() {
           </div>
         </div>
       </div>
+      <FailedLogin />
     </div>
   );
 }

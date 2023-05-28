@@ -56,6 +56,7 @@ div {
 .formLogout {
     background-color: #3f72af;
     width: 15%;
+    min-width: 240px;
     height: 40px;
     display: inline-block;
     border-radius: 5px;
@@ -68,6 +69,11 @@ div {
     margin-top: 5px;
 }
 
+.formLogout:hover {
+    background-color: rgb(43, 192, 218);
+    color: black;
+    cursor: pointer;
+}
 .iconLogout {
     display: inline-block;
     float: right;
@@ -75,7 +81,14 @@ div {
     margin-right: 5px;
 }
 
-.iconLogout:hover {
+.iconChangePassword {
+    display: inline-block;
+    margin-top: 4px;
+    float: right;
+    margin-right: 10px;
+}
+
+.iconLogout:hover, .iconChangePassword:hover {
     cursor: pointer;
     color: red;
 }

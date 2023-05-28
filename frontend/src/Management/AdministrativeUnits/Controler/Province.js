@@ -19,8 +19,8 @@ function Province() {
         },
     };
 
-    const [provinces, setProvinces] = useState([]);
-    const [show, setShow] = useState(false);
+    const [provinces, setProvinces] = useState([])
+    const [show, setShow] = useState(false)
     const [showEdit, setShowEdit] = useState(false);
     const [regions, setRegions] = useState([]);
     const [nameProvince, setNameProvince] = useState();
@@ -38,6 +38,7 @@ function Province() {
     const [showWarning, setShowWarning] = useState(false)
     const [checkedId, setCheckedId] = useState(-1);
     const [showWarningCreate, setWarningCreate] = useState(0);
+    const [message, setMessage] = useState()
 
     const fetchFullProvince = async (page) => {
         try {
@@ -100,7 +101,6 @@ function Province() {
         setRegionProvince('')
         setUnitProvince('')
         setAdministrativeCode('')
-        setCheckedId(-1)
     }
 
     const CreateNewProvince = async () => {
@@ -119,27 +119,35 @@ function Province() {
             "administrativeCode": administrativeCode
         }
 
-        if (String(unitProvince) === '1') {
-            province.administrativeUnit.fullName = "Thành phố trực thuộc trung ương";
-            province.administrativeUnit.shortName = "Thành phố";
-        } else if (String(unitProvince) === '2') {
-            province.administrativeUnit.fullName = "Tỉnh";
-            province.administrativeUnit.shortName = "Tỉnh";
-        }
-        for (let i = 0; i < regions.length; i++) {
-            if (regionProvince === String(regions[i].id)) {
-                province.administrativeRegion.name = regions[i].name
-            }
-        }
-        try {
-            await axios.post("http://localhost:8080/api/v1/province/save", province, config)
-            const response = await axios('http://localhost:8080/api/v1/province/?page=' + page, config);
-            setProvinces(response.data.provinces);
-            setShow(false)
-            setWarningCreate(false)
-        }
-        catch {
+        if (idProvince === "" || nameProvince === "" || unitProvince === "" || regionProvince === "") {
+            setMessage("CHƯA NHẬP ĐỦ THÔNG TIN CẦN THIẾT 👿")
             setWarningCreate(true)
+        } else {
+            if (String(unitProvince) === '1') {
+                province.administrativeUnit.fullName = "Thành phố trực thuộc trung ương";
+                province.administrativeUnit.shortName = "Thành phố";
+            } else if (String(unitProvince) === '2') {
+                province.administrativeUnit.fullName = "Tỉnh";
+                province.administrativeUnit.shortName = "Tỉnh";
+            }
+            for (let i = 0; i < regions.length; i++) {
+                if (regionProvince === String(regions[i].id)) {
+                    province.administrativeRegion.name = regions[i].name
+                }
+            }
+            try {
+                await axios.post("http://localhost:8080/api/v1/province/save", province, config)
+                const response = await axios('http://localhost:8080/api/v1/province/?page=' + page, config);
+                setProvinces(response.data.provinces);
+                setShow(false)
+                setWarningCreate(false)
+            }
+            catch (error) {
+                setWarningCreate(true)
+                let messageEdit = String(error.response.data)
+                setMessage(messageEdit.toUpperCase())
+
+            }
         }
     }
 
@@ -179,27 +187,21 @@ function Province() {
         }
 
         try {
-            await axios.put("http://localhost:8080/api/v1/province/save/" + defalutIdProvince, province, config)
+            const response_post = await axios.put("http://localhost:8080/api/v1/province/save/" + defalutIdProvince, province, config)
+            console.log(response_post.data)
             setShowWarning(false)
             setShowEdit(false)
             const response = await axios('http://localhost:8080/api/v1/province/?page=' + page, config);
             setProvinces(response.data.provinces);
-        } catch {
+        } catch (error) {
+            console.log(error.response.data)
+            let messageEdit = String(error.response.data)
+            setMessage(messageEdit.toUpperCase())
             setShowWarning(true)
         }
+
     }
-
-    const CheckedIdNewProvince = async () => {
-        setCheckedId(0)
-        try {
-            const response = await axios.get("http://localhost:8080/api/v1/province/" + idProvince, config)
-            setCheckedId(2)
-        } catch {
-            setCheckedId(1)
-        }
-    }
-
-
+    
     const ModalProvince = () => {
         return (
             <Modal show={show}>
@@ -215,6 +217,7 @@ function Province() {
                                 value={nameProvince}
                                 onChange={(e) => {
                                     setNameProvince(e.target.value)
+                                    setWarningCreate(false)
                                 }}
                             />
                         </Form.Group>
@@ -227,37 +230,32 @@ function Province() {
                                 value={idProvince}
                                 onChange={(e) => {
                                     setIdProvince(e.target.value)
-                                    setCheckedId(0)
-                                    if(e.target.value.length === 0) setCheckedId(-1)
+                                    setWarningCreate(false)
                                 }}
                             />
-                            {(checkedId === 0) ? <div className='checked' onClick={() => CheckedIdNewProvince()}><BiCheckCircle className="iconChecked" />Kiểm tra trùng lặp</div> : null}
-                            {(checkedId === 2) ? <div className="warningChecked">Mã đơn vị hành chính bạn vừa nhập đang bị trùng với một đơn vị hành chính có sẵn</div> : null}
-                            {(checkedId === 1) ? <div className="successChecked">Bạn có thể sử dụng mã vừa nhập</div> : null}
                         </Form.Group>
                         <Form.Group
                             className="mb-3"
                         >
                             <Form.Label>Đơn vị</Form.Label>
                             <Form.Select value={unitProvince}
-                                onChange={(e) => { setUnitProvince(e.target.value) }}><option></option><option value={1} >1. Thành phố trực thuộc trung ương</option><option value={2}>2. Tỉnh</option></Form.Select>
+                                onChange={(e) => {
+                                    setUnitProvince(e.target.value)
+                                    setWarningCreate(false)
+                                }}><option></option><option value={1} >1. Thành phố trực thuộc trung ương</option><option value={2}>2. Tỉnh</option></Form.Select>
                         </Form.Group>
                         <Form.Group
                             className="mb-3"
                         >
                             <Form.Label>Khu vực</Form.Label>
                             <Form.Select value={regionProvince}
-                                onChange={(e) => { setRegionProvince(e.target.value) }}><option></option>{listRegionItems}</Form.Select>
-                        </Form.Group>
-                        <Form.Group
-                            className="mb-3"
-                        >
-                            <Form.Label>Mã hành chính</Form.Label>
-                            <Form.Control type="text" value={administrativeCode}
-                                onChange={(e) => { setAdministrativeCode(e.target.value) }} />
+                                onChange={(e) => {
+                                    setRegionProvince(e.target.value)
+                                    setWarningCreate(false)
+                                }}><option></option>{listRegionItems}</Form.Select>
                         </Form.Group>
                     </Form>
-                    {(showWarningCreate) ? <div className="noteWarning"><p>THÊM TỈNH THÀNH PHỐ MỚI KHÔNG THÀNH CÔNG</p></div> : null}
+                    {(showWarningCreate) ? <div className="noteWarning"><p>{message}</p></div> : null}
                 </Modal.Body>
                 <Modal.Footer>
                     <div className="note">
@@ -272,7 +270,7 @@ function Province() {
                         Đóng
                     </Button>
                     <Button variant="primary" onClick={() => { CreateNewProvince() }}>
-                        Lưu
+                        Xác nhận
                     </Button>
                 </Modal.Footer>
             </Modal>
@@ -318,6 +316,7 @@ function Province() {
                                 value={nameProvince}
                                 onChange={(e) => {
                                     setNameProvince(e.target.value)
+                                    setShowWarning(false)
                                 }}
                             />
                         </Form.Group>
@@ -330,6 +329,14 @@ function Province() {
                                 value={idProvince}
                                 onChange={(e) => {
                                     setIdProvince(e.target.value)
+                                    setShowWarning(false)
+                                    /*if (e.target.value.length === 0) {
+                                        setCheckedId(-1)
+                                    } else if (e.target.value === defalutIdProvince) {
+                                        CheckedIdNewProvince(1)
+                                    } else {
+                                        CheckedIdNewProvince(e.target.value)
+                                    }*/
                                 }}
                             />
                         </Form.Group>
@@ -339,6 +346,7 @@ function Province() {
                             <Form.Label>Đơn vị</Form.Label>
                             <Form.Select value={unitProvince} onChange={(e) => {
                                 setUnitProvince(e.target.value)
+                                setShowWarning(false)
                             }}><option></option><option value='1'>1. Thành phố trực thuộc trung ương</option><option value='2'>2. Tỉnh</option></Form.Select>
                         </Form.Group>
                         <Form.Group
@@ -347,18 +355,12 @@ function Province() {
                             <Form.Label>Khu vực</Form.Label>
                             <Form.Select value={regionProvince} onChange={(e) => {
                                 setRegionProvince(e.target.value)
+                                setShowWarning(false)
                             }}>{listRegionItems}</Form.Select>
-                        </Form.Group>
-                        <Form.Group
-                            className="mb-3"
-                        >
-                            <Form.Label>Mã hành chính</Form.Label>
-                            <Form.Control type="text" value={administrativeCode}
-                                onChange={(e) => { setAdministrativeCode(e.target.value) }} />
                         </Form.Group>
                     </Form>
                 </Modal.Body>
-                {(showWarning) ? <div className="noteWarning"><p>THAY ĐỔI THÔNG TIN KHÔNG THÀNH CÔNG</p></div> : null}
+                {(showWarning) ? <div className="noteWarning"><p>{message}</p></div> : null}
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => {
                         setShowEdit(false)
@@ -372,7 +374,6 @@ function Province() {
                         Đóng
                     </Button>
                     <Button variant="secondary" onClick={() => {
-                        setShowEdit(false)
                         EditProvince()
                         provinces.map((item) => {
                             if (item.code === idProvince) {
@@ -380,13 +381,7 @@ function Province() {
                             }
                         })
                     }}>
-                        Lưu
-                    </Button>
-                    <Button variant="secondary" onClick={() => {
-                        setShowEdit(false)
-                        DeleteProvince()
-                    }}>
-                        Xóa
+                        Xác nhận
                     </Button>
                 </Modal.Footer>
             </Modal>
@@ -396,6 +391,7 @@ function Province() {
     const listProvinces = provinces.map((post) =>
         <tr key={post.code} value={post.code} onClick={() => {
             fetchDetailProvince(post.code)
+            setShowWarning(false)
             post.isActive = true
         }} className="rowTable" style={{ backgroundColor: (post.isActive) ? "yellow" : "white" }}>
             <td>{post.code}</td>
@@ -431,7 +427,7 @@ function Province() {
     return (
         <div>
             <NavbarPage />
-            <Button className="buttonAdd" onClick={() => { CreateProvince() }}>+ Khai báo tỉnh/thành phố</Button>
+            <Button className="buttonAdd" onClick={() => { CreateProvince() }}>Khai báo tỉnh/thành phố</Button>
             <div>
                 <TableResidential />
                 {(show) ? ModalProvince() : null}

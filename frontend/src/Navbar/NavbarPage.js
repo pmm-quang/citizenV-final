@@ -1,31 +1,95 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Form from 'react-bootstrap/Form';
 import './NavbarPage.css'
 import logo from './file/logo.png'
 import { AiOutlineMenu, AiOutlineLogout } from "react-icons/ai";
-import { Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import {BsPersonCircle} from 'react-icons/bs'
+import { BsPersonCircle } from 'react-icons/bs'
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Form, Modal, Button } from 'react-bootstrap';
+import { useState } from 'react';
+import { IoMdConstruct } from 'react-icons/io'
 
 function NavbarPage() {
   const user_account = JSON.parse(localStorage.getItem("user"));
   const author = user_account.role;
   console.log(user_account)
 
+  const [show, setShow] = useState(false)
+  const [showChangePassword, setShowChangePassword] = useState(false)
+
   let navigate = useNavigate();
+
+  const GetChangePassWordAccount = () => {
+    return (
+      <Modal show={showChangePassword}>
+        <Modal.Header className='headerModal'>
+          <Modal.Title className='titleModal'>THAY ĐỔI MẬT KHẨU</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3">
+              <Form.Label>Mã đơn vị</Form.Label>
+              <Form.Control value={user_account.username} disabled />
+            </Form.Group>
+            {(author === 'A1') ? <Form.Group className="mb-3">
+              <Form.Label>Tên đơn vị</Form.Label>
+              <Form.Control value={"Trung ương"} disabled />
+            </Form.Group> : null}
+            {(author !== 'A1') ? <Form.Group className="mb-3">
+              <Form.Label>Tên đơn vị</Form.Label>
+              <Form.Control value={user_account.division.name} disabled />
+            </Form.Group> : null}
+            {(author !== 'A1') ? <Form.Group className="mb-3">
+              <Form.Label>Phân loại đơn vị hành chính</Form.Label>
+              <Form.Control value={user_account.division.administrativeUnit.fullName} disabled />
+            </Form.Group> : null}
+            {(author !== 'A1') ? <Form.Group className="mb-3">
+              <Form.Label>Trạng thái</Form.Label>
+              <Form.Control value={user_account.declarationStatus} disabled />
+            </Form.Group> : null}
+            <Form.Group className="mb-3">
+              <Form.Label>Mật khẩu mới</Form.Label>
+              <Form.Control />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Nhập lại mật khẩu</Form.Label>
+              <Form.Control />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => {
+            setShowChangePassword(false)
+          }}>
+            Đóng
+          </Button>
+          <Button variant="primary" onClick={() => {
+
+          }}>
+            Xác nhận
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    )
+  }
+
   return (
     <div>
       <div className="headerPage">
-        <img src={logo} className='logoIcon' onClick = {() => navigate("/home")}/>
+        <img src={logo} className='logoIcon' onClick={() => navigate("/home")} />
         <p className="nameApp">CitizenV</p>
         <div className='formLogout'>
-          <BsPersonCircle className='iconAccount'/>
+          <BsPersonCircle className='iconAccount' />
           {(author === 'A1') ? user_account.username + " - Trung ương" : null}
           {(author === 'B2') ? user_account.username + " - " + user_account.division.administrativeUnit.shortName + " " + user_account.division.name : null}
           {(author !== 'A1' && author !== 'B2') ? user_account.username + " - " + user_account.division.name : null}
-          <AiOutlineLogout className='iconLogout' onClick={() => navigate('/login')} />
+          <AiOutlineLogout className='iconLogout' onClick={() => {
+            navigate('/login')
+            localStorage.removeItem("user")
+          }
+          } />
+          <IoMdConstruct className='iconChangePassword' onClick={() => setShowChangePassword(true)} />
         </div>
-
       </div>
       <div className="listOptions">
         {(author === 'A1') ? <div className='option' style={{ marginLeft: '115px' }} onClick={() => { navigate("/province") }}>Quản lý tỉnh, thành phố</div> : null}
@@ -44,16 +108,17 @@ function NavbarPage() {
           <div className='sub-option-list'>
             {(author === 'A1') ? <div className='sub-option' onClick={() => { navigate("/province") }}>Quản lý tỉnh, thành phố</div> : null}
             {(author === 'A2') ? <div className='sub-option' onClick={() => { navigate("/district") }}>Quản lý quận, huyện, thị xã</div> : null}
-            {(author === 'A3') ? <div className='sub-option' onClick={() => { navigate("/district") }}>Quản lý xã, phường, thị trấn</div> : null}
-            {(author === 'EDITOR') ? <div className='sub-option' onClick={() => { navigate("/district") }}>Quản lý tổ dân phố, thôn, xóm</div> : null}
-            {(author !== 'B2') ? <div className='sub-option'>Quản lý tài khoản</div> : null}
-            <div className='sub-option'>Thông tin dân cư</div>
-            <div className='sub-option'>Thống kê</div>
-            <div className='sub-option'>Tìm kiếm người dân</div>
-            {(author === 'B2') ? <div className='sub-option'>Nhập liệu</div> : null}
+            {(author === 'A3') ? <div className='sub-option' onClick={() => { navigate("/ward") }}>Quản lý xã, phường, thị trấn</div> : null}
+            {(author === 'EDITOR') ? <div className='sub-option' onClick={() => { navigate("/hamlet") }}>Quản lý tổ dân phố, thôn, xóm</div> : null}
+            {(author !== 'B2') ? <div className='sub-option' onClick={() => { navigate("/account") }}>Quản lý tài khoản</div> : null}
+            <div className='sub-option' onClick={() => { navigate("/citizen") }}>Thông tin dân cư</div>
+            <div className='sub-option' onClick={() => { navigate("/statis") }}>Thống kê</div>
+            <div className='sub-option' onClick={() => { navigate("/findresidential") }}>Tìm kiếm người dân</div>
+            {(author === 'B2') ? <div className='sub-option' onClick={() => { navigate("/citizeninput") }}>Nhập liệu</div> : null}
           </div>
         </div>
       </div>
+      <GetChangePassWordAccount />
     </div>
   );
 }

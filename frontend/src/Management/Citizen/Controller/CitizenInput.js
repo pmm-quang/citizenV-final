@@ -575,7 +575,7 @@ function CitizenInput() {
                         </Form.Group>
                         <Form.Group className="mb-4">
                             <Form.Label>Số CMND/CCCD</Form.Label>
-                            <Form.Control type="text" className='inputForm' value={fullNameAssociation1} onChange={(e) => setNationalIdAssociation1(e.target.value)} />
+                            <Form.Control type="text" className='inputForm' value={nationalIdAssociation1} onChange={(e) => setNationalIdAssociation1(e.target.value)} />
                         </Form.Group>
                         <div className="titleFlex">14. MẸ</div>
                         <Form.Group className="mb-4">
@@ -584,7 +584,7 @@ function CitizenInput() {
                         </Form.Group>
                         <Form.Group className="mb-4">
                             <Form.Label>Số CMND/CCCD</Form.Label>
-                            <Form.Control type="text" className='inputForm' value={fullNameAssociation2} onChange={(e) => setNationalIdAssociation2(e.target.value)} />
+                            <Form.Control type="text" className='inputForm' value={nationalIdAssociation2} onChange={(e) => setNationalIdAssociation2(e.target.value)} />
                         </Form.Group>
                     </div>
                     <div className='formFlex'>
@@ -595,16 +595,16 @@ function CitizenInput() {
                         </Form.Group>
                         <Form.Group className="mb-4">
                             <Form.Label>Số CMND/CCCD</Form.Label>
-                            <Form.Control type="text" className='inputForm' value={fullNameAssociation3} onChange={(e) => setNationalIdAssociation3(e.target.value)} />
+                            <Form.Control type="text" className='inputForm' value={nationalIdAssociation3} onChange={(e) => setNationalIdAssociation3(e.target.value)} />
                         </Form.Group>
                         <div className="titleFlex">16. NGƯỜI GIÁM HỘ HỢP PHÁP</div>
                         <Form.Group className="mb-4">
                             <Form.Label>Họ và tên</Form.Label>
-                            <Form.Control type="text" className='inputForm' value={fullNameAssociation4} onChange={(e) => setFullNameAssociation3(e.target.value)} />
+                            <Form.Control type="text" className='inputForm' value={fullNameAssociation4} onChange={(e) => setFullNameAssociation4(e.target.value)} />
                         </Form.Group>
                         <Form.Group className="mb-4" >
                             <Form.Label>Số CMND/CCCD</Form.Label>
-                            <Form.Control type="text" className='inputForm' value={fullNameAssociation4} onChange={(e) => setNationalIdAssociation3(e.target.value)} />
+                            <Form.Control type="text" className='inputForm' value={nationalIdAssociation4} onChange={(e) => setNationalIdAssociation4(e.target.value)} />
                         </Form.Group>
                     </div>
                 </div>
@@ -727,7 +727,7 @@ function CitizenInput() {
             <NavbarPage />
             {(status === "Đang khai báo") ? FormInput() : null}
             {(status === "Đã hoàn thành") ? <NotifyCompleteDeclaration /> : null}
-            {(status === "Chưa cấp quyền khai báo") ? <NotifyDeclaration /> : null}
+            {(status === "Chưa cấp quyền khai báo" || status === "Đã khóa") ? <NotifyDeclaration /> : null}
         </div>
     );
 }

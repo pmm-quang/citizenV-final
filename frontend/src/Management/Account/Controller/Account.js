@@ -16,7 +16,7 @@ function Account() {
   const role = user_account.role;
 
   const [checkedId, setCheckedId] = useState(-1)
-  const [checkedTime, setCheckedTime] = useState(false)
+  const [checkedRepass, setCheckedRepass] = useState(false)
   const [selectAll, setSelectAll] = useState(false);
   const [accountList, setAccountList] = useState([]);
   const [premission, setPremission] = useState(false)
@@ -38,6 +38,12 @@ function Account() {
   const [createEndTime, setCreateEndTime] = useState()
   const [status, setStatus] = useState(user_account.declarationStatus)
   const [codeBlockDeclaration, setCodeBlockDeclaration] = useState()
+  const [message, setMessage] = useState()
+  const [showWarning, setShowWarning] = useState(false)
+  const [showChangePassword, setShowChangePassword] = useState(false)
+  const [idAccountChangePassword, setIdAccountChangePassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [repeatNewPassword, setRepeatNewPassword] = useState('')
 
   const config = {
     headers: {
@@ -124,9 +130,16 @@ function Account() {
         const response = await axios('http://localhost:8080/api/v1/user/', config);
         setAccountList(response.data);
         console.log(response.data)
-      } catch (err) {
-        console.error(err);
+        setShowWarning(false)
+      } catch (error) {
+        let messageEdit = String(error.response.data)
+        if (messageEdit.toUpperCase() === "ACCESS IS DENIED") setMessage("TÀI KHOẢN HIỆN KHÔNG CÓ QUYỀN THỰC HIỆN")
+        else setMessage(messageEdit.toUpperCase())
+        setShowWarning(false)
+        setShowWarning(true)
       }
+    } else if (password !== repeatPassword) {
+      setCheckedRepass(true)
     }
   }
 
@@ -138,7 +151,7 @@ function Account() {
   }, [])
 
   const listAccDeclaration = accountList.map((account, index) =>
-    (account.declaration.startTime === null || account.declaration.status === "Đã hoàn thành" || account.declaration.status === "Đã khóa") ? <option key={index} value={account.username}>{account.username + ". " + account.division.name}</option> : null
+    (account.declaration.startTime === null || account.declaration.status === "Đã hoàn thành" || account.declaration.status === "Đã khóa" || account.declaration.status === "Đã quá hạn khai báo") ? <option key={index} value={account.username}>{account.username + ". " + account.division.name}</option> : null
   )
 
   const listAccAcceptDeclaration = accountList.map((account, index) =>
@@ -157,11 +170,11 @@ function Account() {
     </tr>
   )
 
-  const CheckedIdNewAccount = async () => {
+  const CheckedIdNewAccount = async (id) => {
     setCheckedId(0)
     let count = 0;
     for (let i = 0; i < accountList.length; i++) {
-      if (accountList[i].username === userAccount) {
+      if (accountList[i].username === id) {
         count++;
       }
     }
@@ -199,6 +212,11 @@ function Account() {
 
   const CreateAccount = () => {
     setShow(true)
+    setCheckedId(0)
+    setCheckedRepass(false)
+    setUserAccount()
+    setPassword()
+    setRepeatPassword()
   }
 
   const tableAccount = accountList.map((account) => (
@@ -209,6 +227,10 @@ function Account() {
       {(account.declaration.endTime === null) ? <th className="top-row-title">Chưa khai báo</th> : <th className="top-row-title">{account.declaration.endTime}</th>}
       {<th className="top-row-title">{account.declaration.status}</th>}
     </tr>
+  ));
+
+  const listAccountChangePassword = accountList.map((account) => (
+    <option value={account.username}>{account.username + ". " + account.division.name}</option>
   ));
 
   const CompleteDeclaration = async () => {
@@ -233,7 +255,16 @@ function Account() {
       status: "Đang khai báo"
     }
     console.log(declaration)
-    if (startDate < endDate && endDate >= timeNow && endDate < user_account.declarationEndTime) {
+    if (startDate > endDate) {
+      setShowWarning(true)
+      setMessage("THỜI GIAN KẾT THÚC KHAI BÁO ĐANG NHỎ HƠN THỜI GIAN BẮT ĐẦU KHAI BÁO")
+    } else if (endDate <= timeNow) {
+      setShowWarning(true)
+      setMessage("THỜI GIAN KẾT THÚC KHAI BÁO ĐANG NHỎ HƠN THỜI GIAN HIỆN TẠI")
+    } else if (endDate > user_account.declarationEndTime && user_account.role !== 'A1') {
+      setShowWarning(true)
+      setMessage("THỜI GIAN KẾT THÚC KHAI BÁO Ở CẤP DƯỚI PHẢI NHỎ HƠN CẤP TRÊN")
+    } else {
       try {
         await axios.put("http://localhost:8080/api/v1/declaration/save/" + idAccount, declaration, config);
         setShowCreateDeclaration(false)
@@ -241,11 +272,38 @@ function Account() {
       } catch (error) {
         console.log(error)
       }
-    } else {
-      console.log('error')
     }
   }
 
+  const ChangePassword = async () => {
+    if (newPassword === '' || repeatNewPassword === '' || idAccountChangePassword === '') {
+      setShowWarning(true)
+      setMessage("HÃY NHẬP ĐẦY ĐỦ THÔNG TIN TRƯỚC KHI XÁC NHẬN THAY ĐỔI")
+    } else if (newPassword !== repeatNewPassword) {
+      setShowWarning(true)
+      setMessage("MẬT KHẨU NHẬP LẠI KHÔNG TRÙNG KHỚP VỚI MẬT KHẨU TRƯỚC ĐÓ")
+    } else {
+      console.log(newPassword)
+      try {
+        await axios.put("http://localhost:8080/api/v1/user/change-password/" + idAccountChangePassword, newPassword, config)
+        setShowChangePassword(false)
+      } catch (error) {
+        console.log(error)
+        setShowWarning(true)
+        let messageEdit = String(error.response.data)
+        if (error.response.status === 403) setMessage("TÀI KHOẢN HIỆN KHÔNG CÓ QUYỀN THỰC HIỆN")
+        else setMessage(messageEdit.toUpperCase())
+      }
+    }
+  }
+
+  const ClickButtonChangePassword = () => {
+    setShowChangePassword(true);
+    setIdAccountChangePassword('')
+    setNewPassword('')
+    setRepeatNewPassword('')
+    setShowWarning(false)
+  }
   const ModalAddAccount = () => {
     return (
       <Modal show={show}>
@@ -259,6 +317,7 @@ function Account() {
               <Form.Select value={userAccount} onChange={(e) => {
                 setUserAccount(e.target.value)
                 setCheckedId(0)
+                CheckedIdNewAccount(e.target.value)
               }
               }>
                 <option>
@@ -266,10 +325,7 @@ function Account() {
                 {listDivision}
               </Form.Select>
             </Form.Group>
-            {(checkedId === 0) ? <div className='checked' onClick={() => CheckedIdNewAccount()}><BiCheckCircle className="iconChecked" />Kiểm tra</div> : null}
-            {(checkedId === 2) ? <div className="warningChecked">Mã của đơn vị hành chính vừa nhập đang bị trùng với một đơn vị hành chính đã có sẵn</div> : null}
-            {(checkedId === 3) ? <div className="warningChecked">Mã của đơn vị hành chính vừa nhập không nằm trong khu vực quản lý</div> : null}
-            {(checkedId === 1) ? <div className="successChecked">Bạn có thể sử dụng mã vừa nhập</div> : null}
+            {(checkedId === 2) ? <div className="warningChecked">Tài khoản của đơn vị hành chính được chọn đã tồn tại</div> : null}
             <Form.Group className="mb-3">
               <Form.Label>Tên tài khoản (*)</Form.Label>
               <Form.Control value={userAccount} disabled />
@@ -278,6 +334,7 @@ function Account() {
               <Form.Label>Mật khẩu (*)</Form.Label>
               <Form.Control type="password" value={password} onChange={(e) => {
                 setPassword(e.target.value)
+                setCheckedRepass(false)
               }
               } />
             </Form.Group>
@@ -285,20 +342,24 @@ function Account() {
               <Form.Label>Nhập lại mật khẩu (*)</Form.Label>
               <Form.Control type="password" value={repeatPassword} onChange={(e) => {
                 setRepeatPassword(e.target.value)
+                setCheckedRepass(false)
               }} />
             </Form.Group>
+            {(checkedRepass) ? <div className="warningChecked">Mật khẩu không trùng với mật khẩu được nhập trước đó</div> : null}
           </Form>
+          {(showWarning) ? <div className="noteWarning"><p>{message}</p></div> : null}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => {
             setShow(false)
+            setShowWarning(false)
           }}>
             Đóng
           </Button>
           <Button variant="primary" onClick={() => {
             CreateNewAccount()
           }}>
-            Lưu
+            Xác nhận
           </Button>
         </Modal.Footer>
       </Modal>
@@ -312,16 +373,16 @@ function Account() {
           <Modal.Title className='titleModal'>KHÓA QUYỀN KHAI BÁO</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form> 
+          <Form>
             <Form.Label>Chọn đơn vị hành chính cấp dưới</Form.Label>
             <Form.Select value={codeBlockDeclaration} onChange={(e) => setCodeBlockDeclaration(e.target.value)}>
               <option></option>
               {listAccAcceptDeclaration}
-            </Form.Select> 
+            </Form.Select>
           </Form>
         </Modal.Body>
         <Modal.Footer>
-        <Button variant="secondary" onClick={() => {
+          <Button variant="secondary" onClick={() => {
             setShowDeclaration(false)
           }}>
             Đóng
@@ -369,15 +430,71 @@ function Account() {
               />
             </Form.Group>
           </Form>
+          {(showWarning) ? <div className="noteWarning"><p>{message}</p></div> : null}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => {
             setShowCreateDeclaration(false)
+            setShowWarning(false)
           }}>
             Đóng
           </Button>
           <Button variant="secondary" onClick={() => {
             AddDeclaration()
+          }}>
+            Lưu
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    )
+  }
+
+  const ModalChangePassword = () => {
+    return (
+      <Modal show={showChangePassword}>
+        <Modal.Header className='headerModal'>
+          <Modal.Title className='titleModal'>CẤP MỚI MẬT KHẨU CHO TÀI KHOẢN CẤP DƯỚI</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3">
+              <Form.Label>Chọn đơn vị hành chính (*)</Form.Label>
+              <Form.Select value={idAccountChangePassword} onChange={(e) => {
+                setIdAccountChangePassword(e.target.value)
+                setShowWarning(false)
+              }
+              }>
+                <option>
+                </option>
+                {listAccountChangePassword}
+              </Form.Select>
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Mật khẩu mới</Form.Label>
+              <Form.Control type="password" value={newPassword} onChange={(e) => {
+                setNewPassword(e.target.value)
+                setShowWarning(false)
+              }} />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Nhập lại mật khẩu</Form.Label>
+              <Form.Control type="password" value={repeatNewPassword} onChange={(e) => {
+                setRepeatNewPassword(e.target.value)
+                setShowWarning(false)
+              }} />
+            </Form.Group>
+          </Form>
+          {(showWarning) ? <div className="noteWarning"><p>{message}</p></div> : null}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => {
+            setShowChangePassword(false)
+            setShowWarning(false)
+          }}>
+            Đóng
+          </Button>
+          <Button variant="secondary" onClick={() => {
+            ChangePassword()
           }}>
             Lưu
           </Button>
@@ -415,6 +532,7 @@ function Account() {
           {((role === 'A1' || status === "Đang khai báo") && (role !== 'B2')) ? <Button className="account-option" onClick={() => setShowCreateDeclaration(true)}>Cấp quyền khai báo</Button> : null}
           {(role === 'B1' && status === "Đang khai báo") ? <Button className="account-option" onClick={() => CompleteDeclaration()}>Hoàn thành khai báo</Button> : null}
           {(status === "Đã khóa") ? null : <Button className="account-option" onClick={() => setShowDeclaration(true)}>Khóa khai báo</Button>}
+          <Button className="account-option" onClick={() => ClickButtonChangePassword()}>Cấp mới mật khẩu</Button>
         </div>
         <div className="account-table">
           <Table striped bordered hover>
@@ -434,6 +552,7 @@ function Account() {
         {(show) ? ModalAddAccount() : null}
         {(showDeclaration) ? ModalListDeclaration() : null}
         {ModalDeclaration()}
+        {ModalChangePassword()}
       </div>
     </div>
   );

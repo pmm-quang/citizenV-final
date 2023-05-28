@@ -26,10 +26,12 @@ th, td {
     width: 18%;
     flex-direction: column;
     align-items: center;
+    margin-left: 10px;
 }
 
 .account-option {
-    width: 200px;
+    width: 80%;
+    max-width: 200px;
     margin-bottom: 3vh;
 }
 
@@ -136,4 +138,11 @@ td {
     width: 130px;
     margin-top: 10px;
     margin-bottom: 10px;
+}
+
+.noteWarning {
+    text-align: center;
+    font-size: 15px;
+    color: red;
+    font-weight: bold;
 }

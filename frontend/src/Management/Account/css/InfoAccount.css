@@ -1,0 +1,39 @@
+.pageInfoAccount {
+    display: flex
+}
+
+.pageInfoAccount .optionsList {
+    margin-left: 40px; 
+    margin-top: 20px;
+    width: 20%;
+}
+
+.pageInfoAccount .optionSelect {
+    margin-bottom: 20px;
+}
+
+.pageInfoAccount .optionSelect .buttonOption {
+    width: 80%;
+    max-width: 220px;
+}
+
+.showFlexPage {
+    width: 70%;
+    margin-top: 20px;
+}
+
+.showFlexPage .titleAccount {
+    text-align: center;
+    font-weight: bold;
+    font-size: 24px;
+}
+
+#detailed-resident-info-header {
+    display: flex;
+    margin: 10px;
+}
+
+.detailed-resident-info .row-head {
+    width: 30%;
+    background-color: rgb(170, 246, 255);
+}
