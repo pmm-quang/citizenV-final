@@ -31,4 +31,5 @@ public final class Constant {
     public static final String ERR_MESSAGE_USERNAME_AND_UNIT_CODE_DO_NOT_MATCH = "Tên tài khoản và mã đơn vị không trùng khớp";
 
     public static final String ACCESS_DENIED_MESSAGE_DO_NOT_HAVE_PERMISSION_TO_CREATE_ACCOUNT = "Không có quyền tạo tài khoản cho đơn vị";
+    public static final String ACCESS_DENIED_MESSAGE_DO_NOT_HAVE_PERMISSION_TO_CHANGE_PASSWORD = "Không có quyền thay đổi mật khẩu của tài khoản này";
 }

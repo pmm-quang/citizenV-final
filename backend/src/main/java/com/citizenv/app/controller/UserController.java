@@ -1,20 +1,16 @@
 package com.citizenv.app.controller;
-import com.citizenv.app.payload.CitizenDto;
 import com.citizenv.app.payload.UserDto;
-import com.citizenv.app.secirity.CustomUserDetail;
+import com.citizenv.app.payload.request.ChangePasswordRequest;
 import com.citizenv.app.secirity.SecurityUtils;
 import com.citizenv.app.service.UserService;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.File;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 //@CrossOrigin(origins = {"http://localhost:3000/", "http://localhost:3001/"})
 @RestController
@@ -47,13 +43,20 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('WRITE')")
     @PutMapping("/change-password/{username}")
-    public ResponseEntity<UserDto> changePassword(@PathVariable String username, @RequestBody String newPassword ) {
-//        CustomUserDetail userDetail = getUserDetail();
-//        String userDetailUsername = userDetail.getUsername();
+    public ResponseEntity<?> createNewPassword(@PathVariable String username, @RequestBody Map<String, String> request ) {
+        String newPassword = request.get("newPassword");
         String userDetailUsername = SecurityUtils.getUsernameCurrentUserLogin();
-        UserDto userDto = userService.changePassword(userDetailUsername, username, newPassword);
+        UserDto userDto = userService.createNewPassword(userDetailUsername, username, newPassword);
         return ResponseEntity.ok(userDto);
     }
+
+    @PreAuthorize("hasAuthority('WRITE')")
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
+        String userDetailUsername = SecurityUtils.getUsernameCurrentUserLogin();
+        return ResponseEntity.ok().body(userService.changePassword(userDetailUsername, request));
+    }
+
     @PreAuthorize("hasAuthority('WRITE')")
     @PostMapping("/save")
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto user) {
@@ -63,7 +66,5 @@ public class UserController {
         UserDto userDto = userService.createUser(usernameUserDetail,divisionUserDetail, user);
         return ResponseEntity.status(201).body(userDto);
     }
-
-
 
 }
