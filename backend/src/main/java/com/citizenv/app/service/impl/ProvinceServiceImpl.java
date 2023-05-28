@@ -104,7 +104,7 @@ public class ProvinceServiceImpl implements ProvinceService {
 
     @Transactional
     @Override
-    public ProvinceDto createProvince(ProvinceDto province) {
+    public String createProvince(ProvinceDto province) {
         String provinceCode = province.getCode();
         repository.findByCode(provinceCode).ifPresent(p -> {
             throw new ResourceFoundException("Tỉnh/thành phố", "mã định danh", provinceCode);
@@ -123,12 +123,12 @@ public class ProvinceServiceImpl implements ProvinceService {
         newProvince.setAdministrativeUnit((AdministrativeUnit) map.get("admUnit"));
         newProvince.setAdministrativeRegion((AdministrativeRegion) map.get("admRegion"));
         Province createProvince = repository.save(newProvince);
-        return mapper.map(createProvince, ProvinceDto.class);
+        return "Tạo mới tỉnh/thành phố thành công";
     }
 
     @Transactional
     @Override
-    public ProvinceDto updateProvince(String provinceCodeNeedUpdate, ProvinceDto province) {
+    public String updateProvince(String provinceCodeNeedUpdate, ProvinceDto province) {
         Province foundProvince = repository.findByCode(provinceCodeNeedUpdate).orElseThrow(
                 () -> new ResourceNotFoundException("Tỉnh/thành phố", "mã định danh", provinceCodeNeedUpdate));
 
@@ -155,7 +155,7 @@ public class ProvinceServiceImpl implements ProvinceService {
         if (!provinceCodeNeedUpdate.equals(provinceCode)) {
             administrativeDivisionRepository.updateCodeOfSubDivision(provinceCode, 3, provinceCodeNeedUpdate);
         }
-        return mapper.map(foundProvince, ProvinceDto.class);
+        return "Chỉnh sửa tỉnh/thành phố thành công!";
     }
 
 

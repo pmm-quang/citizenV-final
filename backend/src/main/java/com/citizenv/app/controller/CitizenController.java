@@ -2,24 +2,19 @@ package com.citizenv.app.controller;
 
 import com.citizenv.app.payload.CitizenDto;
 import com.citizenv.app.payload.custom.CustomCitizenRequest;
-import com.citizenv.app.secirity.CustomUserDetail;
 import com.citizenv.app.secirity.SecurityUtils;
 import com.citizenv.app.service.CitizenService;
+import com.citizenv.app.service.ExcelService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 //@CrossOrigin(origins = {"http://localhost:3000/", "http://localhost:3001/"})
 @RestController
@@ -27,9 +22,11 @@ import java.util.Objects;
 public class CitizenController {
 //    @Autowired
     private final CitizenService citizenService;
+    private final ExcelService excelService;
 
-    public CitizenController(CitizenService citizenService) {
+    public CitizenController(CitizenService citizenService, ExcelService excelService) {
         this.citizenService = citizenService;
+        this.excelService = excelService;
     }
 
     @GetMapping("/")
@@ -117,20 +114,21 @@ public class CitizenController {
 //        return new ResponseEntity<>(list, HttpStatus.OK);
 //    }
 
-//    @PreAuthorize("hasAnyAuthority('WRITE')")
+    @PreAuthorize("hasAnyAuthority('WRITE')")
     @PostMapping("/save")
     public ResponseEntity<?> createCitizen(@RequestBody CustomCitizenRequest citizen) {
-        CitizenDto citizenDto = citizenService.createCitizen(citizen);
-        return new ResponseEntity<>("Created success!", HttpStatus.CREATED);
+        String message = citizenService.createCitizen(citizen);
+        return ResponseEntity.status(201).body(message);
     }
 
-//    @PreAuthorize("hasAnyAuthority('WRITE')")
+    @PreAuthorize("hasAnyAuthority('WRITE')")
     @PutMapping("/save/{citizenId}")
     public ResponseEntity<?> updateCitizen(@PathVariable String citizenId, @RequestBody CustomCitizenRequest citizen) {
-        CitizenDto citizenDto = citizenService.updateCitizen(citizenId, citizen);
-        return new ResponseEntity<>("Updated success!", HttpStatus.OK);
+        String message = citizenService.updateCitizen(citizenId, citizen);
+        return ResponseEntity.ok().body(message);
     }
 
+    @PreAuthorize("hasAnyAuthority('WRITE')")
     @PostMapping(value = "/excel/upload")
     public ResponseEntity<?> uploadExcelFile(@RequestParam("excelFile") MultipartFile excelFile) throws IOException {
         System.out.println(excelFile.getSize());
@@ -139,8 +137,8 @@ public class CitizenController {
 //            tempFile.delete();
 //        }
 //        String filePath = "src/main/java/com/citizenv/app/controller/file.xlsx";
-        List<CitizenDto> list = citizenService.createUserFromExcelFile(excelFile);
-        return ResponseEntity.ok().build();
+        String message = excelService.createUserFromExcelFile(excelFile);
+        return ResponseEntity.ok().body(message);
     }
 
 }

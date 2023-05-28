@@ -91,6 +91,12 @@ class BackendApplicationTests {
     }
 
     @Test
+    void testMatchPassword() {
+        String pasencode = encoder.encode("abc");
+        System.out.println(encoder.matches("abc", "$2a$10$Q74awP3.7Iad5wnZ.tzwcuM3Uezt7I3KSgnI.PznhbKXF0NQcIIV6"));
+    }
+
+    @Test
     public void encode() {
         System.out.println(encoder.encode("abc"));
     }

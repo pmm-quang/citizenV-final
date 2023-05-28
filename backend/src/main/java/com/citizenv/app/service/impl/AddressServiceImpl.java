@@ -27,7 +27,8 @@ public class AddressServiceImpl implements AddressService {
     private final HamletRepository hamletRepository;
     private final ModelMapper mapper;
 
-    public AddressServiceImpl(AddressTypeRepository addressTypeRepository, AddressRepository repository, CitizenRepository citizenRepository, HamletRepository hamletRepository, ModelMapper mapper) {
+    public AddressServiceImpl(AddressTypeRepository addressTypeRepository, AddressRepository repository,
+                              CitizenRepository citizenRepository, HamletRepository hamletRepository, ModelMapper mapper) {
         this.addressTypeRepository = addressTypeRepository;
         this.repository = repository;
         this.citizenRepository = citizenRepository;
@@ -38,8 +39,7 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public List<AddressDto> getAll() {
         List<Address> list = repository.findAll();
-        List<AddressDto> dtoList = list.stream().map(address -> mapper.map(address, AddressDto.class)).collect(Collectors.toList());
-        return dtoList;
+        return list.stream().map(address -> mapper.map(address, AddressDto.class)).collect(Collectors.toList());
     }
 
     @Override
@@ -48,8 +48,7 @@ public class AddressServiceImpl implements AddressService {
                 () -> new ResourceNotFoundException("Citizen", "CititzenID", citizenID)
         );
         List<Address> list = repository.findAllByCitizen(foundCitizen);
-        List<AddressDto> dtoList = list.stream().map(address -> mapper.map(address, AddressDto.class)).collect(Collectors.toList());
-        return dtoList;
+        return list.stream().map(address -> mapper.map(address, AddressDto.class)).collect(Collectors.toList());
     }
 
     @Override
@@ -79,7 +78,6 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public List<AddressTypeDto> getAllAddressType() {
         List<AddressType> list = addressTypeRepository.findAll();
-        List<AddressTypeDto> dtoList = list.stream().map(addressType -> mapper.map(addressType, AddressTypeDto.class)).collect(Collectors.toList());
-        return dtoList;
+        return list.stream().map(addressType -> mapper.map(addressType, AddressTypeDto.class)).collect(Collectors.toList());
     }
 }

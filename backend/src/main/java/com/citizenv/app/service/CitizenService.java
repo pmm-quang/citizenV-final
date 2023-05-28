@@ -31,7 +31,7 @@ public interface CitizenService {
 
     Map<String, Object> getAllByProvinceCode(String provinceCode, int page);
 
-    CitizenDto createCitizen(CustomCitizenRequest citizen);
-    CitizenDto updateCitizen(String nationalId, CustomCitizenRequest citizen);
-    List<CitizenDto> createUserFromExcelFile(MultipartFile excelFile);
+    String createCitizen(CustomCitizenRequest citizen);
+    String updateCitizen(String nationalId, CustomCitizenRequest citizen);
+    String createUserFromExcelFile(MultipartFile excelFile);
 }

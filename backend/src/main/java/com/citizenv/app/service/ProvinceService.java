@@ -13,7 +13,7 @@ public interface ProvinceService {
     ProvinceDto getByCode(String code);
     List<ProvinceDto> getAllByAdministrativeUnitId(int admUnitId);
     List<ProvinceDto> getAllByAdministrativeRegionId(int admRegionId);
-    ProvinceDto createProvince(ProvinceDto province);
-    ProvinceDto updateProvince(String provinceCodeNeedUpdate, ProvinceDto province);
+    String createProvince(ProvinceDto province);
+    String updateProvince(String provinceCodeNeedUpdate, ProvinceDto province);
     String deleteById(Long provinceCode);
 }

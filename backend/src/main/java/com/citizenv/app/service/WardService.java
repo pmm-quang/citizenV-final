@@ -8,8 +8,6 @@ import java.util.List;
 
 public interface WardService {
     List<WardDto> getAll();
-
-
     List<WardDto> getAll(String divisionCodeOfUserDetail);
     WardDto getByCode(String code);
     List<WardDto> getByDistrictCode(String wardCode);

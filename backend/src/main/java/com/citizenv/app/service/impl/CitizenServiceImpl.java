@@ -146,7 +146,7 @@ public class CitizenServiceImpl implements CitizenService {
 
     @Transactional
     @Override
-    public CitizenDto createCitizen(CustomCitizenRequest citizen) {
+    public String createCitizen(CustomCitizenRequest citizen) {
         String nId = citizen.getNationalId();
         repo.findByNationalId(nId).ifPresent(
                 citizen1 -> {
@@ -199,12 +199,12 @@ public class CitizenServiceImpl implements CitizenService {
             newCitizen.setAssociations(associations);
         }
         Citizen createCitizen = repo.save(newCitizen);
-        return mapper.map(createCitizen, CitizenDto.class);
+        return "Thêm thông tin người dân thành công!";
     }
 
     @Transactional
     @Override
-    public CitizenDto updateCitizen(String nationalId, CustomCitizenRequest citizen) {
+    public String updateCitizen(String nationalId, CustomCitizenRequest citizen) {
         Citizen foundCitizen = repo.findByNationalId(nationalId).orElseThrow(
                 () -> new ResourceNotFoundException("Người dân", "mã số định danh", nationalId)
         );
@@ -296,7 +296,7 @@ public class CitizenServiceImpl implements CitizenService {
                 foundCitizen.getAssociations().add(as);
             }
         }
-        return mapper.map(foundCitizen, CitizenDto.class);
+        return "Chỉnh sửa thông tin người dân thành công!";
 
     }
 
@@ -422,14 +422,14 @@ public class CitizenServiceImpl implements CitizenService {
         Ethnicity foundEthnicity = null;
         if (ethnicityId != null) {
             foundEthnicity = ethnicityRepo.findById(ethnicityId).orElseThrow(
-                    () -> new ResourceNotFoundException("Dân tộc", "id", "" + ethnicityId)
+                    () -> new ResourceNotFoundException("Dân tộc", "id", String.valueOf(ethnicityId))
             );
         }
 
         Religion foundReligion = null;
         if (religion != null) {
             foundReligion = religionRepo.findById(religion.getId()).orElseThrow(
-                    () -> new ResourceNotFoundException("Tôn giáo", "id","" + religion.getId())
+                    () -> new ResourceNotFoundException("Tôn giáo", "id", String.valueOf(religion.getId()))
             );
         }
         Citizen c = new Citizen();
@@ -446,7 +446,7 @@ public class CitizenServiceImpl implements CitizenService {
     }
 
     @Override
-    public List<CitizenDto> createUserFromExcelFile(MultipartFile excelFile) {
+    public String createUserFromExcelFile(MultipartFile excelFile) {
         try {
 //            FileInputStream file = new FileInputStream(excelFile);
             Workbook workbook = new XSSFWorkbook(excelFile.getInputStream());
@@ -559,7 +559,7 @@ public class CitizenServiceImpl implements CitizenService {
                                 List<Hamlet> hamlet = hamletRepo.findHamletFromExcel(listNameOfAdr[3], listNameOfAdr[2],
                                         listNameOfAdr[1], listNameOfAdr[0]);
 
-                                if (hamlet.size() > 0 || hamlet != null) {
+                                if (hamlet != null) {
                                     if (colNum == 11) {
                                         provinceCodeOfHometown = hamlet.get(0).getCode().substring(0, 2);
                                     }
@@ -607,9 +607,9 @@ public class CitizenServiceImpl implements CitizenService {
                 System.out.println();
                 citizen.setAddresses(addresses);
                 citizen.setAssociations(associations);
-//                if (!Utils.validateNationalId(citizen.getNationalId(),citizen.getSex(),provinceCodeOfHometown, citizen.getDateOfBirth())) {
-//                    throw new InvalidException("Invalid identifier at row " + (rowNum+1));
-//                }
+                if (!Utils.validateNationalId(citizen.getNationalId(),citizen.getSex(),provinceCodeOfHometown, citizen.getDateOfBirth())) {
+                    throw new InvalidException("Invalid identifier at row " + (rowNum+1));
+                }
                 for (Association as :
                         associations) {
                     System.out.println(as.getCitizen() + as.getAssociatedCitizenName() + as.getAssociatedCitizenNationalId() + as.getAssociationType());
@@ -621,7 +621,7 @@ public class CitizenServiceImpl implements CitizenService {
             }
             List<Citizen> list = repo.saveAll(citizens);
 
-            return list.stream().map(citizen -> mapper.map(citizen, CitizenDto.class)).collect(Collectors.toList());
+            return "Thêm thông tin người dân từ file excel thành công!";
         }  catch (IOException e) {
             throw new RuntimeException(e);
         }

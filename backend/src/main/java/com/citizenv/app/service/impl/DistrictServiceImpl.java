@@ -100,7 +100,7 @@ public class DistrictServiceImpl implements DistrictService {
 
     @Transactional
     @Override
-    public DistrictDto createDistrict(String divisionCodeOfUserDetail, DistrictDto district) {
+    public String createDistrict(String divisionCodeOfUserDetail, DistrictDto district) {
         String newDistrictCode = district.getCode();
         repository.findByCode(newDistrictCode).ifPresent(
                 foundDistrict -> {throw new ResourceFoundException("Quận/huyện/thị xã", "mã định danh", newDistrictCode);});
@@ -115,12 +115,12 @@ public class DistrictServiceImpl implements DistrictService {
         createDistrict.setProvince(foundProvince);
         createDistrict.setAdministrativeUnit(foundAdmUnit);
         District newDistrict = repository.save(createDistrict);
-        return mapper.map(newDistrict, DistrictDto.class);
+        return "Tạo mới quận/huyện/thị xã thành công!";
     }
 
     @Transactional
     @Override
-    public DistrictDto updateDistrict(String districtCodeNeedUpdate, DistrictDto district) {
+    public String updateDistrict(String districtCodeNeedUpdate, DistrictDto district) {
         String districtCode = district.getCode();
         District foundDistrict = repository.findByCode(districtCodeNeedUpdate).orElseThrow(
                 () -> new ResourceNotFoundException("Quận/huyện/thị xã", "mã định danh", districtCodeNeedUpdate)
@@ -133,7 +133,6 @@ public class DistrictServiceImpl implements DistrictService {
         }
 
         if (!foundDistrict.getName().equals(district.getCode())) {
-            String provinceCode = districtCode.substring(0, 4);
             administrativeDivisionRepository.findByName(district.getName(), district.getProvince().getCode()).ifPresent(
                     p -> {throw new InvalidException(Constant.ERR_MESSAGE_UNIT_NAME_ALREADY_EXISTS);}
             );
@@ -149,7 +148,7 @@ public class DistrictServiceImpl implements DistrictService {
         if (!districtCode.equals(districtCodeNeedUpdate)) {
             administrativeDivisionRepository.updateCodeOfSubDivision(district.getCode(), 5, districtCodeNeedUpdate);
         }
-        return mapper.map(foundDistrict, DistrictDto.class);
+        return "Chỉnh sửa quận/huyện/thị xã thành công!";
     }
     @Override
     public void deleteDistrict(String districtCode) {

@@ -61,18 +61,18 @@ public class HamletController {
 
     @PreAuthorize("hasAuthority('WRITE')")
     @PostMapping("/save")
-    public ResponseEntity<HamletDto> createHamlet(@RequestBody CustomHamletRequest hamlet) {
+    public ResponseEntity<?> createHamlet(@RequestBody CustomHamletRequest hamlet) {
         String divisionCode = SecurityUtils.getDivisionCodeCurrentUserLogin();
-        HamletDto hamletDto = service.createHamlet(divisionCode,hamlet);
-        return ResponseEntity.status(201).body(hamletDto);
+        String message = service.createHamlet(divisionCode,hamlet);
+        return ResponseEntity.status(201).body(message);
     }
 
     @PreAuthorize("hasAuthority('WRITE')")
     @PutMapping("/save/{hamletCode}")
-    public ResponseEntity<Object> updateHamlet(@PathVariable String hamletCode,
+    public ResponseEntity<?> updateHamlet(@PathVariable String hamletCode,
                                                   @RequestBody CustomHamletRequest hamlet) {
-        HamletDto hamletDto = service.updateHamlet(hamletCode, hamlet);
-        return ResponseEntity.ok().body(hamletDto);
+        String message = service.updateHamlet(hamletCode, hamlet);
+        return ResponseEntity.ok().body(message);
     }
 
     /*Script to add more hamlets to Hanoi. Dangerous.*/

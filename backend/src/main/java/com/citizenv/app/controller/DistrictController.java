@@ -60,17 +60,17 @@ public class DistrictController {
 
     @PreAuthorize("hasAuthority('WRITE')")
     @PostMapping("/save")
-    public ResponseEntity<DistrictDto> createDistrict(@RequestBody DistrictDto district) {
+    public ResponseEntity<?> createDistrict(@RequestBody DistrictDto district) {
         String divisionCode = SecurityUtils.getDivisionCodeCurrentUserLogin();
-        DistrictDto districtDto = districtService.createDistrict(divisionCode,district);
-        return new ResponseEntity<>(districtDto, HttpStatus.CREATED);
+        String message = districtService.createDistrict(divisionCode,district);
+        return ResponseEntity.status(201).body(message);
     }
 
     @PreAuthorize("hasAuthority('WRITE')")
     @PutMapping("/save/{districtCode}")
-    public ResponseEntity<DistrictDto> updateDistrict(@PathVariable String districtCode,
+    public ResponseEntity<?> updateDistrict(@PathVariable String districtCode,
                                                       @RequestBody DistrictDto district) {
-        DistrictDto districtDto = districtService.updateDistrict(districtCode, district);
-        return ResponseEntity.ok().body(districtDto);
+        String message = districtService.updateDistrict(districtCode, district);
+        return ResponseEntity.ok().body(message);
     }
 }

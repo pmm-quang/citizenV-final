@@ -37,24 +37,24 @@ public class DeclarationController {
     }*/
     @PreAuthorize("hasAuthority('WRITE')")
     @PutMapping("/save/{username}")
-    public ResponseEntity<DeclarationDto> update(@PathVariable String username,
+    public ResponseEntity<?> update(@PathVariable String username,
                                                  @RequestBody DeclarationDto declarationDto) {
-        DeclarationDto dto = declarationService.openDeclaration(username, declarationDto);
-        return ResponseEntity.status(201).body(dto);
+        String message = declarationService.openDeclaration(username, declarationDto);
+        return ResponseEntity.status(201).body(message);
     }
 
     @PreAuthorize("hasAuthority('WRITE')")
     @GetMapping("/lock-declaration/{username}")
     public ResponseEntity<String> lockDeclaration(@PathVariable String username) {
-        declarationService.lockDeclaration(username);
-        return ResponseEntity.ok().body("Đã khóa quyền khai báo");
+        String message = declarationService.lockDeclaration(username);
+        return ResponseEntity.ok().body(message);
     }
 
     @PreAuthorize("hasAuthority('WRITE')")
     @GetMapping("/set-completed")
     public ResponseEntity<?> setDeclarationCompleted() {
         String usernameUserDetail = SecurityUtils.getUsernameCurrentUserLogin();
-        declarationService.setCompleted(usernameUserDetail);
-        return ResponseEntity.ok().body("Đã hòan thành khai báo");
+        String message = declarationService.setCompleted(usernameUserDetail);
+        return ResponseEntity.ok().body(message);
     }
 }

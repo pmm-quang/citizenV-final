@@ -11,12 +11,9 @@ public interface UserService {
     List<UserDto> getAll(CustomUserDetail userDetail);
     List<UserDto> getByCreatedBy(String usernameUserDetail);
     UserDto getById(String userId);
-    UserDto createUser(CustomUserDetail userDetail, UserDto userDto);
-    UserDto createUser(String usernameUserDetail, String divisionCodeUserDetail, UserDto userDto);
-    UserDto createUser(UserDto userDto);
-    UserDto updateUser(String divisionCodeUserDetail, UserDto userDto);
+    String createUser(String usernameUserDetail, String divisionCodeUserDetail, UserDto userDto);
 
-    UserDto createNewPassword(String userDetailUsername, String username, String newPassword);
+    String createNewPassword(String userDetailUsername, String username, String newPassword);
 
     String changePassword(String usernameUserDetail,ChangePasswordRequest request);
 

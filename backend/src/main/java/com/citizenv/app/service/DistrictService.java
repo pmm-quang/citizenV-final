@@ -17,9 +17,9 @@ public interface DistrictService {
 
     List<DistrictDto> getAllByAdministrativeUnitId(int admUnitId);
 
-    DistrictDto createDistrict(String divisionCodeOfUserDetail, DistrictDto district);
+    String createDistrict(String divisionCodeOfUserDetail, DistrictDto district);
 
-    DistrictDto updateDistrict(String districtCodeNeedUpdate, DistrictDto district);
+    String updateDistrict(String districtCodeNeedUpdate, DistrictDto district);
 
     void deleteDistrict(String districtCode);
 

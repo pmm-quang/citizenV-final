@@ -88,8 +88,9 @@ public class HamletServiceImpl implements HamletService {
         return hamletDtos;
     }
 
+    @Transactional
     @Override
-    public HamletDto createHamlet(String divisionCode, CustomHamletRequest hamlet) {
+    public String createHamlet(String divisionCode, CustomHamletRequest hamlet) {
         hamlet.setWardCode(divisionCode);
        String hamletCode = hamlet.getCode();
        if (hamletCode != null) {
@@ -104,12 +105,12 @@ public class HamletServiceImpl implements HamletService {
        }
        Hamlet createHamlet = validate(hamlet);
        Hamlet newHamlet = repository.save(createHamlet);
-       return mapper.map(newHamlet, HamletDto.class);
+       return "Tạo mới thôn/xóm/bản/tổ dân phố thành công!";
     }
 
     @Transactional
     @Override
-    public HamletDto updateHamlet(String hamletCodeNeedUpdate, CustomHamletRequest hamlet) {
+    public String updateHamlet(String hamletCodeNeedUpdate, CustomHamletRequest hamlet) {
         Hamlet foundHamlet =  repository.findByCode(hamletCodeNeedUpdate).orElseThrow(
                 () -> new ResourceNotFoundException("Thôn/xóm/bản/tổ dân phố", "mã định danh", hamletCodeNeedUpdate)
         );
@@ -128,7 +129,7 @@ public class HamletServiceImpl implements HamletService {
         foundHamlet.setName(createHamlet.getName());
         foundHamlet.setWard(createHamlet.getWard());
         foundHamlet.setAdministrativeUnit(createHamlet.getAdministrativeUnit());
-        return mapper.map(foundHamlet, HamletDto.class);
+        return "Cập nhật thôn/xóm/bản/tổ dân phố thành công!";
     }
 
     private Hamlet validate(CustomHamletRequest hamlet) {

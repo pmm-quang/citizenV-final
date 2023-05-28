@@ -55,21 +55,21 @@ public class ProvinceController {
     @GetMapping("/by-administrative-region/{admRegionId}")
     public ResponseEntity<Object> getAllByAdministrativeRegionId(@PathVariable int admRegionId) {
         List<ProvinceDto> list = provinceService.getAllByAdministrativeRegionId(admRegionId);
-        return new ResponseEntity<>(list, HttpStatus.OK);
+        return ResponseEntity.ok().body(list);
     }
 
     @PreAuthorize("hasAuthority('WRITE')")
     @PostMapping("/save")
-    public ResponseEntity<Object> create(@RequestBody ProvinceDto provinceDto) {
-         ProvinceDto newProvince = provinceService.createProvince(provinceDto);
-         return new ResponseEntity<>(newProvince, HttpStatus.CREATED);
+    public ResponseEntity<?> create(@RequestBody ProvinceDto provinceDto) {
+         String message = provinceService.createProvince(provinceDto);
+         return ResponseEntity.status(201).body(message);
     }
 
     @PreAuthorize("hasAuthority('WRITE')")
     @PutMapping("save/{provinceCode}")
-    public ResponseEntity<ProvinceDto> update(@PathVariable String provinceCode, @RequestBody ProvinceDto province) {
-        ProvinceDto newProvince = provinceService.updateProvince(provinceCode, province);
-        return new ResponseEntity<>(newProvince, HttpStatus.OK);
+    public ResponseEntity<?> update(@PathVariable String provinceCode, @RequestBody ProvinceDto province) {
+        String message = provinceService.updateProvince(provinceCode, province);
+        return ResponseEntity.ok().body(message);
     }
 
 

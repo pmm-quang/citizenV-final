@@ -46,8 +46,8 @@ public class UserController {
     public ResponseEntity<?> createNewPassword(@PathVariable String username, @RequestBody Map<String, String> request ) {
         String newPassword = request.get("newPassword");
         String userDetailUsername = SecurityUtils.getUsernameCurrentUserLogin();
-        UserDto userDto = userService.createNewPassword(userDetailUsername, username, newPassword);
-        return ResponseEntity.ok(userDto);
+        String message = userService.createNewPassword(userDetailUsername, username, newPassword);
+        return ResponseEntity.ok(message);
     }
 
     @PreAuthorize("hasAuthority('WRITE')")
@@ -59,12 +59,12 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('WRITE')")
     @PostMapping("/save")
-    public ResponseEntity<UserDto> createUser(@RequestBody UserDto user) {
+    public ResponseEntity<?> createUser(@RequestBody UserDto user) {
         String divisionUserDetail = SecurityUtils.getDivisionCodeCurrentUserLogin();
         String usernameUserDetail = SecurityUtils.getUsernameCurrentUserLogin();
         System.out.println("username: " + usernameUserDetail + ", divisionCode: " + divisionUserDetail);
-        UserDto userDto = userService.createUser(usernameUserDetail,divisionUserDetail, user);
-        return ResponseEntity.status(201).body(userDto);
+        String message = userService.createUser(usernameUserDetail,divisionUserDetail, user);
+        return ResponseEntity.status(201).body(message);
     }
 
 }
