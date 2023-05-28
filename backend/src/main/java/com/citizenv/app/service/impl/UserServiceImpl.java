@@ -13,6 +13,7 @@ import com.citizenv.app.payload.AdministrativeDivisionDto;
 import com.citizenv.app.payload.DeclarationDto;
 import com.citizenv.app.payload.UserDto;
 import com.citizenv.app.payload.excel.ExcelCitizen;
+import com.citizenv.app.payload.request.ChangePasswordRequest;
 import com.citizenv.app.repository.AdministrativeDivisionRepository;
 import com.citizenv.app.repository.DeclarationRepository;
 import com.citizenv.app.repository.RoleRepository;
@@ -345,14 +346,15 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public UserDto changePassword(String userDetailUsername, String username, String newPassword) {
+    public UserDto createNewPassword(String userDetailUsername, String username, String newPassword) {
         User foundUser = repository.findByUsername(username).orElseThrow(
                 () -> new ResourceNotFoundException("User", "username", username)
         );
+
         if (!userDetailUsername.equals(username)) {
             String createdBy = foundUser.getCreatedBy().getUsername();
             if (!createdBy.equals(userDetailUsername)) {
-                throw new AccessDeniedException("Khong co quyen thay doi mat khau tai khoan nay");
+                throw new AccessDeniedException(Constant.ACCESS_DENIED_MESSAGE_DO_NOT_HAVE_PERMISSION_TO_CHANGE_PASSWORD);
             }
         }
         String newPasswordEncode = encoder.encode(newPassword);
@@ -360,6 +362,25 @@ public class UserServiceImpl implements UserService {
         UserDto userDto = mapper.map(foundUser, UserDto.class);
         userDto.setPassword(null);
         return userDto;
+    }
+
+    @Override
+    public String changePassword(String usernameUserDetail, ChangePasswordRequest request) {
+        if (request.getNewPassword() == null || request.getOldPassword() == null) {
+            throw new InvalidException(Constant.ERR_MESSAGE_NOT_ENTERED_THE_REQUIRED_INFO);
+        }
+        User foundUser = repository.findByUsername(usernameUserDetail).orElseThrow(
+                () -> new ResourceNotFoundException("Tài khoản", "username", usernameUserDetail)
+        );
+//        String oldPassFromRequestEncode = encoder.encode(request.getOldPassword());
+        if (!encoder.matches(request.getOldPassword(), foundUser.getPassword())) {
+            throw new InvalidException("Mật khẩu cũ không đúng");
+        }
+        if (!request.getNewPassword().equals(request.getOldPassword())) {
+            String passEncode = encoder.encode(request.getNewPassword());
+            foundUser.setPassword(passEncode);
+        }
+        return "Change password success!";
     }
 
 
