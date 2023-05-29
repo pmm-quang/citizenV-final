@@ -16,7 +16,7 @@ public class CustomAddressRepositoryImpl implements CustomAddressRepository {
 
     StringBuilder sb;
 
-    public Map<String, String> specialSqlSequenceSelectByProperty;
+    Map<String, String> specialSqlSequenceSelectByProperty;
     Map<String, String> specialSqlSequenceJoinProperty;
 
     public CustomAddressRepositoryImpl() {
@@ -34,16 +34,6 @@ public class CustomAddressRepositoryImpl implements CustomAddressRepository {
         specialSqlSequenceSelectByProperty.put("job", "c.job");
         specialSqlSequenceSelectByProperty.put("ageGroup", "CASE when DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(),c.date_of_birth)), '%Y') + 0 <= 15 then \"Dưới độ tuổi lao động\" when DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(),c.date_of_birth)), '%Y') + 0 <= 65 then \"Trong độ tuổi lao động\" else \"Trên độ tuổi lao động\" end");
         specialSqlSequenceSelectByProperty.put("local", "case when admd2.administrative_unit_id = 7 then 'Nông thôn' else 'Thành thị' end");
-
-        /*specialSqlSequenceJoinProperty.put("bloodType", " join citizens c on. c.id = a.citizen_id");
-        specialSqlSequenceJoinProperty.put("sex", " join citizens c on. c.id = a.citizen_id");
-        specialSqlSequenceJoinProperty.put("maritalStatus", " join citizens c on. c.id = a.citizen_id");
-        specialSqlSequenceJoinProperty.put("ethnicity", " join citizens c on. c.id = a.citizen_id");
-        specialSqlSequenceJoinProperty.put("otherNationality", " join citizens c on. c.id = a.citizen_id");
-        specialSqlSequenceJoinProperty.put("educationalLevel", " join citizens c on. c.id = a.citizen_id");
-        specialSqlSequenceJoinProperty.put("job", " join citizens c on. c.id = a.citizen_id");
-        specialSqlSequenceJoinProperty.put("ageGroup", " join citizens c on. c.id = a.citizen_id");
-        specialSqlSequenceJoinProperty.put("local", " join citizens c on. c.id = a.citizen_id");*/
     }
 
     public CustomAddressRepositoryImpl(EntityManager entityManager) {

@@ -1,6 +1,9 @@
 package com.citizenv.app.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
@@ -8,7 +11,6 @@ import javax.persistence.*;
 @Table(name = "addresses")
 @Getter
 @Setter
-@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 public class Address {
@@ -26,7 +28,7 @@ public class Address {
     private Hamlet hamlet;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "address_type")
+    @JoinColumn(name = "address_type_id")
     private AddressType addressType;
 
     public void setParam (Citizen citizen, Hamlet hamlet, AddressType addressType) {

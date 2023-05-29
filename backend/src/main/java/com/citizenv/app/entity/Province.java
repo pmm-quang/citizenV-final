@@ -22,6 +22,4 @@ public class Province extends AdministrativeDivision {
 //    @ToString.Exclude
 //    @EqualsAndHashCode.Exclude
     private List<District> districts;
-
-    private String administrativeCode;
 }

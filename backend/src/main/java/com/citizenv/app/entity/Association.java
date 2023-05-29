@@ -25,7 +25,7 @@ public class Association {
     private String associatedCitizenName;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "association_type")
+    @JoinColumn(name = "association_type_id")
     private AssociationType associationType;
 
 }

@@ -19,15 +19,13 @@ public interface StatisticsService {
 
     List<PopulationDto> getPopulationListByCitizenProperty(String citizenProperty);
 
-    List<DivisionPopulationByCitizenPropertyDto> getProvincePopulationListByCitizenProperty(String property);
-
     List<AverageAgeDto> getProvinceAverageAgeList();
+
+    List<AverageAgeByYearDto> getAverageAgeByDivisionCodeAndYearRange(String divisionCode, int startYear, int endYear);
 
     List<AgeGroupDto> getPopulationListByAgeGroup(Integer startYear, Integer endYear);
 
     List<PopulationDto> getUrbanAndRuralAreaPopulation();
-
-    List<PopulationDto> getPopulation(Map<String, Object> body);
 
     List<Map<String, Object>> test();
 }

@@ -2,13 +2,13 @@ package com.citizenv.app.service.impl;
 
 import com.citizenv.app.component.Utils;
 import com.citizenv.app.entity.*;
+import com.citizenv.app.exception.InvalidArgumentException;
 import com.citizenv.app.exception.ResourceNotFoundException;
 import com.citizenv.app.payload.population.*;
 import com.citizenv.app.payload.request.DivisionPopulationRequest;
 import com.citizenv.app.repository.AddressRepository;
 import com.citizenv.app.repository.AdministrativeDivisionRepository;
 import com.citizenv.app.repository.CitizenRepository;
-import com.citizenv.app.repository.ProvinceRepository;
 import com.citizenv.app.service.StatisticsService;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -29,15 +29,13 @@ public class StatisticsServiceImpl implements StatisticsService {
     AddressRepository addressRepository;
 
     StringBuilder sb = new StringBuilder();
-    private final ProvinceRepository provinceRepository;
 
     private final AdministrativeDivisionRepository administrativeDivisionRepository;
 
     public StatisticsServiceImpl(CitizenRepository citizenRepository, AddressRepository addressRepository,
-                                 ProvinceRepository provinceRepository, AdministrativeDivisionRepository administrativeDivisionRepository) {
+                                 AdministrativeDivisionRepository administrativeDivisionRepository) {
         this.citizenRepository = citizenRepository;
         this.addressRepository = addressRepository;
-        this.provinceRepository = provinceRepository;
         this.administrativeDivisionRepository = administrativeDivisionRepository;
 
     }
@@ -109,14 +107,6 @@ public class StatisticsServiceImpl implements StatisticsService {
                 }
 
             }
-            // Với mỗi bản ghi Address tìm được thì tìm code của Address trong List result trên và tăng số đếm lên 1
-            /*for (Address currentAddress :
-                    addressesForPopulationCount) {
-                Province currentProvince = currentAddress.getHamlet().getWard().getDistrict().getProvince();
-                if (request.getCodes().contains(currentProvince.getCode())) {
-                    result.stream().filter(population -> population.getCode().equals(currentProvince.getCode())).findFirst().ifPresent(currentResultDto -> currentResultDto.increasePopulation(1L));
-                }
-            }*/
         }
         return result;
     }
@@ -129,7 +119,9 @@ public class StatisticsServiceImpl implements StatisticsService {
                 addressesForPopulationCount) {
             if (currentAddress.getHamlet().getWard().getDistrict().getProvince().getCode().equals(provinceCode)) {
                 District currentDistrict = currentAddress.getHamlet().getWard().getDistrict();
-                result.stream().filter(population -> population.getCode().equals(currentDistrict.getCode())).findFirst().ifPresentOrElse(currentPopulation -> currentPopulation.increasePopulation(1L), () -> result.add(new DivisionGeneralPopulationDto(currentDistrict.getCode(), currentDistrict.getName())));
+                String currentDistrictAdmUnitName = currentDistrict.getAdministrativeUnit().getShortName();
+                sb = new StringBuilder();
+                result.stream().filter(population -> population.getCode().equals(currentDistrict.getCode())).findFirst().ifPresentOrElse(currentPopulation -> currentPopulation.increasePopulation(1L), () -> result.add(new DivisionGeneralPopulationDto(currentDistrict.getCode(), sb.append(currentDistrictAdmUnitName).append(" ").append(currentDistrict.getName()).toString())));
             }
         }
         return result;
@@ -143,7 +135,9 @@ public class StatisticsServiceImpl implements StatisticsService {
                 addressesForPopulationCount) {
             if (currentAddress.getHamlet().getWard().getDistrict().getCode().equals(districtCode)) {
                 Ward currentWard = currentAddress.getHamlet().getWard();
-                result.stream().filter(population -> population.getCode().equals(currentWard.getCode())).findFirst().ifPresentOrElse(currentPopulation -> currentPopulation.increasePopulation(1L), () -> result.add(new DivisionGeneralPopulationDto(currentWard.getCode(), currentWard.getName())));
+                String currentWardAdmUnitName = currentWard.getAdministrativeUnit().getShortName();
+                sb = new StringBuilder();
+                result.stream().filter(population -> population.getCode().equals(currentWard.getCode())).findFirst().ifPresentOrElse(currentPopulation -> currentPopulation.increasePopulation(1L), () -> result.add(new DivisionGeneralPopulationDto(currentWard.getCode(), sb.append(currentWardAdmUnitName).append(" ").append(currentWard.getName()).toString())));
             }
         }
         return result;
@@ -157,7 +151,9 @@ public class StatisticsServiceImpl implements StatisticsService {
                 addressesForPopulationCount) {
             if (currentAddress.getHamlet().getWard().getCode().equals(wardCode)) {
                 Hamlet currentHamlet = currentAddress.getHamlet();
-                result.stream().filter(population -> population.getCode().equals(currentHamlet.getCode())).findFirst().ifPresentOrElse(currentPopulation -> currentPopulation.increasePopulation(1L), () -> result.add(new DivisionGeneralPopulationDto(currentHamlet.getCode(), currentHamlet.getName())));
+                String currentHamletAdmUnitName = currentHamlet.getAdministrativeUnit().getShortName();
+                sb = new StringBuilder();
+                result.stream().filter(population -> population.getCode().equals(currentHamlet.getCode())).findFirst().ifPresentOrElse(currentPopulation -> currentPopulation.increasePopulation(1L), () -> result.add(new DivisionGeneralPopulationDto(currentHamlet.getCode(), sb.append(currentHamletAdmUnitName).append(" ").append(currentHamlet.getName()).toString())));
             }
         }
         return result;
@@ -165,6 +161,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Override
     public AgeGroupDto getPopulationListByAgeGroup(Integer year) {
+        if (year > LocalDate.now().getYear()) throw new InvalidArgumentException("Invalid year");
         List<Address> addressesForPopulationCount = getAddressesForPopulationCount();
         AgeGroupDto result = new AgeGroupDto(year);
         result.getAgeGroupPopulation().add(new PopulationDto(Utils.AGE_GROUP_UNDER_LEGAL_WORKING_AGE));
@@ -219,73 +216,10 @@ public class StatisticsServiceImpl implements StatisticsService {
         }
     }
 
-    @Override
-    public List<DivisionPopulationByCitizenPropertyDto> getProvincePopulationListByCitizenProperty(String property) {
-        /*try {
-            List<Address> addressesForPopulationCount = getAddressesForPopulationCount();
-            List<DivisionPopulationByCitizenPropertyDto> result = new ArrayList<>();
-            sb.setLength(0);
-            Method method;
-            method = Citizen.class.getDeclaredMethod(sb.append("get").append(property.substring(0, 1).toUpperCase()).append(property.substring(1)).toString());
-            for (Address currentAddress :
-                    addressesForPopulationCount) {
-                Citizen currentCitizen = currentAddress.getCitizen();
-                Object currentName = method.invoke(currentCitizen);
-                Province currentProvince = currentAddress.getHamlet().getWard().getDistrict().getProvince();
-                result
-                        .stream()
-                        .filter(population -> population.getCode().equals(currentProvince.getCode()))
-                        .findFirst()
-                        .ifPresentOrElse(divisionPopulationByCitizenPropertyDto ->
-                                divisionPopulationByCitizenPropertyDto.getDetails()
-                                        .stream()
-                                        .filter(populationByCitizenPropertyDto -> populationByCitizenPropertyDto.getName().equals(currentName.toString()))
-                                        .findFirst()
-                                        .ifPresentOrElse(currentPopulationByCitizenPropertyDto ->
-                                                currentPopulationByCitizenPropertyDto.increasePopulation(1L),
-                                                () -> divisionPopulationByCitizenPropertyDto.getDetails().add(new PopulationDto(currentName.toString(), 1L))),
-                                () -> result.add(new DivisionPopulationByCitizenPropertyDto(currentProvince.getCode(), currentProvince.getName(), new ArrayList<>(List.of(new PopulationDto(currentName.toString(), 1L))))));
-            }
-            return result;
-        } catch (SecurityException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
-            throw new RuntimeException();
-        }*/
-        return null;
-    }
-
     private List<Map<String, Object>> getDivisionPopulationByProperty(String code, Set<String> properties) {
         try {
             return addressRepository.countByProperties(properties, code);
-
-
-            /*List<Address> addressesForPopulationCount = getAddressesForPopulationCount(code);
-            List<PopulationDto> result = new ArrayList<>();
-            sb.setLength(0);
-            Method method;
-            method = Citizen.class.getDeclaredMethod(sb.append("get").append(properties.substring(0, 1).toUpperCase()).append(properties.substring(1)).toString());
-            for (Address currentAddress :
-                    addressesForPopulationCount) {
-                Citizen currentCitizen = currentAddress.getCitizen();
-                Object requestProperty = method.invoke(currentCitizen);
-                result.stream().filter(populationDto -> populationDto.getName().equals(requestProperty.toString())).findFirst().ifPresentOrElse(currentPropertyPopulation ->
-                                currentPropertyPopulation.increasePopulation(1L), () -> result.add(new PopulationDto(requestProperty.toString(), 1L)));
-                result
-                        .stream()
-                        .filter(population -> population.getCode().equals(currentProvince.getCode()))
-                        .findFirst()
-                        .ifPresentOrElse(divisionPopulationByCitizenPropertyDto ->
-                                        divisionPopulationByCitizenPropertyDto.getDetails()
-                                                .stream()
-                                                .filter(populationByCitizenPropertyDto -> populationByCitizenPropertyDto.getName().equals(requestProperty.toString()))
-                                                .findFirst()
-                                                .ifPresentOrElse(currentPopulationByCitizenPropertyDto ->
-                                                                currentPopulationByCitizenPropertyDto.increasePopulation(1L),
-                                                        () -> divisionPopulationByCitizenPropertyDto.getDetails().add(new PopulationDto(requestProperty.toString(), 1L))),
-                                () -> result.add(new DivisionPopulationByCitizenPropertyDto(currentProvince.getCode(), currentProvince.getName(), new ArrayList<>(List.of(new PopulationDto(requestProperty.toString(), 1L))))));
-            }
-            return result;*/
-        } catch (SecurityException/* | NoSuchMethodException | InvocationTargetException | IllegalAccessException*/ e) {
+        } catch (SecurityException e) {
             e.printStackTrace();
             throw new RuntimeException();
         }
@@ -317,6 +251,34 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
+    public List<AverageAgeByYearDto> getAverageAgeByDivisionCodeAndYearRange(String divisionCode, int startYear, int endYear) {
+        List<AverageAgeByYearDto> result = new ArrayList<>();
+        for (int currentYear = startYear; currentYear <= endYear; currentYear++) {
+            result.add(getAverageAgeByDivisionCodeAndYear(divisionCode, currentYear));
+        }
+        return result;
+    }
+
+    private AverageAgeByYearDto getAverageAgeByDivisionCodeAndYear(String divisionCode, int currentYear) {
+        if (currentYear > LocalDate.now().getYear()) throw new InvalidArgumentException("Invalid year");
+        List<Address> addressesForPopulationCount = getAddressesForPopulationCount(divisionCode);
+        double totalAge = 0;
+        long populationCount = 0L;
+        for (Address currentAddress :
+                addressesForPopulationCount) {
+            int ageSinceCurrentYear = Period.between(currentAddress.getCitizen().getDateOfBirth(), LocalDate.of(currentYear, 1, 1)).getYears();
+            if (ageSinceCurrentYear > 0) {
+                totalAge += ageSinceCurrentYear;
+                populationCount++;
+            }
+            System.out.println("Current year: " + currentYear + ", current address: " + currentAddress.getId() + ", current age: " + ageSinceCurrentYear + ", total: " + totalAge + ", count: " + populationCount);
+        }
+        AdministrativeDivision currentDivision = administrativeDivisionRepository.findByCode(divisionCode).orElseThrow(() -> new ResourceNotFoundException("Division", "code", divisionCode));
+        double averageAge = totalAge / populationCount;
+        return new AverageAgeByYearDto(currentDivision.getCode(), currentDivision.getName(), currentYear, averageAge);
+    }
+
+    @Override
     public List<AgeGroupDto> getPopulationListByAgeGroup(Integer startYear, Integer endYear) {
         List<AgeGroupDto> result = new ArrayList<>();
         for (Integer i = startYear; i <= endYear; i++) {
@@ -338,11 +300,6 @@ public class StatisticsServiceImpl implements StatisticsService {
         }
         return result;
 
-    }
-
-    @Override
-    public List<PopulationDto> getPopulation(Map<String, Object> body) {
-        return null;
     }
 
     @Override

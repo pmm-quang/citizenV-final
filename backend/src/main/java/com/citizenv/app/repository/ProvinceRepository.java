@@ -23,8 +23,6 @@ public interface ProvinceRepository extends JpaRepository<Province, Long> {
 
     Optional<Province> findByName(String name);
 
-    Optional<Province> findByAdministrativeCode(String admCode);
-
     List<Province> findAllByAdministrativeUnit(AdministrativeUnit administrativeUnit);
 
     List<Province> findAllByAdministrativeRegion(AdministrativeRegion administrativeRegion);
