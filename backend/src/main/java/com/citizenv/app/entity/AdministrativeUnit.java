@@ -17,7 +17,6 @@ public class AdministrativeUnit {
 
     private String fullName;
     private String shortName;
-    private String codeName;
 
     @OneToMany(mappedBy = "administrativeUnit", fetch = FetchType.LAZY)
     @ToString.Exclude

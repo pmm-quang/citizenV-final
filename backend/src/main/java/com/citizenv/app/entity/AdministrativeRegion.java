@@ -16,9 +16,6 @@ public class AdministrativeRegion {
     private Integer id;
 
     private String name;
-    private String nameEn;
-    private String codeName;
-    private String codeNameEn;
 
     @OneToMany(mappedBy = "administrativeRegion", cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
     @ToString.Exclude
