@@ -1,6 +1,7 @@
 package com.citizenv.app.service.impl;
 
 
+import com.citizenv.app.component.Constant;
 import com.citizenv.app.component.Utils;
 import com.citizenv.app.entity.*;
 import com.citizenv.app.exception.InvalidException;
@@ -96,18 +97,6 @@ public class CitizenServiceImpl implements CitizenService {
     }
 
     @Override
-    public Map<String, Object> getAll(int page) {
-        Page<Citizen> citizenEntities = repo.findAll(PageRequest.of(page - 1, 15));
-        return getStringObjectMap(page, citizenEntities);
-    }
-
-    public CitizenDto getById(String citizenId) {
-        Citizen citizen = repo.findById(citizenId).orElseThrow(
-                () -> new ResourceNotFoundException("Customer", "CustomerID", citizenId));
-        return mapper.map(citizen, CitizenDto.class);
-    }
-
-    @Override
     public CitizenDto getByNationalId(String nationalId) {
         Citizen citizen = repo.findByNationalId(nationalId).orElseThrow(
                 () -> new ResourceNotFoundException("Người dân", "mã định danh", nationalId));
@@ -129,7 +118,8 @@ public class CitizenServiceImpl implements CitizenService {
         Hamlet foundHamlet = hamletRepo.findByCode(hamletCode).orElseThrow(
                 ()-> new ResourceNotFoundException("Thôn/xóm/bản/tổ dân phố", "mã định danh", hamletCode)
         );
-        Page<Citizen> citizensPage = repo.findAllByHamletCode(hamletCode, 2, PageRequest.of(page - 1, 15));
+        Long hamletId = foundHamlet.getId();
+        Page<CustomCitizenResponse> citizensPage = repo.findAllByHamletCode(hamletCode, 2, PageRequest.of(page - 1, 15));
         return getStringObjectMap(page, citizensPage);
     }
 
@@ -138,16 +128,7 @@ public class CitizenServiceImpl implements CitizenService {
         District foundDistrict = districtRepo.findByCode(districtCode).orElseThrow(
                 () -> new ResourceNotFoundException("Huyện/thị xã/thành phố", "mã định danh", districtCode)
         );
-        Page<Citizen> citizensPage = repo.findAllByDistrictCode(districtCode, 2, PageRequest.of(page - 1, 15));
-        return getStringObjectMap(page, citizensPage);
-    }
-
-    @Override
-    public Map<String, Object> getAllByProvinceCode(String provinceCode, int page) {
-        Province foundProvince = provinceRepo.findByCode(provinceCode).orElseThrow(
-                () -> new ResourceNotFoundException("Tỉnh/thành phố", "mã định danh", provinceCode)
-        );
-        Page<Citizen> citizensPage = repo.findAllByProvinceCode(provinceCode, 2, PageRequest.of(page - 1, 15));
+        Page<CustomCitizenResponse> citizensPage = repo.findAllByDistrictCode(districtCode, 2, PageRequest.of(page - 1, 15));
         return getStringObjectMap(page, citizensPage);
     }
 
@@ -305,24 +286,15 @@ public class CitizenServiceImpl implements CitizenService {
 
     }
 
-    private Map<String, Object> getStringObjectMap(int page, Page<Citizen> citizensPage) {
-        List<CitizenDto> list = citizensPage.stream().map(l-> mapper.map(l, CitizenDto.class)).collect(Collectors.toList());
+    private Map<String, Object> getStringObjectMap(int page, Page<CustomCitizenResponse> citizensPage) {
+//        List<CitizenDto> list = citizensPage.stream().map(l-> mapper.map(l, CitizenDto.class)).collect(Collectors.toList());
         Map<String, Object> res = new HashMap<>();
         res.put("totalPages", citizensPage.getTotalPages());
         res.put("totalElements", citizensPage.getTotalElements());
         res.put("page", page);
         res.put("pageSize", citizensPage.getNumberOfElements());
-        res.put("citizens", list);
+        res.put("citizens", citizensPage);
         return res;
-    }
-
-    @Override
-    public List<CitizenDto> getAllByWardCode(String wardCode) {
-        Ward foundWard = wardRepo.findByCode(wardCode).orElseThrow(
-                () -> new ResourceNotFoundException("Xã/phường/thị trấn", "mã định danh", wardCode)
-        );
-        List<Citizen> entities = repo.findAllByWardCode(wardCode, 2);
-        return entities.stream().map(l-> mapper.map(l, CitizenDto.class)).collect(Collectors.toList());
     }
 
     @Override
@@ -330,32 +302,10 @@ public class CitizenServiceImpl implements CitizenService {
         Ward foundWard = wardRepo.findByCode(wardCode).orElseThrow(
                 () -> new ResourceNotFoundException("Xã/phường/thị trấn", "mã định danh", wardCode)
         );
-        Page<Citizen> citizensPage = repo.findAllByWardCode(wardCode, 2, PageRequest.of(page - 1, 15));
+        Page<CustomCitizenResponse> citizensPage = repo.findAllByWardCode(wardCode, 2, PageRequest.of(page - 1, 15));
         return getStringObjectMap(page, citizensPage);
     }
 
-    @Override
-    public List<CitizenDto> getAllByDistrictCode(String districtCode) {
-        District foundDistrict = districtRepo.findByCode(districtCode).orElseThrow(
-                () -> new ResourceNotFoundException("Quận/huyện/thị xã", "mã định danh", districtCode)
-        );
-        List<Citizen> entities = repo.findAllByDistrictCode(districtCode, 2);
-        return entities.stream().map(l-> mapper.map(l, CitizenDto.class)).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<CitizenDto> getAllByProvinceCode(String provinceCode) {
-        Province foundProvince = provinceRepo.findByCode(provinceCode).orElseThrow(
-                () -> new ResourceNotFoundException("Tỉnh/thành phố", "mã định danh", provinceCode)
-        );
-        List<Citizen> entities = repo.findAllByProvinceCode(provinceCode, 2);
-        return entities.stream().map(l-> mapper.map(l, CitizenDto.class)).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<CitizenDto> getAllByAddressId(String addressId) {
-        return null;
-    }
     @Override
     public void deleteCitizen(String citizenId) {
         Citizen foundCitizen = repo.findById(citizenId).orElseThrow(
@@ -384,24 +334,24 @@ public class CitizenServiceImpl implements CitizenService {
             if (a.getAddressType() == 1) {
                 checkHometown = true;
                 if (a.getHamletCode() == null || a.getProvinceCode() == null) {
-                    throw new InvalidException("Truong que quan phai khac null");
+                    throw new InvalidException(Constant.ERR_MESSAGE_NOT_ENTERED_THE_REQUIRED_INFO);
                 }
                 provinceCodeOfQueQuan = a.getProvinceCode();
             } else if (a.getAddressType() == 2) {
                 checkPermanentAddress = true;
                 if (a.getHamletCode() == null || a.getProvinceCode() == null) {
-                    throw new InvalidException("Truong dia chi thuong tru phai khac null");
+                    throw new InvalidException(Constant.ERR_MESSAGE_NOT_ENTERED_THE_REQUIRED_INFO);
                 }
             }
         }
         if (!checkHometown || !checkPermanentAddress) {
-            throw new InvalidException("Chua nhap du cac truong dia chi bat buoc");
+            throw new InvalidException(Constant.ERR_MESSAGE_NOT_ENTERED_THE_REQUIRED_INFO);
         }
 
         // Kiểm tra số định danh- id
-//        if (!Utils.validateNationalId(nationalId,sex, provinceCodeOfQueQuan, dateOfBirth)) {
-//            throw new InvalidException("Ma so dinh danh khong hop le");
-//        }
+        if (!Utils.validateNationalId(nationalId,sex, provinceCodeOfQueQuan, dateOfBirth)) {
+            throw new InvalidException("Mã số định danh không hợp lệ");
+        }
         //Kiểm tra định dạng tên tiếng Việt hợp lệ - name
 //        String name = citizen.getName();
 //        if (!Utils.validateName(name)) {
@@ -410,7 +360,7 @@ public class CitizenServiceImpl implements CitizenService {
 
         //Kiểm tra giới tính hợp lệ - sex
         if (!Utils.validateSex(sex)) {
-            throw new InvalidException("Gioi tinh khong hop le");
+            throw new InvalidException("Giới tính không hợp lệ");
         }
 
         //Kiểm tra nhóm máu - bloodType
@@ -418,13 +368,13 @@ public class CitizenServiceImpl implements CitizenService {
             try {
                 Utils.BloodType.valueOf(bloodType);
             } catch (IllegalArgumentException e) {
-                throw new InvalidException("Nhom mau khong hop le");
+                throw new InvalidException("Nhóm máu không hợp lệ");
             }
         }
 
         //Kiểm tra ngày sinh hợp lệ - dateOfBirth
         if (dateOfBirth.isAfter(LocalDate.now())) {
-            throw new InvalidException("Ngay thang nam sinh khong hop le");
+            throw new InvalidException("Ngày tháng năm sinh không hợp lệ");
         }
         Ethnicity foundEthnicity = null;
         if (ethnicityId != null) {
@@ -447,6 +397,8 @@ public class CitizenServiceImpl implements CitizenService {
         c.setSex(sex);
         c.setMaritalStatus(maritalStatus);
         c.setOtherNationality(otherNationality);
+        c.setEducationalLevel(citizenRequest.getEducationalLevel());
+        c.setJob(citizenRequest.getJob());
         c.setEthnicity(foundEthnicity);
         c.setReligion(foundReligion);
         return c;
@@ -568,7 +520,7 @@ public class CitizenServiceImpl implements CitizenService {
         }
         else {
             conditionCitizen.append(" c.otherNationality is null \n");
-            conditionClauses.add(String.valueOf(conditionClauses));
+            conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
         }
         if (request.getReligionId() != null) {
@@ -579,7 +531,7 @@ public class CitizenServiceImpl implements CitizenService {
         }
         else {
             conditionCitizen.append(" c.religion is null \n");
-            conditionClauses.add(String.valueOf(conditionClauses));
+            conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
         }
         if (request.getJob() != null) {
@@ -590,7 +542,7 @@ public class CitizenServiceImpl implements CitizenService {
         }
         else {
             conditionCitizen.append(" c.job is null \n");
-            conditionClauses.add(String.valueOf(conditionClauses));
+            conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
         }
         if (request.getEducationalLevel() != null) {
@@ -601,7 +553,7 @@ public class CitizenServiceImpl implements CitizenService {
         }
         else {
             conditionCitizen.append(" c.educationalLevel is null \n");
-            conditionClauses.add(String.valueOf(conditionClauses));
+            conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
         }
 //        if (request.get)

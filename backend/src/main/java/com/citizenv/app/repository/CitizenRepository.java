@@ -1,6 +1,7 @@
 package com.citizenv.app.repository;
 
 import com.citizenv.app.entity.Citizen;
+import com.citizenv.app.payload.custom.CustomCitizenResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -36,12 +37,12 @@ public interface CitizenRepository extends JpaRepository<Citizen, Long> {
             "where h.code = :hamletCode and a.addressType.id = :addressTypeId")
     List<Citizen> findAllByHamletCode(@Param("hamletCode") String hamletCode,
                                       @Param("addressTypeId") Integer addressTypeId);
-    @Query(value = "select c from Citizen c " +
+    @Query(value = "select new com.citizenv.app.payload.custom.CustomCitizenResponse(c.nationalId, c.name, c.sex) from Citizen c " +
             "join Address a on c.id = a.citizen.id " +
             "join Hamlet h on h.code = a.hamlet.code " +
             "where h.code = :hamletCode and a.addressType.id = :addressTypeId")
-    Page<Citizen> findAllByHamletCode(@Param("hamletCode") String hamletCode,
-                                      @Param("addressTypeId") Integer addressTypeId, Pageable pageable);
+    Page<CustomCitizenResponse> findAllByHamletCode(@Param("hamletCode") String hamletCode,
+                                                    @Param("addressTypeId") Integer addressTypeId, Pageable pageable);
     @Query(value = "select c from Citizen c " +
             "join Address a on c.id = a.citizen.id " +
             "join Hamlet h on h.code = a.hamlet.code " +
@@ -50,12 +51,12 @@ public interface CitizenRepository extends JpaRepository<Citizen, Long> {
     List<Citizen> findAllByWardCode(@Param("wardCode") String wardCode,
                                     @Param("addressTypeId") Integer addressTypeId);
 
-    @Query(value = "select c from Citizen c " +
+    @Query(value = "select new com.citizenv.app.payload.custom.CustomCitizenResponse(c.nationalId, c.name, c.sex) from Citizen c " +
             "join Address a on c.id = a.citizen.id " +
             "join Hamlet h on h.code = a.hamlet.code " +
             "join Ward w on w.code = h.ward.code " +
             "where w.code = :wardCode and a.addressType.id = :addressTypeId")
-    Page<Citizen> findAllByWardCode(@Param("wardCode") String wardCode,
+    Page<CustomCitizenResponse> findAllByWardCode(@Param("wardCode") String wardCode,
                                     @Param("addressTypeId") Integer addressTypeId, Pageable pageable);
     @Query(value = "select c from Citizen c " +
             "join Address a on c.id = a.citizen.id " +
@@ -66,13 +67,13 @@ public interface CitizenRepository extends JpaRepository<Citizen, Long> {
     List<Citizen> findAllByDistrictCode(@Param("districtCode") String districtCode,
                                         @Param("addressTypeId") Integer addressTypeId);
 
-    @Query(value = "select c from Citizen c " +
+    @Query(value = "select new com.citizenv.app.payload.custom.CustomCitizenResponse(c.nationalId, c.name, c.sex) from Citizen c " +
             "join Address a on c.id = a.citizen.id " +
             "join Hamlet h on h.code = a.hamlet.code " +
             "join Ward w on w.code = h.ward.code " +
             "join District d on d.code = w.district.code " +
             "where d.code = :districtCode and a.addressType.id = :addressTypeId")
-    Page<Citizen> findAllByDistrictCode(@Param("districtCode") String districtCode,
+    Page<CustomCitizenResponse> findAllByDistrictCode(@Param("districtCode") String districtCode,
                                         @Param("addressTypeId") Integer addressTypeId, Pageable pageable);
     @Query(value = "select c from Citizen c " +
             "join Address a on c.id = a.citizen.id " +

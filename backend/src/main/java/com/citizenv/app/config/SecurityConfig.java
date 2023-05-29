@@ -77,16 +77,9 @@ public class SecurityConfig {
                 .antMatchers("**/user/save").hasAnyRole("A1", "A2", "A3", "B1")
                 .antMatchers("**/user/change-password/**").hasAnyRole("A1", "A2", "A3", "B1", "B2")
                 .anyRequest().authenticated();
-  //      http.authenticationProvider(authenticationProvider());
-                // .anyRequest().authenticated();
 //               .anyRequest().permitAll();
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-//                .and()
-//                .logout()
-//                .logoutUrl("/logout")
-//                .invalidateHttpSession(true)
-//                .deleteCookies("JSESSIONID");
         return http.build();
     }
 }

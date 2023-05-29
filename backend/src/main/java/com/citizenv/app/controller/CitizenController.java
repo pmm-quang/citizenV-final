@@ -36,12 +36,6 @@ public class CitizenController {
         return new ResponseEntity<>(citizenDtoList, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/", params = "page")
-    public ResponseEntity<Map<String, Object>> getAll(@RequestParam int page) {
-        Map<String, Object> dtoPaginationList = citizenService.getAll(page);
-        return new ResponseEntity<>(dtoPaginationList, HttpStatus.OK);
-    }
-
     @GetMapping("/{nationalId}")
     public ResponseEntity<CitizenDto> getByNationalId(@PathVariable String nationalId) {
         CitizenDto citizenDto = citizenService.getByNationalId(nationalId);
@@ -50,19 +44,13 @@ public class CitizenController {
 
     @GetMapping(value = "/by-hamlet/{hamletCode}", params = "page")
     public ResponseEntity<Map<String, Object>> getAllByHamletCode(@PathVariable String hamletCode, @RequestParam int page) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        CustomUserDetail userDetail = (CustomUserDetail) authentication.getPrincipal();
+
         String divisionCode = SecurityUtils.getDivisionCodeCurrentUserLogin();
-        if (divisionCode == null) {
+        if (divisionCode == null || hamletCode.indexOf(divisionCode) == 0) {
             Map<String, Object> list = citizenService.getAllByHamletCode(hamletCode, page);
             return new ResponseEntity<>(list, HttpStatus.OK);
         } else {
-            if (hamletCode.indexOf(divisionCode) == 0) {
-                Map<String, Object> list = citizenService.getAllByHamletCode(hamletCode, page);
-                return new ResponseEntity<>(list, HttpStatus.OK);
-            } else {
-                throw new AccessDeniedException("Khong co quyen try cap");
-            }
+            throw new AccessDeniedException("Không có quyền truy cập");
         }
     }
 
@@ -77,44 +65,6 @@ public class CitizenController {
         Map<String, Object> list = citizenService.getAllByDistrictCode(districtCode, page);
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
-
-//    @GetMapping(value = "/by-province/{provinceCode}", params = "page")
-//    public ResponseEntity<Map<String, Object>> getAllByProvinceCode(@PathVariable String provinceCode, @RequestParam int page) {
-//        Map<String, Object> list = citizenService.getAllByProvinceCode(provinceCode, page);
-//        return new ResponseEntity<>(list, HttpStatus.OK);
-//    }
-
-//    @GetMapping("/by-hamlet/{hamletCode}")
-//    public ResponseEntity<List<CitizenDto>> getAllByHamletCode(@PathVariable String hamletCode) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        CustomUserDetail userDetail = (CustomUserDetail) authentication.getPrincipal();
-//        String divisionCode = userDetail.getUser().getDivision().getCode();
-//        if (hamletCode.indexOf(divisionCode) == 0) {
-//            List<CitizenDto> list = citizenService.getAllByHamletCode(hamletCode);
-//            return new ResponseEntity<>(list, HttpStatus.OK);
-//        } else {
-//            throw new AccessDeniedException("Khong co quyen truy cap");
-//        }
-//    }
-
-//    @GetMapping("/by-ward/{wardCode}")
-//    public ResponseEntity<List<CitizenDto>> getAllByWardCode(@PathVariable String wardCode) {
-//        List<CitizenDto> list = citizenService.getAllByWardCode(wardCode);
-//        return new ResponseEntity<>(list, HttpStatus.OK);
-//    }
-
-//    @GetMapping("/by-district/{districtCode}")
-//    public ResponseEntity<List<CitizenDto>> getAllByDistrictCode(@PathVariable String districtCode) {
-//        List<CitizenDto> list = citizenService.getAllByDistrictCode(districtCode);
-//        return new ResponseEntity<>(list, HttpStatus.OK);
-//    }
-
-//    @GetMapping("/by-province/{provinceCode}")
-//    public ResponseEntity<List<CitizenDto>> getAllByProvinceCode(@PathVariable String provinceCode) {
-//        List<CitizenDto> list = citizenService.getAllByProvinceCode(provinceCode);
-//        return new ResponseEntity<>(list, HttpStatus.OK);
-//    }
-
     @PreAuthorize("hasAnyAuthority('WRITE')")
     @PostMapping("/save")
     public ResponseEntity<?> createCitizen(@RequestBody CustomCitizenRequest citizen) {

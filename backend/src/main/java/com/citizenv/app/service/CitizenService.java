@@ -12,15 +12,9 @@ import java.util.Map;
 
 public interface CitizenService {
     List<CitizenDto> getAll();
-
-    Map<String, Object> getAll(int page);
-    CitizenDto getById(String citizenId);
     CitizenDto getByNationalId(String nationalId);
     List<CitizenDto> getAllByHamletCode(String hamletCode);
-    List<CitizenDto> getAllByWardCode(String wardCode);
-    List<CitizenDto> getAllByDistrictCode(String districtCode);
-    List<CitizenDto> getAllByProvinceCode(String provinceCode);
-    List<CitizenDto> getAllByAddressId(String addressId); //get dia chi thuong tru
+
 
     void deleteCitizen(String citizenId);
 
@@ -30,7 +24,6 @@ public interface CitizenService {
 
     Map<String, Object> getAllByDistrictCode(String districtCode, int page);
 
-    Map<String, Object> getAllByProvinceCode(String provinceCode, int page);
 
     String createCitizen(CustomCitizenRequest citizen);
     String updateCitizen(String nationalId, CustomCitizenRequest citizen);
