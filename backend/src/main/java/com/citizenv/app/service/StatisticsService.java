@@ -21,13 +21,11 @@ public interface StatisticsService {
 
     List<AverageAgeDto> getProvinceAverageAgeList();
 
-    List<AverageAgeByYearDto> getAverageAgeByDivisionCodeAndYearRange(String divisionCode, int startYear, int endYear);
+    Map<String, Object> getAverageAgeByDivisionCodeAndYearRange(String divisionCode, int startYear, int endYear);
 
     List<AgeGroupDto> getPopulationListByAgeGroup(Integer startYear, Integer endYear);
 
     List<PopulationDto> getUrbanAndRuralAreaPopulation();
-
-    List<Map<String, Object>> test();
 
     Map<String, Object> getPopulationListByAgeGroup(String divisionCode, Integer startYear, Integer endYear);
 }

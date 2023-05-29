@@ -45,7 +45,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         return addressRepository.findByAddressType_Id(2);
     }
 
-    @Cacheable("addressesForPopulationCount")
+    @Cacheable(value = "addressesForPopulationCount", key = "#code")
     public List<Address> getAddressesForPopulationCount(String code) {
         return addressRepository.findByAddressType_IdAndDivisionCode(2, code);
     }
@@ -267,22 +267,26 @@ public class StatisticsServiceImpl implements StatisticsService {
             }
         }
         for (Map.Entry<String, List<Long>> entry : totalAgeMap.entrySet()) {
-            String[] codeAndNamePair = entry.getKey().split(",");
-            result.add(new AverageAgeDto(codeAndNamePair[0], codeAndNamePair[1], entry.getValue().get(1).doubleValue() / entry.getValue().get(0).doubleValue()));
+            result.add(new AverageAgeDto(LocalDate.now().getYear(), entry.getValue().get(1).doubleValue() / entry.getValue().get(0).doubleValue()));
         }
         return result;
     }
 
     @Override
-    public List<AverageAgeByYearDto> getAverageAgeByDivisionCodeAndYearRange(String divisionCode, int startYear, int endYear) {
-        List<AverageAgeByYearDto> result = new ArrayList<>();
+    public Map<String, Object> getAverageAgeByDivisionCodeAndYearRange(String divisionCode, int startYear, int endYear) {
+        List<AverageAgeDto> averageAgeDtos = new ArrayList<>();
         for (int currentYear = startYear; currentYear <= endYear; currentYear++) {
-            result.add(getAverageAgeByDivisionCodeAndYear(divisionCode, currentYear));
+            averageAgeDtos.add(getAverageAgeByDivisionCodeAndYear(divisionCode, currentYear));
         }
+        Map<String, Object> result = new HashMap<>();
+        AdministrativeDivision currentDivision = administrativeDivisionRepository.findByCode(divisionCode).orElseThrow(() -> new ResourceNotFoundException("Division", "code", divisionCode));
+        result.put("code", divisionCode);
+        result.put("name", currentDivision.getName());
+        result.put("details", averageAgeDtos);
         return result;
     }
 
-    private AverageAgeByYearDto getAverageAgeByDivisionCodeAndYear(String divisionCode, int currentYear) {
+    private AverageAgeDto getAverageAgeByDivisionCodeAndYear(String divisionCode, int currentYear) {
         if (currentYear > LocalDate.now().getYear()) throw new InvalidArgumentException("Invalid year");
         List<Address> addressesForPopulationCount = getAddressesForPopulationCount(divisionCode);
         double totalAge = 0;
@@ -298,7 +302,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         }
         AdministrativeDivision currentDivision = administrativeDivisionRepository.findByCode(divisionCode).orElseThrow(() -> new ResourceNotFoundException("Division", "code", divisionCode));
         double averageAge = totalAge / populationCount;
-        return new AverageAgeByYearDto(currentDivision.getCode(), currentDivision.getName(), currentYear, averageAge);
+        return new AverageAgeDto(currentYear, averageAge);
     }
 
     @Override
@@ -323,16 +327,6 @@ public class StatisticsServiceImpl implements StatisticsService {
         }
         return result;
 
-    }
-
-    @Override
-    public List<Map<String, Object>> test() {
-        Set<String> properties = new HashSet<>();
-        properties.add("sex");
-        properties.add("local");
-        String code = "24";
-        List<Map<String, Object>> a = addressRepository.countByProperties(properties, code);
-        return a;
     }
 
     @Override

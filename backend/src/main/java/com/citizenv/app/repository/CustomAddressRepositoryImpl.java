@@ -15,6 +15,7 @@ public class CustomAddressRepositoryImpl implements CustomAddressRepository {
     private EntityManager entityManager;
 
     StringBuilder sb;
+    StringBuilder sb2;
 
     Map<String, String> specialSqlSequenceSelectByProperty;
     Map<String, String> specialSqlSequenceJoinProperty;
@@ -47,19 +48,21 @@ public class CustomAddressRepositoryImpl implements CustomAddressRepository {
         String propertiesSqlSelectSequence;
         String propertiesGroupBySequence = "";
         Iterator<String> propertiesIterator = properties.iterator();
+        sb2 = new StringBuilder(propertiesGroupBySequence);
         while (propertiesIterator.hasNext()) {
             String tempKey = propertiesIterator.next();
             String temp = specialSqlSequenceSelectByProperty.get(tempKey);
             sb.append(temp);
             sb.append(" as ");
             sb.append(tempKey);
-            propertiesGroupBySequence += tempKey;
+            sb2.append(tempKey);
             if (propertiesIterator.hasNext()) {
                 sb.append(", ");
-                propertiesGroupBySequence += ", ";
+                sb2.append(", ");
             }
         }
         propertiesSqlSelectSequence = sb.toString();
+        propertiesGroupBySequence = sb2.toString();
         String codeSqlSequence = "";
         sb.setLength(0);
         if (code != null) {
@@ -70,14 +73,13 @@ public class CustomAddressRepositoryImpl implements CustomAddressRepository {
         String resultSqlString;
         resultSqlString = sb.append("select ")
                 .append(propertiesSqlSelectSequence)
-                .append(", count(*) as population from addresses a join citizens c on c.id = a.citizen_id join hamlets h on h.id = a.hamlet_id join administrative_divisions admd1 on admd1.id = h.id join administrative_divisions admd2 on admd2.code = left(admd1.code, 4) join ethnicities eth on eth.id = c.ethnicity_id left join religions re on re.id = c.religion_id where a.address_type = 2")
+                .append(", count(*) as population from addresses a join citizens c on c.id = a.citizen_id join hamlets h on h.id = a.hamlet_id join administrative_divisions admd1 on admd1.id = h.id join administrative_divisions admd2 on admd2.code = left(admd1.code, 4) join ethnicities eth on eth.id = c.ethnicity_id left join religions re on re.id = c.religion_id where a.address_type_id = 2")
                 .append(codeSqlSequence)
                 .append("group by ")
                 .append(propertiesGroupBySequence).toString();
         Query query = entityManager.createNativeQuery(resultSqlString);
         NativeQueryImpl nativeQuery = (NativeQueryImpl) query;
         nativeQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
-        List<Map<String,Object>> result = nativeQuery.getResultList();
-        return result;
+        return (List<Map<String,Object>>) nativeQuery.getResultList();
     }
 }

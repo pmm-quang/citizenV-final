@@ -11,7 +11,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-@CrossOrigin(origins = {"http://localhost:3000/", "http://localhost:3001/"})
 @RestController
 @RequestMapping("api/v1/statistics")
 public class StatisticsController {
@@ -42,7 +41,6 @@ public class StatisticsController {
 
     @PostMapping("/population/division")
     public ResponseEntity<List<DivisionGeneralPopulationDto>> getDivisionPopulationList(@RequestBody DivisionPopulationRequest request) {
-        System.out.println(request.toString());
         List<DivisionGeneralPopulationDto> population = statisticsService.getDivisionPopulationList(request);
         return new ResponseEntity<>(population, HttpStatus.OK);
     }
@@ -77,18 +75,6 @@ public class StatisticsController {
         return new ResponseEntity<>(population, HttpStatus.OK);
     }
 
-    /*@GetMapping(value = "/population/province/citizen", params = "property")
-    public ResponseEntity<List<DivisionPopulationByCitizenPropertyDto>> getProvincePopulationListByCitizenProperty(@RequestParam String property) {
-        List<DivisionPopulationByCitizenPropertyDto> population = populationService.getProvincePopulationListByCitizenProperty(property);
-        return new ResponseEntity<>(population, HttpStatus.OK);
-    }
-
-    @GetMapping(value = "/population/district/citizen", params = "property")
-    public ResponseEntity<List<DivisionPopulationByCitizenPropertyDto>> getDistrictPopulationListByCitizenProperty(@RequestParam String property) {
-        List<DivisionPopulationByCitizenPropertyDto> population = populationService.getProvincePopulationListByCitizenProperty(property);
-        return new ResponseEntity<>(population, HttpStatus.OK);
-    }*/
-
     @GetMapping(value = "/population/citizen/age-group", params = {"startYear", "endYear"})
     public ResponseEntity<List<AgeGroupDto>> getPopulationListByAgeGroup(@RequestParam Integer startYear, @RequestParam Integer endYear) {
         List<AgeGroupDto> population = statisticsService.getPopulationListByAgeGroup(startYear, endYear);
@@ -114,14 +100,8 @@ public class StatisticsController {
     }
 
     @GetMapping(value = "/avg-age", params = {"divisionCode", "startYear", "endYear"})
-    public ResponseEntity<List<AverageAgeByYearDto>> getProvinceAverageAgeByDivisionCode(@RequestParam String divisionCode, @RequestParam int startYear, @RequestParam int endYear) {
-        List<AverageAgeByYearDto> divisionAvgAgeDtoByYearRange = statisticsService.getAverageAgeByDivisionCodeAndYearRange(divisionCode, startYear, endYear);
+    public ResponseEntity<Map<String, Object>> getProvinceAverageAgeByDivisionCode(@RequestParam String divisionCode, @RequestParam int startYear, @RequestParam int endYear) {
+        Map<String, Object> divisionAvgAgeDtoByYearRange = statisticsService.getAverageAgeByDivisionCodeAndYearRange(divisionCode, startYear, endYear);
         return new ResponseEntity<>(divisionAvgAgeDtoByYearRange, HttpStatus.OK);
-    }
-
-    @GetMapping("/test")
-    public ResponseEntity<List<Map<String, Object>>> test() {
-        List<Map<String, Object>> population = statisticsService.test();
-        return new ResponseEntity<>(population, HttpStatus.OK);
     }
 }

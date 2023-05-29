@@ -6,14 +6,16 @@ import java.text.DecimalFormat;
 
 @Data
 public class AverageAgeDto {
-    private String code;
-    private String name;
-    private Double averageAge;
+    Integer year;
+    protected Double averageAge;
     private static DecimalFormat df = new DecimalFormat(".#");
 
-    public AverageAgeDto(String s, String s1, double d) {
-        code = s;
-        name = s1;
+    public AverageAgeDto(double d) {
+        averageAge = d;
+    }
+
+    public AverageAgeDto(int i, double d) {
+        year = i;
         averageAge = d;
     }
 

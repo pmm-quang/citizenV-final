@@ -23,6 +23,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -134,6 +135,7 @@ public class CitizenServiceImpl implements CitizenService {
 
     @Transactional
     @Override
+    @CacheEvict(value = "addressesForPopulationCount", allEntries = true)
     public String createCitizen(CustomCitizenRequest citizen) {
         String nId = citizen.getNationalId();
         repo.findByNationalId(nId).ifPresent(
@@ -190,6 +192,7 @@ public class CitizenServiceImpl implements CitizenService {
 
     @Transactional
     @Override
+    @CacheEvict(value = "addressesForPopulationCount", allEntries = true)
     public String updateCitizen(String nationalId, CustomCitizenRequest citizen) {
         Citizen foundCitizen = repo.findByNationalId(nationalId).orElseThrow(
                 () -> new ResourceNotFoundException("Người dân", "mã số định danh", nationalId)
