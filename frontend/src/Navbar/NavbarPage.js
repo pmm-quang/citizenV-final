@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Form, Modal, Button } from 'react-bootstrap';
 import { useState } from 'react';
 import { IoMdConstruct } from 'react-icons/io'
+import axios from 'axios';
 
 function NavbarPage() {
   const user_account = JSON.parse(localStorage.getItem("user"));
@@ -16,8 +17,42 @@ function NavbarPage() {
 
   const [show, setShow] = useState(false)
   const [showChangePassword, setShowChangePassword] = useState(false)
+  const [oldPassword, setOldPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [repeatNewPassword, setRepeatNewPassword] = useState('')
+  const [message, setMessage] = useState()
+  const [showWarning, setShowWarning] = useState(false)
 
   let navigate = useNavigate();
+  const config = {
+    headers: {
+      Authorization: `Bearer ${user_account.accessToken}`
+    },
+  };
+
+  const ChangeUserPassword = async () => {
+    if (newPassword === '' || repeatNewPassword === '' || oldPassword === '') {
+      setMessage("HÃY NHẬP ĐẦY ĐỦ THÔNG TIN TRƯỚC KHI XÁC NHẬN THAY ĐỔI")
+      setShowWarning(true)
+    } else if (newPassword !== repeatNewPassword) {
+      setMessage("MẬT KHẨU NHẬP LẠI KHÔNG TRÙNG KHỚP VỚI MẬT KHẨU TRƯỚC ĐÓ")
+      setShowWarning(true)
+    } else {
+      try {
+        await axios.put("http://localhost:8080/api/v1/user/change-password", {
+          oldPassword: oldPassword,
+          newPassword: newPassword
+        }, config)
+        setShowWarning(false)
+        setShowChangePassword(false)
+      } catch (error) {
+        console.log(error)
+        let messageEdit = String(error.response.data)
+        setMessage(messageEdit.toUpperCase())
+        setShowWarning(true)
+      }
+    }
+  }
 
   const GetChangePassWordAccount = () => {
     return (
@@ -48,14 +83,28 @@ function NavbarPage() {
               <Form.Control value={user_account.declarationStatus} disabled />
             </Form.Group> : null}
             <Form.Group className="mb-3">
+              <Form.Label>Mật khẩu hiện tại</Form.Label>
+              <Form.Control type = "password" value={oldPassword} onChange={(e) => {
+                setOldPassword(e.target.value)
+                setShowWarning(false)
+              }} />
+            </Form.Group>
+            <Form.Group className="mb-3">
               <Form.Label>Mật khẩu mới</Form.Label>
-              <Form.Control />
+              <Form.Control type = "password" value={newPassword} onChange={(e) => {
+                setNewPassword(e.target.value)
+                setShowWarning(false)
+              }} />
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Nhập lại mật khẩu</Form.Label>
-              <Form.Control />
+              <Form.Control type = "password" value={repeatNewPassword} onChange={(e) => {
+                setRepeatNewPassword(e.target.value)
+                setShowWarning(false)
+              }} />
             </Form.Group>
           </Form>
+          {(showWarning) ? <div className="noteWarning"><p>{message}</p></div> : null}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => {
@@ -64,7 +113,7 @@ function NavbarPage() {
             Đóng
           </Button>
           <Button variant="primary" onClick={() => {
-
+            ChangeUserPassword()
           }}>
             Xác nhận
           </Button>
@@ -85,10 +134,16 @@ function NavbarPage() {
           {(author !== 'A1' && author !== 'B2') ? user_account.username + " - " + user_account.division.name : null}
           <AiOutlineLogout className='iconLogout' onClick={() => {
             navigate('/login')
-            localStorage.removeItem("user")
+            localStorage.clear()
           }
           } />
-          <IoMdConstruct className='iconChangePassword' onClick={() => setShowChangePassword(true)} />
+          <IoMdConstruct className='iconChangePassword' onClick={() => {
+            setShowChangePassword(true)
+            setOldPassword('')
+            setNewPassword('')
+            setRepeatNewPassword('')
+          }
+          } />
         </div>
       </div>
       <div className="listOptions">
@@ -118,7 +173,7 @@ function NavbarPage() {
           </div>
         </div>
       </div>
-      <GetChangePassWordAccount />
+      {GetChangePassWordAccount()}
     </div>
   );
 }

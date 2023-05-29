@@ -4,7 +4,7 @@
     margin-right: 30px;
 }
 
-.title{
+.title {
     margin-right: 10px;
     margin-top: 10px;
     font-weight: bold;
@@ -19,8 +19,6 @@
 
 .flexStatic {
     display: flex;
-    margin-top: 10px;
-    margin-left: 10px;
 }
 
 .tableResidentialInHamlet {
@@ -52,7 +50,6 @@
 .flex_first {
     align-items: center;
     width: 30%;
-    margin-top: 30px;
     border: 2px solid black;
 }
 
@@ -61,15 +58,6 @@
     text-align: center;
     margin-top: 30px;
     width: 100%;
-}
-
-.optionStatic {
-    margin-left: 10px;
-    margin-bottom: 10px;
-}
-
-.optionStatic:hover {
-    cursor: pointer;
 }
 
 .chartLine {
@@ -81,11 +69,25 @@
 .flex-year {
     display: flex;
     margin-bottom: 20px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.flexFormInput {
+    display: flex;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .formInput {
     margin-right: 20px;
     display: flex;
+}
+
+.formInputMultiOption {
+    margin-right: 20px;
+    display: flex;
+    margin-left: 5%;
 }
 
 .titleSelectYear {
@@ -95,4 +97,64 @@
 
 .selectMultiOption {
     width: 60%;
+}
+
+.statisOption {
+    width: 20%;
+    border-right: 3px solid black;
+}
+
+.statisOption .title {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.statisOption .buttonOption {
+    width: 100%;
+    text-align: center;
+    border-bottom: 2px solid black;
+    height: 50px;
+    background-color: rgb(130, 91, 237);
+}
+
+.statisOption .buttonOption:hover {
+    cursor: pointer;
+    background-color: rgb(173, 150, 237)
+}
+
+.buttonChildOption {
+    text-align: center;
+    border-bottom: 2px solid black;
+    background-color: rgb(91, 191, 237);
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.buttonChildOption:hover {
+    cursor: pointer;
+    background-color: rgb(150, 217, 237)
+}
+
+.statisOption .buttonOption .titleOption {
+    padding-top: 12px;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.optionStatic {
+    margin-left: 20%;
+    margin-bottom: 10px;
+}
+
+.optionStatic:hover {
+    cursor: pointer;
+}
+
+.noteStatis {
+    font-size: 12px;
+    margin-left: 10px;
+    margin-right: 5px;
+    margin-top: 10px;
+    font-style: italic;
 }

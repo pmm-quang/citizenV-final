@@ -68,7 +68,9 @@ function CitizenInput() {
     const [nameHamletAddress2, setNameHamletAddress2] = useState("")
     const [declaration, setDeclaration] = useState()
     const [file, setFile] = useState()
-    
+    const [job, setJob] = useState()
+    const [educationalLevel, setEducationalLevel] = useState()
+
 
     const GetDecleration = async () => {
         try {
@@ -266,7 +268,7 @@ function CitizenInput() {
             headers: {
                 "Content-Type": "multipart/form-data",
                 "Authorization": `Bearer ${user_account.accessToken}`
-              },
+            },
         }
         console.log(config)
         try {
@@ -277,7 +279,7 @@ function CitizenInput() {
         }
     }
 
-    
+
     const SetDefault = () => {
         setProvinceCodeAddress1("")
         setDistrictCodeAddress1("");
@@ -436,300 +438,325 @@ function CitizenInput() {
                             <Form.Control type="text" className="inputForm" value={otherNationality} onChange={(e) => setOtherNationality(e.target.value)} />
                         </Form.Group>
                     </div>
-                </div>
-            </div>
-        )
-    }
-
-    const SecondPageFormInput = () => {
-        return (
-            <div style={{ margin: '20px 20px 20px 20px', border: '2px solid black' }}>
-                <div className='titlePage'>TRANG 2: THÔNG TIN CƠ BẢN CỦA NGƯỜI DÂN (TIẾP)</div>
-                <div className="listForm">
                     <div className='formFlex'>
-                        <div className="titleFlex">10*. QUÊ QUÁN</div>
                         <Form.Group className="mb-5">
-                            <Form.Label>Tỉnh / Thành phố</Form.Label>
-                            <Form.Select aria-label="Default select example" className='inputForm' value={provinceCodeAddress1} onChange={(e) => {
-                                fetchDistrict(e.target.value, 1)
-                                setProvinceCodeAddress1(e.target.value)
-                                setWardsAddress1([])
-                                setHamletsAddress1([])
-                            }}>
+                            <Form.Label>10. Nghề nghiệp</Form.Label>
+                            <Form.Select className="inputForm" value={job} onChange={(e) => setJob(e.target.value)}>
                                 <option></option>
-                                {listProvincesAddress1}
+                                <option value = "Tiểu học">1. Tiểu học</option>
+                                <option value = "Trung học cơ sở">2. Trung học cơ sở</option>
+                                <option value = "Trung học phổ thông">3. Trung học phổ thông</option>
+                                <option value = "Trung cấp">4. Trung cấp</option>
+                                <option value = "Cao đẳng/Đại học">5. Cao đẳng/Đại học</option>
                             </Form.Select>
                         </Form.Group>
                         <Form.Group className="mb-5">
-                            <Form.Label>Quận/Huyện/Thị xã</Form.Label>
-                            <Form.Select aria-label="Default select example" className='inputForm' value={districtCodeAddress1} onChange={(e) => {
-                                fetchWard(e.target.value, 1)
-                                setDistrictCodeAddress1(e.target.value)
-                                setHamletsAddress1([])
-                            }}>
+                            <Form.Label>11. Trình độ văn hóa</Form.Label>
+                            <Form.Select className="inputForm" value={educationalLevel} onChange={(e) => setEducationalLevel(e.target.value)}>
                                 <option></option>
-                                {listDistrictsAddress1}
-                            </Form.Select>
-                        </Form.Group>
-                        <Form.Group className="mb-5">
-                            <Form.Label>Xã/Phường/Thị trấn</Form.Label>
-                            <Form.Select aria-label="Default select example" className='inputForm' value={wardCodeAddress1} onChange={(e) => {
-                                setWardCodeAddress1(e.target.value, 1)
-                                fetchHamlet(e.target.value, 1)
-                            }}>
-                                <option></option>
-                                {listWardsAddress1}
-                            </Form.Select>
-                        </Form.Group>
-                        <Form.Group className="mb-5">
-                            <Form.Label>Thôn/Xóm/Tổ dân phố</Form.Label>
-                            <Form.Select aria-label="Default select example" className='inputForm' value={hamletCodeAddress1} onChange={(e) => {
-                                setHamletCodeAddress1(e.target.value, 1)
-                            }}>
-                                <option></option>
-                                {listHamletsAddress1}
-                            </Form.Select>
-                        </Form.Group>
-                    </div>
-                    <div className='formFlex'>
-                        <div className="titleFlex">11. ĐỊA CHỈ THƯỜNG TRÚ</div>
-                        <Form.Group className="mb-5">
-                            <Form.Label>Tỉnh / Thành phố</Form.Label>
-                            <Form.Control aria-label="Default select example" className='inputForm' value={provinceCodeAddress2 + ". " + nameProvinceAddress2} disabled />
-                        </Form.Group>
-                        <Form.Group className="mb-5">
-                            <Form.Label>Quận/Huyện/Thị xã</Form.Label>
-                            <Form.Control aria-label="Default select example" className='inputForm' value={districtCodeAddress2 + ". " + nameDistrictAddress2} disabled />
-                        </Form.Group>
-                        <Form.Group className="mb-5">
-                            <Form.Label>Xã/Phường/Thị trấn</Form.Label>
-                            <Form.Control aria-label="Default select example" className='inputForm' value={wardCodeAddress2 + ". " + nameWardAddress2} disabled
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-5">
-                            <Form.Label>Thôn/Xóm/Tổ dân phố</Form.Label>
-                            <Form.Control aria-label="Default select example" className='inputForm' value={hamletCodeAddress2 + ". " + nameHamletAddress2} disabled
-                            />
-                        </Form.Group>
-                    </div>
-                    <div className='formFlex'>
-                        <div className="titleFlex">12. ĐỊA CHỈ TẠM TRÚ</div>
-                        <Form.Group className="mb-5">
-                            <Form.Label>Tỉnh / Thành phố</Form.Label>
-                            <Form.Select aria-label="Default select example" className='inputForm' value={provinceCodeAddress3} onChange={(e) => {
-                                fetchDistrict(e.target.value, 3)
-                                setProvinceCodeAddress3(e.target.value)
-                                setWardsAddress3([])
-                                setHamletsAddress3([])
-                            }}>
-                                <option></option>
-                                {listProvincesAddress3}
-                            </Form.Select>
-                        </Form.Group>
-                        <Form.Group className="mb-5">
-                            <Form.Label>Quận/Huyện/Thị xã</Form.Label>
-                            <Form.Select aria-label="Default select example" className='inputForm' value={districtCodeAddress3} onChange={(e) => {
-                                fetchWard(e.target.value, 3)
-                                setDistrictCodeAddress3(e.target.value)
-                                setHamletsAddress3([])
-                            }}>
-                                <option></option>
-                                {listDistrictsAddress3}
-                            </Form.Select>
-                        </Form.Group>
-                        <Form.Group className="mb-5">
-                            <Form.Label>Xã/Phường/Thị trấn</Form.Label>
-                            <Form.Select aria-label="Default select example" className='inputForm' value={wardCodeAddress3} onChange={(e) => {
-                                setWardCodeAddress3(e.target.value, 3)
-                                fetchHamlet(e.target.value, 3)
-                            }}>
-                                <option></option>
-                                {listWardsAddress3}
-                            </Form.Select>
-                        </Form.Group>
-                        <Form.Group className="mb-5">
-                            <Form.Label>Thôn/Xóm/Tổ dân phố</Form.Label>
-                            <Form.Select aria-label="Default select example" className='inputForm' value={hamletCodeAddress3} onChange={(e) => {
-                                setHamletCodeAddress3(e.target.value, 3)
-                            }}>
-                                <option></option>
-                                {listHamletsAddress3}
+                                <option value = "Tiểu học">1. Tiểu học</option>
+                                <option value = "Trung học cơ sở">2. Trung học cơ sở</option>
+                                <option value = "Trung học phổ thông">3. Trung học phổ thông</option>
+                                <option value = "Trung cấp">4. Trung cấp</option>
+                                <option value = "Cao đẳng/Đại học">5. Cao đẳng/Đại học</option>
                             </Form.Select>
                         </Form.Group>
                     </div>
                 </div>
             </div>
         )
-    }
+}
 
-    const ThirdPageFormInput = () => {
-        return (
-            <div style={{ margin: '20px 20px 20px 20px', border: '2px solid black' }}>
-                <div className='titlePage'>TRANG 3: THÔNG TIN CƠ BẢN CỦA NGƯỜI THÂN</div>
-                <div className="listForm">
-                    <div className='formFlex'>
-                        <div className="titleFlex">13. BỐ</div>
-                        <Form.Group className="mb-4">
-                            <Form.Label>Họ và tên</Form.Label>
-                            <Form.Control type="text" className='inputForm' value={fullNameAssociation1} onChange={(e) => setFullNameAssociation1(e.target.value)} />
-                        </Form.Group>
-                        <Form.Group className="mb-4">
-                            <Form.Label>Số CMND/CCCD</Form.Label>
-                            <Form.Control type="text" className='inputForm' value={nationalIdAssociation1} onChange={(e) => setNationalIdAssociation1(e.target.value)} />
-                        </Form.Group>
-                        <div className="titleFlex">14. MẸ</div>
-                        <Form.Group className="mb-4">
-                            <Form.Label>Họ và tên</Form.Label>
-                            <Form.Control type="text" className='inputForm' value={fullNameAssociation2} onChange={(e) => setFullNameAssociation2(e.target.value)} />
-                        </Form.Group>
-                        <Form.Group className="mb-4">
-                            <Form.Label>Số CMND/CCCD</Form.Label>
-                            <Form.Control type="text" className='inputForm' value={nationalIdAssociation2} onChange={(e) => setNationalIdAssociation2(e.target.value)} />
-                        </Form.Group>
-                    </div>
-                    <div className='formFlex'>
-                        <div className="titleFlex">15. VỢ/CHỒNG</div>
-                        <Form.Group className="mb-4">
-                            <Form.Label>Họ và tên</Form.Label>
-                            <Form.Control type="text" className='inputForm' value={fullNameAssociation3} onChange={(e) => setFullNameAssociation3(e.target.value)} />
-                        </Form.Group>
-                        <Form.Group className="mb-4">
-                            <Form.Label>Số CMND/CCCD</Form.Label>
-                            <Form.Control type="text" className='inputForm' value={nationalIdAssociation3} onChange={(e) => setNationalIdAssociation3(e.target.value)} />
-                        </Form.Group>
-                        <div className="titleFlex">16. NGƯỜI GIÁM HỘ HỢP PHÁP</div>
-                        <Form.Group className="mb-4">
-                            <Form.Label>Họ và tên</Form.Label>
-                            <Form.Control type="text" className='inputForm' value={fullNameAssociation4} onChange={(e) => setFullNameAssociation4(e.target.value)} />
-                        </Form.Group>
-                        <Form.Group className="mb-4" >
-                            <Form.Label>Số CMND/CCCD</Form.Label>
-                            <Form.Control type="text" className='inputForm' value={nationalIdAssociation4} onChange={(e) => setNationalIdAssociation4(e.target.value)} />
-                        </Form.Group>
-                    </div>
+const SecondPageFormInput = () => {
+    return (
+        <div style={{ margin: '20px 20px 20px 20px', border: '2px solid black' }}>
+            <div className='titlePage'>TRANG 2: THÔNG TIN CƠ BẢN CỦA NGƯỜI DÂN (TIẾP)</div>
+            <div className="listForm">
+                <div className='formFlex'>
+                    <div className="titleFlex">12*. QUÊ QUÁN</div>
+                    <Form.Group className="mb-5">
+                        <Form.Label>Tỉnh / Thành phố</Form.Label>
+                        <Form.Select aria-label="Default select example" className='inputForm' value={provinceCodeAddress1} onChange={(e) => {
+                            fetchDistrict(e.target.value, 1)
+                            setProvinceCodeAddress1(e.target.value)
+                            setWardsAddress1([])
+                            setHamletsAddress1([])
+                        }}>
+                            <option></option>
+                            {listProvincesAddress1}
+                        </Form.Select>
+                    </Form.Group>
+                    <Form.Group className="mb-5">
+                        <Form.Label>Quận/Huyện/Thị xã</Form.Label>
+                        <Form.Select aria-label="Default select example" className='inputForm' value={districtCodeAddress1} onChange={(e) => {
+                            fetchWard(e.target.value, 1)
+                            setDistrictCodeAddress1(e.target.value)
+                            setHamletsAddress1([])
+                        }}>
+                            <option></option>
+                            {listDistrictsAddress1}
+                        </Form.Select>
+                    </Form.Group>
+                    <Form.Group className="mb-5">
+                        <Form.Label>Xã/Phường/Thị trấn</Form.Label>
+                        <Form.Select aria-label="Default select example" className='inputForm' value={wardCodeAddress1} onChange={(e) => {
+                            setWardCodeAddress1(e.target.value, 1)
+                            fetchHamlet(e.target.value, 1)
+                        }}>
+                            <option></option>
+                            {listWardsAddress1}
+                        </Form.Select>
+                    </Form.Group>
+                    <Form.Group className="mb-5">
+                        <Form.Label>Thôn/Xóm/Tổ dân phố</Form.Label>
+                        <Form.Select aria-label="Default select example" className='inputForm' value={hamletCodeAddress1} onChange={(e) => {
+                            setHamletCodeAddress1(e.target.value, 1)
+                        }}>
+                            <option></option>
+                            {listHamletsAddress1}
+                        </Form.Select>
+                    </Form.Group>
+                </div>
+                <div className='formFlex'>
+                    <div className="titleFlex">13. ĐỊA CHỈ THƯỜNG TRÚ</div>
+                    <Form.Group className="mb-5">
+                        <Form.Label>Tỉnh / Thành phố</Form.Label>
+                        <Form.Control aria-label="Default select example" className='inputForm' value={provinceCodeAddress2 + ". " + nameProvinceAddress2} disabled />
+                    </Form.Group>
+                    <Form.Group className="mb-5">
+                        <Form.Label>Quận/Huyện/Thị xã</Form.Label>
+                        <Form.Control aria-label="Default select example" className='inputForm' value={districtCodeAddress2 + ". " + nameDistrictAddress2} disabled />
+                    </Form.Group>
+                    <Form.Group className="mb-5">
+                        <Form.Label>Xã/Phường/Thị trấn</Form.Label>
+                        <Form.Control aria-label="Default select example" className='inputForm' value={wardCodeAddress2 + ". " + nameWardAddress2} disabled
+                        />
+                    </Form.Group>
+                    <Form.Group className="mb-5">
+                        <Form.Label>Thôn/Xóm/Tổ dân phố</Form.Label>
+                        <Form.Control aria-label="Default select example" className='inputForm' value={hamletCodeAddress2 + ". " + nameHamletAddress2} disabled
+                        />
+                    </Form.Group>
+                </div>
+                <div className='formFlex'>
+                    <div className="titleFlex">14. ĐỊA CHỈ TẠM TRÚ</div>
+                    <Form.Group className="mb-5">
+                        <Form.Label>Tỉnh / Thành phố</Form.Label>
+                        <Form.Select aria-label="Default select example" className='inputForm' value={provinceCodeAddress3} onChange={(e) => {
+                            fetchDistrict(e.target.value, 3)
+                            setProvinceCodeAddress3(e.target.value)
+                            setWardsAddress3([])
+                            setHamletsAddress3([])
+                        }}>
+                            <option></option>
+                            {listProvincesAddress3}
+                        </Form.Select>
+                    </Form.Group>
+                    <Form.Group className="mb-5">
+                        <Form.Label>Quận/Huyện/Thị xã</Form.Label>
+                        <Form.Select aria-label="Default select example" className='inputForm' value={districtCodeAddress3} onChange={(e) => {
+                            fetchWard(e.target.value, 3)
+                            setDistrictCodeAddress3(e.target.value)
+                            setHamletsAddress3([])
+                        }}>
+                            <option></option>
+                            {listDistrictsAddress3}
+                        </Form.Select>
+                    </Form.Group>
+                    <Form.Group className="mb-5">
+                        <Form.Label>Xã/Phường/Thị trấn</Form.Label>
+                        <Form.Select aria-label="Default select example" className='inputForm' value={wardCodeAddress3} onChange={(e) => {
+                            setWardCodeAddress3(e.target.value, 3)
+                            fetchHamlet(e.target.value, 3)
+                        }}>
+                            <option></option>
+                            {listWardsAddress3}
+                        </Form.Select>
+                    </Form.Group>
+                    <Form.Group className="mb-5">
+                        <Form.Label>Thôn/Xóm/Tổ dân phố</Form.Label>
+                        <Form.Select aria-label="Default select example" className='inputForm' value={hamletCodeAddress3} onChange={(e) => {
+                            setHamletCodeAddress3(e.target.value, 3)
+                        }}>
+                            <option></option>
+                            {listHamletsAddress3}
+                        </Form.Select>
+                    </Form.Group>
                 </div>
             </div>
-        )
-    }
+        </div>
+    )
+}
 
-    // Show message out of declared time
-    const NotifyDeclaration = () => {
-        return (
-            <div>
-                <div className="warning">HIỆN KHÔNG PHẢI THỜI GIAN KHAI BÁO DÂN SỐ</div>
-                <div className="childWarning">Vui lòng quay trở lại sau</div>
-            </div>
-        )
-    }
-
-    // Show message completed declaration
-    const NotifyCompleteDeclaration = () => {
-        return (
-            <div>
-                <div className="successNotify">ĐÃ HOÀN THÀNH KHAI BÁO</div>
-                <div className="childSuccessNotify">Vui lòng quay trở lại sau</div>
-            </div>
-        )
-    }
-
-    const ModalNotify = () => {
-        return (
-            <Modal show={showNotify}>
-                <Modal.Header className='headerModal'>
-                    <Modal.Title className='titleModal' style={{ color: (checked) ? 'green' : 'red', fontWeight: 'bold' }}>{(checked) ? "THÊM NGƯỜI DÂN THÀNH CÔNG" : "THÊM NGƯỜI DÂN KHÔNG THÀNH CÔNG"}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    {(checked) ? "Bạn có thể kiểm tra thông tin người dân vừa nhập bằng cách sử dụng chức năng tìm kiếm" : "Hãy nhập đầy đủ thông tin ở các trường bắt buộc"}
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => {
-                        setShowNotify(false)
-                    }}>
-                        Đóng
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-        )
-    }
-
-    // form input excel
-    const ModalInputByExcel = () => {
-        return (
-            <Modal show={showInput}>
-                <Modal.Header className='headerModal'>
-                    <Modal.Title className='titleModal'>NHẬP DỮ LIỆU TỪ FILE</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form>
-                        <Form.Control type="file" accept=".xlsx, .xls, .csv" onChange={(e) => {
-                            setFile(e.target.files[0])}
-                        } />
-                    </Form>
-                    <div className="noteInputbyfile">Lưu ý: Chỉ chấp nhận các định dạng: ".xlsx", ".xls", ".csv"</div>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => {
-                        setShowInput(false)
-                    }}>
-                        Đóng
-                    </Button>
-                    <Button variant="secondary" onClick={() => {
-                        setShowInput(false)
-                        PostFileExcel()
-                    }}>
-                        Xác nhận
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-        )
-    }
-
-    const ListOptionButton = () => {
-        return (
-            <div>
-                <div className='pagelistButton'>
-                    <Button className={(page === 1) ? "optionButtonSelect" : "optionButton"} onClick={() => setPage(1)}>Trang 1</Button>
-                    <Button className={(page === 2) ? "optionButtonSelect" : "optionButton"} onClick={() => setPage(2)}>Trang 2</Button>
-                    <Button className={(page === 3) ? "optionButtonSelect" : "optionButton"} onClick={() => setPage(3)}>Trang 3</Button>
+const ThirdPageFormInput = () => {
+    return (
+        <div style={{ margin: '20px 20px 20px 20px', border: '2px solid black' }}>
+            <div className='titlePage'>TRANG 3: THÔNG TIN CƠ BẢN CỦA NGƯỜI THÂN</div>
+            <div className="listForm">
+                <div className='formFlex'>
+                    <div className="titleFlex">15. BỐ</div>
+                    <Form.Group className="mb-4">
+                        <Form.Label>Họ và tên</Form.Label>
+                        <Form.Control type="text" className='inputForm' value={fullNameAssociation1} onChange={(e) => setFullNameAssociation1(e.target.value)} />
+                    </Form.Group>
+                    <Form.Group className="mb-4">
+                        <Form.Label>Số CMND/CCCD</Form.Label>
+                        <Form.Control type="text" className='inputForm' value={nationalIdAssociation1} onChange={(e) => setNationalIdAssociation1(e.target.value)} />
+                    </Form.Group>
+                    <div className="titleFlex">16. MẸ</div>
+                    <Form.Group className="mb-4">
+                        <Form.Label>Họ và tên</Form.Label>
+                        <Form.Control type="text" className='inputForm' value={fullNameAssociation2} onChange={(e) => setFullNameAssociation2(e.target.value)} />
+                    </Form.Group>
+                    <Form.Group className="mb-4">
+                        <Form.Label>Số CMND/CCCD</Form.Label>
+                        <Form.Control type="text" className='inputForm' value={nationalIdAssociation2} onChange={(e) => setNationalIdAssociation2(e.target.value)} />
+                    </Form.Group>
                 </div>
-                <div className='listButton'>
-                    <Button className="optionButton" onClick={() => OnClickButton()}>Xác nhận</Button>
-                    <Button className="optionButton" onClick={() => SetDefault()}>Xóa toàn bộ dữ liệu</Button>
-                    <Button className="optionButton" onClick={() => setShowInput(true)}>Nhập bằng tệp</Button>
-                    <a href={PDFFile} download="mau-phieu-thu-thap-thong-tin-dan-cu" target="_blank" rel="noreferrer">
-                        <Button className="optionButton">Tải mẫu phiếu</Button>
-                    </a>
-                    <a href={ExcelFile} download="mau-file-du-lieu-dan-cu" target="_blank" rel="noreferrer">
-                        <Button className="optionButton">Tải file mẫu</Button>
-                    </a>
+                <div className='formFlex'>
+                    <div className="titleFlex">17. VỢ/CHỒNG</div>
+                    <Form.Group className="mb-4">
+                        <Form.Label>Họ và tên</Form.Label>
+                        <Form.Control type="text" className='inputForm' value={fullNameAssociation3} onChange={(e) => setFullNameAssociation3(e.target.value)} />
+                    </Form.Group>
+                    <Form.Group className="mb-4">
+                        <Form.Label>Số CMND/CCCD</Form.Label>
+                        <Form.Control type="text" className='inputForm' value={nationalIdAssociation3} onChange={(e) => setNationalIdAssociation3(e.target.value)} />
+                    </Form.Group>
+                    <div className="titleFlex">18. NGƯỜI GIÁM HỘ HỢP PHÁP</div>
+                    <Form.Group className="mb-4">
+                        <Form.Label>Họ và tên</Form.Label>
+                        <Form.Control type="text" className='inputForm' value={fullNameAssociation4} onChange={(e) => setFullNameAssociation4(e.target.value)} />
+                    </Form.Group>
+                    <Form.Group className="mb-4" >
+                        <Form.Label>Số CMND/CCCD</Form.Label>
+                        <Form.Control type="text" className='inputForm' value={nationalIdAssociation4} onChange={(e) => setNationalIdAssociation4(e.target.value)} />
+                    </Form.Group>
                 </div>
             </div>
-        )
-    }
+        </div>
+    )
+}
 
-    const FormInput = () => {
-        return (
-            <div>
-                <div>
-                    <ListOptionButton />
-                </div>
-                {(page === 1) ? FirstPageFormInput() : null}
-                {(page === 2) ? SecondPageFormInput() : null}
-                {(page === 3) ? ThirdPageFormInput() : null}
-                <ModalNotify />
-                {ModalInputByExcel()}
-            </div>
-        )
-    }
-
+// Show message out of declared time
+const NotifyDeclaration = () => {
     return (
         <div>
-            <NavbarPage />
-            {(status === "Đang khai báo") ? FormInput() : null}
-            {(status === "Đã hoàn thành") ? <NotifyCompleteDeclaration /> : null}
-            {(status === "Chưa cấp quyền khai báo" || status === "Đã khóa") ? <NotifyDeclaration /> : null}
+            <div className="warning">HIỆN KHÔNG PHẢI THỜI GIAN KHAI BÁO DÂN SỐ</div>
+            <div className="childWarning">Vui lòng quay trở lại sau</div>
         </div>
-    );
+    )
+}
+
+// Show message completed declaration
+const NotifyCompleteDeclaration = () => {
+    return (
+        <div>
+            <div className="successNotify">ĐÃ HOÀN THÀNH KHAI BÁO</div>
+            <div className="childSuccessNotify">Vui lòng quay trở lại sau</div>
+        </div>
+    )
+}
+
+const ModalNotify = () => {
+    return (
+        <Modal show={showNotify}>
+            <Modal.Header className='headerModal'>
+                <Modal.Title className='titleModal' style={{ color: (checked) ? 'green' : 'red', fontWeight: 'bold' }}>{(checked) ? "THÊM NGƯỜI DÂN THÀNH CÔNG" : "THÊM NGƯỜI DÂN KHÔNG THÀNH CÔNG"}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                {(checked) ? "Bạn có thể kiểm tra thông tin người dân vừa nhập bằng cách sử dụng chức năng tìm kiếm" : "Hãy nhập đầy đủ thông tin ở các trường bắt buộc"}
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={() => {
+                    setShowNotify(false)
+                }}>
+                    Đóng
+                </Button>
+            </Modal.Footer>
+        </Modal>
+    )
+}
+
+// form input excel
+const ModalInputByExcel = () => {
+    return (
+        <Modal show={showInput}>
+            <Modal.Header className='headerModal'>
+                <Modal.Title className='titleModal'>NHẬP DỮ LIỆU TỪ FILE</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <Form>
+                    <Form.Control type="file" accept=".xlsx, .xls, .csv" onChange={(e) => {
+                        setFile(e.target.files[0])
+                    }
+                    } />
+                </Form>
+                <div className="noteInputbyfile">Lưu ý: Chỉ chấp nhận các định dạng: ".xlsx", ".xls", ".csv"</div>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={() => {
+                    setShowInput(false)
+                }}>
+                    Đóng
+                </Button>
+                <Button variant="secondary" onClick={() => {
+                    setShowInput(false)
+                    PostFileExcel()
+                }}>
+                    Xác nhận
+                </Button>
+            </Modal.Footer>
+        </Modal>
+    )
+}
+
+const ListOptionButton = () => {
+    return (
+        <div>
+            <div className='pagelistButton'>
+                <Button className={(page === 1) ? "optionButtonSelect" : "optionButton"} onClick={() => setPage(1)}>Trang 1</Button>
+                <Button className={(page === 2) ? "optionButtonSelect" : "optionButton"} onClick={() => setPage(2)}>Trang 2</Button>
+                <Button className={(page === 3) ? "optionButtonSelect" : "optionButton"} onClick={() => setPage(3)}>Trang 3</Button>
+            </div>
+            <div className='listButton'>
+                <Button className="optionButton" onClick={() => OnClickButton()}>Xác nhận</Button>
+                <Button className="optionButton" onClick={() => SetDefault()}>Xóa toàn bộ dữ liệu</Button>
+                <Button className="optionButton" onClick={() => setShowInput(true)}>Nhập bằng tệp</Button>
+                <a href={PDFFile} download="mau-phieu-thu-thap-thong-tin-dan-cu" target="_blank" rel="noreferrer">
+                    <Button className="optionButton">Tải mẫu phiếu</Button>
+                </a>
+                <a href={ExcelFile} download="mau-file-du-lieu-dan-cu" target="_blank" rel="noreferrer">
+                    <Button className="optionButton">Tải file mẫu</Button>
+                </a>
+            </div>
+        </div>
+    )
+}
+
+const FormInput = () => {
+    return (
+        <div>
+            <div>
+                <ListOptionButton />
+            </div>
+            {(page === 1) ? FirstPageFormInput() : null}
+            {(page === 2) ? SecondPageFormInput() : null}
+            {(page === 3) ? ThirdPageFormInput() : null}
+            <ModalNotify />
+            {ModalInputByExcel()}
+        </div>
+    )
+}
+
+return (
+    <div>
+        <NavbarPage />
+        {(status === "Đang khai báo") ? FormInput() : null}
+        {(status === "Đã hoàn thành") ? <NotifyCompleteDeclaration /> : null}
+        {(status === "Chưa cấp quyền khai báo" || status === "Đã khóa") ? <NotifyDeclaration /> : null}
+    </div>
+);
 }
 
 export default CitizenInput;

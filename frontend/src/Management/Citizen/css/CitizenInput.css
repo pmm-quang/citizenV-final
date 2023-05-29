@@ -37,7 +37,7 @@
 }
 
 .formFlex {
-    flex: 400px;
+    flex: 300px;
     margin-left: 30px;
 }
 
@@ -89,4 +89,12 @@
     font-weight: bold;
     font-size: 35px;
     text-align: center;
+}
+
+.firstPageFlex {
+    display: flex
+}
+
+.secondPageFlex {
+    display: flex
 }

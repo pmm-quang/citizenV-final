@@ -13,9 +13,6 @@ import Hamlet from '../Management/AdministrativeUnits/Controler/Hamlet';
 import InfoAccount from '../Management/Account/Controller/InfoAccount';
 
 function Router() {
-  const user_account = JSON.parse(localStorage.getItem("user"));
-  const author = user_account.role;
-
   return (
     <BrowserRouter>
       <Routes>

@@ -9,6 +9,7 @@ import { Bar, Doughnut, Line, Pie } from 'react-chartjs-2';
 import { AiFillCaretRight } from 'react-icons/ai'
 import { Button } from 'react-bootstrap';
 import Select from 'react-select'
+import { Modal } from 'react-bootstrap';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -31,7 +32,7 @@ ChartJS.register(
     Title,
     Tooltip,
     Legend,
-    Colors, 
+    Colors,
     BarElement,
     ArcElement
 );
@@ -58,10 +59,15 @@ function BasicStatis() {
     const [end, setEnd] = useState('')
     const [dataAgeStatic, setDataAgeStatic] = useState([]);
     const [value, setValue] = useState([])
+    const [showBasicStatis, setShowBasicStatis] = useState(false)
     const [provinceCodes, setProvinceCodes] = useState([])
     const [optionCodes, setOptionCodes] = useState([])
     const [dataMultiStatic, setDataMultiStatic] = useState([])
     const [optionList, setOptionList] = useState([])
+    const [firstSelectOption, setFirstSelectOption] = useState(false)
+    const [secondSelectOption, setSecondSelectOption] = useState(false)
+    const [checkedAgeGroup, setCheckedAgeGroup] = useState(false)
+    const [showWarningEndYear, setShowWarningEndYear] = useState(false)
     const [dataChart, setDataChart] = useState({
         labels: [],
         datasets: [
@@ -73,13 +79,16 @@ function BasicStatis() {
     });
 
     const [listOption, setListOption] = useState([
-        { value: 'sex', label: "Giới tính" },
-        { value: 'maritalStatus', label: "Tình trạng hôn nhân" },
-        { value: 'bloodType', label: "Nhóm máu" },
-        { value: 'ethnicity', label: "Dân tộc" },
-        { value: 'religion', label: "Tôn giáo" },
-        { value: 'otherNationality', label: "Quốc tịch khác" }
+        { value: 'sex', label: "Giới tính", checked: false },
+        { value: 'maritalStatus', label: "Tình trạng hôn nhân", checked: false },
+        { value: 'bloodType', label: "Nhóm máu", checked: false },
+        { value: 'ethnicity', label: "Dân tộc", checked: false },
+        { value: 'religion', label: "Tôn giáo", checked: false },
+        { value: 'otherNationality', label: "Quốc tịch khác", checked: false }
     ])
+
+    let heightScreen = window.screen.height
+
     const fetchProvince = async () => {
         if (role === 'A1') {
             try {
@@ -245,31 +254,36 @@ function BasicStatis() {
     }
 
     const GetDataAgeStatic = async (start, end) => {
-        setDataStatic([])
-        setDataAgeStatic([])
-        setOption("ageGroup")
-        setShowChart(false)
-        const year = end - start;
-        const response = await axios.get("http://localhost:8080/api/v1/statistics/population/citizen/age-group?year=" + year + "&startYear=" + start + "&endYear=" + end, config)
-        setDataAgeStatic(response.data)
-        setDataChart({
-            labels: response.data.map(item => item.year),
-            datasets: [
-                {
-                    label: "Dưới độ tuổi lao động",
-                    data: response.data.map(item => item.ageGroupPopulation[0].population)
-                },
-                {
-                    label: "Trong độ tuổi lao động",
-                    data: response.data.map(item => item.ageGroupPopulation[1].population)
-                },
-                {
-                    label: "Trên độ tuổi lao động",
-                    data: response.data.map(item => item.ageGroupPopulation[2].population)
-                }
-            ]
-        })
-        console.log(dataChart)
+        if (end > 2023) {
+            setShowWarningEndYear(true)
+        } else {
+            setShowChartAge(true)
+            setDataStatic([])
+            setDataAgeStatic([])
+            setOption("ageGroup")
+            setShowChart(false)
+            const year = end - start;
+            const response = await axios.get("http://localhost:8080/api/v1/statistics/population/citizen/age-group?year=" + year + "&startYear=" + start + "&endYear=" + end, config)
+            setDataAgeStatic(response.data)
+            setDataChart({
+                labels: response.data.map(item => item.year),
+                datasets: [
+                    {
+                        label: "Dưới độ tuổi lao động",
+                        data: response.data.map(item => item.ageGroupPopulation[0].population)
+                    },
+                    {
+                        label: "Trong độ tuổi lao động",
+                        data: response.data.map(item => item.ageGroupPopulation[1].population)
+                    },
+                    {
+                        label: "Trên độ tuổi lao động",
+                        data: response.data.map(item => item.ageGroupPopulation[2].population)
+                    }
+                ]
+            })
+            console.log(dataChart)
+        }
     }
 
 
@@ -327,45 +341,69 @@ function BasicStatis() {
             </tr>)
     )
 
+    const listOptionBasicStatic = listOption.map((option) =>
+        <div className="buttonChildOption" style={(option.checked) ? { backgroundColor: 'yellow' } : null} onClick={() => {
+            GetDataStatic(option.value)
+            option.checked = true
+            listOption.map((otherOption) => {
+                if (otherOption.value !== option.value) otherOption.checked = false
+            }
+            )
+            setCheckedAgeGroup(false)
+        }}>{option.label}</div>
+    )
+
+    const BasicStatis = () => {
+        return (
+            <div>
+                {listOptionBasicStatic}
+                <div className="buttonChildOption" style={(checkedAgeGroup) ? { backgroundColor: 'yellow' } : null} onClick={() => {
+                    setShowAge(true)
+                    setShowChart(false)
+                    setShowMultiStatic(false)
+                    setShowTableMultiStatic(false)
+                    setCheckedAgeGroup(true)
+                    listOption.map((option) => {
+                        option.checked = false
+                    })
+                }
+                }>Nhóm tuổi</div>
+            </div>
+        )
+    }
     const TreeUnits = () => {
         return (
-            <div className="flex_citizen">
-                <div className="title">Các thuộc tính thống kê</div>
-                <div className='listProvinces'>
-                    <div className="optionStatic" onClick={() => {
-                        GetDataStatic('sex')
-                    }}><AiFillCaretRight /> 1. Giới tính</div>
-                    <div className="optionStatic" onClick={() => {
-                        GetDataStatic('maritalStatus')
-                    }}><AiFillCaretRight /> 2. Tình trạng hôn nhân</div>
-                    <div className="optionStatic" onClick={() => {
-                        GetDataStatic('bloodType')
-                    }}><AiFillCaretRight /> 3. Nhóm máu</div>
-                    <div className="optionStatic" onClick={() => {
-                        GetDataStatic('ethnicity')
-                    }}><AiFillCaretRight /> 4. Dân tộc</div>
-                    <div className="optionStatic" onClick={() => {
-                        GetDataStatic('religion')
-                    }}><AiFillCaretRight /> 5. Tôn giáo</div>
-                    <div className="optionStatic" onClick={() => {
-                        GetDataStatic('otherNationality')
-                    }}><AiFillCaretRight /> 6. Quốc tịch khác</div>
-                    <div className="optionStatic" onClick={() => {
-                        setShowAge(true)
-                        setShowChart(false)
-                        setShowMultiStatic(false)
-                        setShowTableMultiStatic(false)
-                    }
-                    }><AiFillCaretRight /> 7. Nhóm tuổi</div>
-                    <div className="optionStatic" onClick={() => {
-                        setShowMultiStatic(true)
-                        setShowChart(false)
-                        setShowChartAge(false)
-                        setShowAge(false)
-                    }
-                    }><AiFillCaretRight /> 8. Thuộc tính kết hợp</div>
-                </div>
-
+            <div className="statisOption" style={{ height: heightScreen }}>
+                <div className="buttonOption" style={(firstSelectOption) ? { backgroundColor: 'yellow' } : null} onClick={() => {
+                    setFirstSelectOption(!firstSelectOption)
+                    setSecondSelectOption(false)
+                    setShowMultiStatic(false)
+                    setShowTableMultiStatic(false)
+                    setCheckedAgeGroup(false)
+                    listOption.map((option) => {
+                        option.checked = false
+                    })
+                    setShowChart(false)
+                    setShowChartAge(false)
+                    setShowAge(false)
+                    setShowBasicStatis(false)
+                }}><div className="titleOption">Thống kê cơ bản</div></div>
+                {(firstSelectOption) ? <BasicStatis /> : null}
+                <div className="buttonOption" style={(secondSelectOption) ? { backgroundColor: 'yellow' } : null} onClick={() => {
+                    setShowMultiStatic(true)
+                    setShowChart(false)
+                    setShowChartAge(false)
+                    setShowAge(false)
+                    setShowBasicStatis(false)
+                    setSecondSelectOption(!secondSelectOption)
+                    setFirstSelectOption(false)
+                    setCheckedAgeGroup(false)
+                    listOption.map((option) => {
+                        option.checked = false
+                    })
+                }}><div className="titleOption">Thống kê tùy chọn</div></div>
+                <div className="noteStatis">⁕ Thống kê cơ bản là những thống kê về dân số dựa trên một thuộc tính cơ bản trong bảng thông tin người dân (giới tính, độ tuổi, nhóm máu,...) trên phạm vi toàn bộ đơn vị</div>
+                <div className="noteStatis">⁕ Thống kê tùy chọn là những thống kê có thể kết hợp nhiều thuộc tính cơ bản và nhiều đơn vị hành chính (nằm trong khu vực quản lý) để có cái nhìn tổng quan hơn về các vấn đề về dân số trong khu vực</div>
             </div>
         )
     }
@@ -439,26 +477,27 @@ function BasicStatis() {
             <div>
                 <div className="titleSelectYear">THỐNG KÊ CÁC NHÓM TUỔI TRONG KHOẢNG THỜI GIAN</div>
                 <div className="flex-year">
-                    <Form.Group className="formInput">
-                        <Form.Label style={{ width: '150px', marginTop: '6px' }}>1*. Năm bắt đầu</Form.Label>
-                        <Form.Control type="text" style={{ width: '200px' }} value={start} onChange={(e) => {
-                            setStart(e.target.value)
-                            setShowChartAge(false)
-                        }} />
-                    </Form.Group>
-                    <Form.Group className="formInput">
-                        <Form.Label style={{ width: '150px', marginTop: '6px' }}>2*. Năm kết thúc</Form.Label>
-                        <Form.Control type="text" style={{ width: '200px' }} value={end} onChange={(e) => {
-                            setEnd(e.target.value)
-                            setShowChartAge(false)
-                        }} />
-                    </Form.Group>
-                    <Form.Group style={{ marginLeft: '30px' }}>
-                        <Button onClick={() => {
-                            GetDataAgeStatic(start, end)
-                            setShowChartAge(true)
-                        }}> Xác nhận </Button>
-                    </Form.Group>
+                    <div className="flexFormInput">
+                        <Form.Group className="formInput">
+                            <Form.Label style={{ width: '150px', marginTop: '6px' }}>1*. Năm bắt đầu</Form.Label>
+                            <Form.Control type="text" style={{ width: '200px' }} value={start} onChange={(e) => {
+                                setStart(e.target.value)
+                                setShowChartAge(false)
+                            }} />
+                        </Form.Group>
+                        <Form.Group className="formInput">
+                            <Form.Label style={{ width: '150px', marginTop: '6px' }}>2*. Năm kết thúc</Form.Label>
+                            <Form.Control type="text" style={{ width: '200px' }} value={end} onChange={(e) => {
+                                setEnd(e.target.value)
+                                setShowChartAge(false)
+                            }} />
+                        </Form.Group>
+                        <Form.Group style={{ marginLeft: '30px' }}>
+                            <Button onClick={() => {
+                                GetDataAgeStatic(start, end)
+                            }}> Xác nhận </Button>
+                        </Form.Group>
+                    </div>
                 </div>
             </div>
         )
@@ -521,17 +560,17 @@ function BasicStatis() {
 
     const SelectOption = () => {
         return (
-            <div>
+            <div className='showSelectMultiOption'>
                 <div className="titleSelectYear">THỐNG KÊ TÙY CHỌN</div>
                 <div>
-                    <Form.Group className="formInput" style={{ marginBottom: '20px' }}>
+                    <Form.Group className="formInputMultiOption" style={{ marginBottom: '20px' }}>
                         <Form.Label style={{ width: '300px', marginTop: '6px' }}>1*. Chọn thuộc tính thống kê</Form.Label>
                         <Select className="selectMultiOption" placeholder="Chọn danh sách thuộc tính cần thống kê" options={listOption} isMulti onChange={(e) => {
                             setOptionCodes(e)
                             setShowTableMultiStatic(false)
                         }} />
                     </Form.Group>
-                    {(role !== 'B2') ? <Form.Group className="formInput">
+                    {(role !== 'B2') ? <Form.Group className="formInputMultiOption">
                         <Form.Label style={{ width: '300px', marginTop: '6px' }}>2*. Chọn đơn vị hành chính</Form.Label>
                         <Select className="selectMultiOption" placeholder="Chọn danh sách đơn vị hành chính cần thống kê" options={optionStaticProvinces} isMulti onChange={(e) => {
                             setProvinceCodes(e)
@@ -548,7 +587,7 @@ function BasicStatis() {
         )
     }
 
-    const SexStatic = () => {
+    const PageStatic = () => {
         return (
             <div className="flexStatic">
                 <TreeUnits className="flex_first" />
@@ -573,10 +612,31 @@ function BasicStatis() {
         )
     }
 
+    const ModalWarningEndYear = () => {
+        return (
+          <Modal show={showWarningEndYear}>
+            <Modal.Header className='headerModal'>
+              <Modal.Title className='titleModal'>LỖI</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              Năm kết thúc không thể lớn hơn năm hiện tại
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => {
+                setShowWarningEndYear(false)
+              }}>
+                Đóng
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        )
+      }
+
     return (
         <div>
             <NavbarPage />
-            {SexStatic()}
+            {PageStatic()}
+            <ModalWarningEndYear />
         </div>
     );
 }

@@ -50,7 +50,7 @@ public class UserController {
         return ResponseEntity.ok(message);
     }
 
-    @PreAuthorize("hasAuthority('WRITE')")
+//    @PreAuthorize("hasAuthority('WRITE')")
     @PutMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
         String userDetailUsername = SecurityUtils.getUsernameCurrentUserLogin();
