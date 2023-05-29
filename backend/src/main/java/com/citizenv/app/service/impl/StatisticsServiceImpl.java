@@ -183,6 +183,29 @@ public class StatisticsServiceImpl implements StatisticsService {
         return result;
     }
 
+    private AgeGroupDto getPopulationListByDivisionCodeAndAgeGroup(String divisionCode, Integer year) {
+        if (year > LocalDate.now().getYear()) throw new InvalidArgumentException("Invalid year");
+        List<Address> addressesForPopulationCount = getAddressesForPopulationCount(divisionCode);
+        AgeGroupDto result = new AgeGroupDto(year);
+        result.getAgeGroupPopulation().add(new PopulationDto(Utils.AGE_GROUP_UNDER_LEGAL_WORKING_AGE));
+        result.getAgeGroupPopulation().add(new PopulationDto(Utils.AGE_GROUP_IN_LEGAL_WORKING_AGE));
+        result.getAgeGroupPopulation().add(new PopulationDto(Utils.AGE_GROUP_OVER_LEGAL_WORKING_AGE));
+        for (Address currentAddress :
+                addressesForPopulationCount) {
+            int ageSinceCurrentYear = Period.between(currentAddress.getCitizen().getDateOfBirth(), LocalDate.of(year, 1, 1)).getYears();
+            if (ageSinceCurrentYear >= 0 && ageSinceCurrentYear <= 14) {
+                result.getAgeGroupPopulation().get(0).increasePopulation(1L);
+            }
+            if (ageSinceCurrentYear >= 15 && ageSinceCurrentYear <= 59) {
+                result.getAgeGroupPopulation().get(1).increasePopulation(1L);
+            }
+            if (ageSinceCurrentYear >= 60) {
+                result.getAgeGroupPopulation().get(2).increasePopulation(1L);
+            }
+        }
+        return result;
+    }
+
     @Override
     public List<PopulationDto> getRegionPopulationList() {
         List<Address> addressesForPopulationCount = getAddressesForPopulationCount();
@@ -310,5 +333,19 @@ public class StatisticsServiceImpl implements StatisticsService {
         String code = "24";
         List<Map<String, Object>> a = addressRepository.countByProperties(properties, code);
         return a;
+    }
+
+    @Override
+    public Map<String, Object> getPopulationListByAgeGroup(String divisionCode, Integer startYear, Integer endYear) {
+        List<AgeGroupDto> ageGroupDtos = new ArrayList<>();
+        for (Integer i = startYear; i <= endYear; i++) {
+            ageGroupDtos.add(getPopulationListByDivisionCodeAndAgeGroup(divisionCode, i));
+        }
+        Map<String, Object> result = new HashMap<>();
+        AdministrativeDivision currentDivision = administrativeDivisionRepository.findByCode(divisionCode).orElseThrow(() -> new ResourceNotFoundException("Division", "code", divisionCode));
+        result.put("code", divisionCode);
+        result.put("name", currentDivision.getName());
+        result.put("details", ageGroupDtos);
+        return result;
     }
 }

@@ -95,6 +95,12 @@ public class StatisticsController {
         return new ResponseEntity<>(population, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/population/citizen/age-group/{divisionCode}", params = {"startYear", "endYear"})
+    public ResponseEntity<Map<String, Object>> getPopulationListByAgeGroup(@PathVariable String divisionCode, @RequestParam Integer startYear, @RequestParam Integer endYear) {
+        Map<String, Object> population = statisticsService.getPopulationListByAgeGroup(divisionCode, startYear, endYear);
+        return new ResponseEntity<>(population, HttpStatus.OK);
+    }
+
     @GetMapping(value = "/population/citizen/age-group", params = "year")
     public ResponseEntity<AgeGroupDto> getPopulationListByAgeGroup(Integer year) {
         AgeGroupDto population = statisticsService.getPopulationListByAgeGroup(year);

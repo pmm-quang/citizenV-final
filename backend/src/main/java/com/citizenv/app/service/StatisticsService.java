@@ -28,4 +28,6 @@ public interface StatisticsService {
     List<PopulationDto> getUrbanAndRuralAreaPopulation();
 
     List<Map<String, Object>> test();
+
+    Map<String, Object> getPopulationListByAgeGroup(String divisionCode, Integer startYear, Integer endYear);
 }

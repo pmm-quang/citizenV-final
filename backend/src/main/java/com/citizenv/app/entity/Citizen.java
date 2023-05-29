@@ -2,13 +2,11 @@ package com.citizenv.app.entity;
 
 import com.citizenv.app.component.Utils;
 import lombok.*;
-import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Table(name = "citizens")
@@ -67,15 +65,23 @@ public class Citizen {
     private List<Association> associations;
 
     public Religion getReligion() {
-        return religion == null ? new Religion(0, Utils.RELIGION_NONE) : religion;
+        return religion == null ? new Religion(0, Utils.NONE) : religion;
     }
 
     public String getOtherNationality() {
         return otherNationality == null ? "" : otherNationality;
     }
 
+    public Ethnicity getEthnicity() {
+        return ethnicity == null ? new Ethnicity(0, Utils.NONE) : ethnicity;
+    }
+
     public String getJob() {
-        return job == null ? "Thất nghiệp" : job;
+        return job == null ? "Không xác định" : job;
+    }
+
+    public String getBloodType() {
+        return bloodType == null ? "Không xác định" : bloodType;
     }
 
     public String getEducationalLevel() {

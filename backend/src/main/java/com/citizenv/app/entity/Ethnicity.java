@@ -26,6 +26,11 @@ public class Ethnicity {
 //    @EqualsAndHashCode.Exclude
     private List<Citizen> citizens;
 
+    public Ethnicity(int i, String s) {
+        id = i;
+        name = s;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
