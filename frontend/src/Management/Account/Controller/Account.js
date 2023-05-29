@@ -155,7 +155,7 @@ function Account() {
   )
 
   const listAccAcceptDeclaration = accountList.map((account, index) =>
-    (account.declaration.status === "Đang khai báo") ? <option key={index} value={account.username}>{account.username + ". " + account.division.name}</option> : null
+    (account.declaration.status === "Đang khai báo" || account.declaration.status === "Chưa mở khai báo") ? <option key={index} value={account.username}>{account.username + ". " + account.division.name}</option> : null
   )
 
   const listDivision = division.map((post) =>
@@ -248,6 +248,7 @@ function Account() {
   const AddDeclaration = async () => {
     const startDate = new Date(createStartTime)
     const endDate = new Date(createEndTime)
+    const declarationEndTime = new Date(user_account.declarationEndTime)
     const timeNow = new Date()
     const declaration = {
       startTime: createStartTime,
@@ -255,13 +256,15 @@ function Account() {
       status: "Đang khai báo"
     }
     console.log(declaration)
+    console.log(createEndTime)
+    console.log(declarationEndTime < endDate)
     if (startDate > endDate) {
       setShowWarning(true)
       setMessage("THỜI GIAN KẾT THÚC KHAI BÁO ĐANG NHỎ HƠN THỜI GIAN BẮT ĐẦU KHAI BÁO")
     } else if (endDate <= timeNow) {
       setShowWarning(true)
       setMessage("THỜI GIAN KẾT THÚC KHAI BÁO ĐANG NHỎ HƠN THỜI GIAN HIỆN TẠI")
-    } else if (endDate > user_account.declarationEndTime && user_account.role !== 'A1') {
+    } else if ((declarationEndTime < endDate) && user_account.role !== 'A1') {
       setShowWarning(true)
       setMessage("THỜI GIAN KẾT THÚC KHAI BÁO Ở CẤP DƯỚI PHẢI NHỎ HƠN CẤP TRÊN")
     } else {
