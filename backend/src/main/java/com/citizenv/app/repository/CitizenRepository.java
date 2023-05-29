@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -108,4 +109,42 @@ public interface CitizenRepository extends JpaRepository<Citizen, Long> {
             "FROM Citizen c join Ward w on w.code = c.ward.code " +
             "GROUP BY c.ward.code")
     List<Population> getPopulationGroupByWard();*/
+
+    @Query(value = "select distinct * from citizens c " +
+            "where (:c_name is null or c.name = :c_name)\n" +
+            "and (:c_date_of_birth is null or c. = :c_date_of_birth)\n" +
+            "and (:c_blood_type is null or c.blood_type = :c_blood_type)\n" +
+            "and (:c_sex is null or c.sex = :c_sex)\n" +
+            "and (:c_marital_status is null or c.marital_status = :c_marital_status)\n" +
+            "and (:c_ethnicity_id is null or c.ethnicity_id = :c_ethnicity_id)\n" +
+            "and (:c_other_nationality is null or c.other_nationality = :c_other_nationality)\n" +
+            "and (:c_religion_id is null or c.religion_id = :c_religion_id)\n" +
+            "and (:c_job is null or c.job = :c_job) \n" +
+            "and (:c_education_level is null or c.educational_level = :c_education_level) \n" +
+            "and (:c_join_condition is null or :c_join_condition)", nativeQuery = true)
+    List<Object[]> search(
+                          @Param("c_name") String c_name,
+                          @Param("c_date_of_birth") LocalDate c_date_of_birth,
+                          @Param("c_blood_type") String c_blood_type,
+                          @Param("c_sex") String c_sex,
+                          @Param("c_marital_status") String c_marital_status,
+                          @Param("c_ethnicity_id") Integer c_ethnicity_id,
+                          @Param("c_other_nationality") String c_other_nationality,
+                          @Param("c_religion_id") Integer c_religion_id,
+                          @Param("c_job") String c_job,
+                          @Param("c_education_level") String c_education_level,
+                          @Param("c_join_condition") String c_join_condition);
+
+    @Query(value = "SELECT DISTINCT c " +
+            "FROM Citizen c " +
+            "JOIN c.addresses a1 " +
+            "JOIN c.addresses a2 " +
+            "JOIN c.associations ass1 " +
+            "where a1.hamlet.id = 171 " +
+            "AND a1.addressType.id = 1 " +
+            "AND a2.hamlet.id = 171 " +
+            "AND a2.addressType.id = 2 ")
+    List<Citizen> getAllCustom();
 }
+
+

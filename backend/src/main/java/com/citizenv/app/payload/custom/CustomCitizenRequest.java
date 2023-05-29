@@ -19,7 +19,9 @@ public class CustomCitizenRequest {
     private String maritalStatus;
     private Integer ethnicityId;
     private String otherNationality;
-    private ReligionDto religion;
+    private Integer religionId;
+    private String job;
+    private String educationalLevel;
     private List<CustomAddress> addresses;
     private List<AssociationDto> associations;
 }

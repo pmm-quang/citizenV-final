@@ -2,6 +2,7 @@ package com.citizenv.app.controller;
 
 import com.citizenv.app.payload.CitizenDto;
 import com.citizenv.app.payload.custom.CustomCitizenRequest;
+import com.citizenv.app.payload.custom.CustomCitizenResponse;
 import com.citizenv.app.secirity.SecurityUtils;
 import com.citizenv.app.service.CitizenService;
 import com.citizenv.app.service.ExcelService;
@@ -139,6 +140,12 @@ public class CitizenController {
 //        String filePath = "src/main/java/com/citizenv/app/controller/file.xlsx";
         String message = excelService.createUserFromExcelFile(excelFile);
         return ResponseEntity.ok().body(message);
+    }
+
+    @PostMapping ("/search")
+    public ResponseEntity<?> searchCitizen(@RequestBody CustomCitizenRequest request) {
+        List<CustomCitizenResponse> list = citizenService.searchCitizen(request);
+        return ResponseEntity.ok().body(list);
     }
 
 }

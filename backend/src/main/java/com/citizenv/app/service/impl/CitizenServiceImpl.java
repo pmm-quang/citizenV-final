@@ -9,6 +9,7 @@ import com.citizenv.app.exception.ResourceNotFoundException;
 import com.citizenv.app.payload.*;
 import com.citizenv.app.payload.custom.CustomAddress;
 import com.citizenv.app.payload.custom.CustomCitizenRequest;
+import com.citizenv.app.payload.custom.CustomCitizenResponse;
 import com.citizenv.app.payload.excel.ExcelCitizen;
 import com.citizenv.app.repository.*;
 import com.citizenv.app.service.CitizenService;
@@ -27,6 +28,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -38,6 +42,9 @@ import java.util.stream.Collectors;
 @Transactional
 @Service
 public class CitizenServiceImpl implements CitizenService {
+
+    @PersistenceContext
+    private EntityManager entityManager;
     @Autowired
     private ModelMapper mapper;
 
@@ -161,6 +168,7 @@ public class CitizenServiceImpl implements CitizenService {
         Address permanentAddress = new Address();
         Address temporaryAddress = new Address();
         for (CustomAddress ad : citizen.getAddresses()) {
+            Address address = new Address();
             Integer adTypeId = ad.getAddressType();
             String hamletCode = ad.getHamletCode();
             AddressType foundAddressType = addressTypeRepo.findById(adTypeId).orElseThrow(
@@ -169,13 +177,9 @@ public class CitizenServiceImpl implements CitizenService {
             Hamlet foundHamlet = hamletRepo.findByCode(hamletCode).orElseThrow(
                     () -> new ResourceNotFoundException("Thôn/xóm/bản/tổ dân phố", "mã định danh", hamletCode)
             );
-            if (adTypeId == 1) {
-                hometown.setParam(c, foundHamlet, foundAddressType);
-            } else if (adTypeId == 2) {
-                permanentAddress.setParam(c, foundHamlet, foundAddressType);
-            } else if (adTypeId == 3) {
-                temporaryAddress.setParam(c, foundHamlet, foundAddressType);
-            }
+            address.setParam(c, foundHamlet, foundAddressType);
+//            address.fullAddressInfo(fullAddressInfo(address));
+            addresses.add(address);
         }
         if (citizen.getAddresses().size() == 2) {
             AddressType foundAddressType = addressTypeRepo.findById(3).orElseThrow(
@@ -183,10 +187,11 @@ public class CitizenServiceImpl implements CitizenService {
             );
             temporaryAddress.setCitizen(c);
             temporaryAddress.setAddressType(foundAddressType);
+            addresses.add(temporaryAddress);
         }
-        addresses.add(hometown);
-        addresses.add(permanentAddress);
-        addresses.add(temporaryAddress);
+//        addresses.add(hometown);
+//        addresses.add(permanentAddress);
+//        addresses.add(temporaryAddress);
         newCitizen.setAddresses(addresses);
 
         List<Association> associations = new ArrayList<>();
@@ -369,7 +374,7 @@ public class CitizenServiceImpl implements CitizenService {
         String maritalStatus = citizenRequest.getMaritalStatus();
         Integer ethnicityId = citizenRequest.getEthnicityId();
         String otherNationality = citizenRequest.getOtherNationality();
-        ReligionDto religion = citizenRequest.getReligion();
+        Integer religionId = citizenRequest.getReligionId();
         String provinceCodeOfQueQuan = null;
         //Kiểm tra mã địa chỉ - address
         boolean checkHometown = false; //check có quê quán không
@@ -409,10 +414,12 @@ public class CitizenServiceImpl implements CitizenService {
         }
 
         //Kiểm tra nhóm máu - bloodType
-        try {
-            Utils.BloodType.valueOf(bloodType);
-        } catch (IllegalArgumentException e) {
-            throw new InvalidException("Nhom mau khong hop le");
+        if (bloodType != null) {
+            try {
+                Utils.BloodType.valueOf(bloodType);
+            } catch (IllegalArgumentException e) {
+                throw new InvalidException("Nhom mau khong hop le");
+            }
         }
 
         //Kiểm tra ngày sinh hợp lệ - dateOfBirth
@@ -427,9 +434,9 @@ public class CitizenServiceImpl implements CitizenService {
         }
 
         Religion foundReligion = null;
-        if (religion != null) {
-            foundReligion = religionRepo.findById(religion.getId()).orElseThrow(
-                    () -> new ResourceNotFoundException("Tôn giáo", "id", String.valueOf(religion.getId()))
+        if (religionId != null) {
+            foundReligion = religionRepo.findById(religionId).orElseThrow(
+                    () -> new ResourceNotFoundException("Tôn giáo", "id", String.valueOf(religionId))
             );
         }
         Citizen c = new Citizen();
@@ -446,185 +453,187 @@ public class CitizenServiceImpl implements CitizenService {
     }
 
     @Override
-    public String createUserFromExcelFile(MultipartFile excelFile) {
-        try {
-//            FileInputStream file = new FileInputStream(excelFile);
-            Workbook workbook = new XSSFWorkbook(excelFile.getInputStream());
-            Sheet sheet = workbook.getSheetAt(0);
-            int startRow = 2;
-            int endRow = sheet.getLastRowNum();
-            int startCol = 0;
-            int endCol = 21;
-            List<AddressType> addressTypes = addressTypeRepo.findAll();
-            List<AssociationType> associationTypes = associationTypeRepo.findAll();
-            List<Citizen> citizens = new ArrayList<>();
-            StringBuilder RowInvalid = new StringBuilder();
-            String provinceCodeOfHometown = null;
-            List<ExcelCitizen> excelModels = new ArrayList<>();
-            for (int rowNum = startRow; rowNum <= endRow; rowNum++) {
-                Citizen citizen = new Citizen();
-                ExcelCitizen model = new ExcelCitizen();
-                List<Address> addresses = new ArrayList<>();
-                List<Association> associations = new ArrayList<>();
-                Row row = sheet.getRow(rowNum);
-                Association association = new Association();
-                Integer associationTypeIndex = 0;
-                for (int colNum = startCol; colNum <= endCol; colNum++) {
-                    Cell cell = row.getCell(colNum);
-                    switch (colNum + 1) {
-                        case 1: citizen.setNationalId(cell.getStringCellValue());break;
-                        case 2:
-                            model.setName(cell.getStringCellValue());
-//                            if (!Utils.validateName(model.getName())) {
-//                                listRowInvalid.append(rowNum);
-//                                break;
-//                            }
-                            citizen.setName(Utils.standardizeName(cell.getStringCellValue()));
-                            break;
-                        case 3:
-                            DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                            LocalDate date = LocalDate.parse(cell.getStringCellValue(), inputFormatter);
+    public List<CustomCitizenResponse> searchCitizen(CustomCitizenRequest request) {
+        StringBuilder query  = new StringBuilder();
+        StringBuilder joinAddresses = new StringBuilder();
+        StringBuilder joinAssociation = new StringBuilder();
+        StringBuilder conditionAddress = new StringBuilder();
+        StringBuilder conditionAssociation = new StringBuilder();
+        StringBuilder conditionCitizen = new StringBuilder();
+        List<String> joinConditions = new ArrayList<>();
+        query.append("select distinct new com.citizenv.app.payload.custom.CustomCitizenResponse(c.nationalId, c.name, c.sex) from Citizen c ");
 
-                            DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                            String formattedDate = date.format(outputFormatter);
-                            model.setDateOfBirth(date);
-                            citizen.setDateOfBirth(date);
-                            break;
-                        case 4:
-                            model.setSex(cell.getStringCellValue());
-                            if (!Utils.validateSex(model.getSex())) {
-                                RowInvalid.append(rowNum);
-                                throw new InvalidException("Lỗi trên cột 'Giới tính' tại hàng: " + (rowNum +1) + " và cột: " + (colNum + 1));
-                            } else {
-                                citizen.setSex(cell.getStringCellValue());
-                            }
-                            break;
-                        case 5:
-                            model.setBloodType(cell.getStringCellValue());
-                            try {
-                                Utils.BloodType.valueOf(cell.getStringCellValue());
-                                citizen.setBloodType(cell.getStringCellValue());
-                            } catch (Exception e) {
-                                throw new InvalidException("Lỗi trên cột 'Nhóm máu' tại hàng: " + (rowNum +1) + " và cột: " + (colNum + 1));
-                            }
-                            break;
-                        case 6:
-                            model.setMaritalStatus(cell.getStringCellValue());
-                            citizen.setMaritalStatus(cell.getStringCellValue());
-                            break;
-                        case 7:
-                            model.setEthnicity(cell.getStringCellValue());
-                            int finalRowNum = rowNum;
-                            int finalColNum = colNum;
-                            Ethnicity ethnicity = ethnicityRepo.findByName(cell.getStringCellValue()).orElseThrow(
-                                    () -> new InvalidException("Lỗi trên cột 'Dân tộc' tại hàng: " + (finalRowNum+1) + " và cột: " + (finalColNum + 1))
-                            );
-                            citizen.setEthnicity(ethnicity);
-                            break;
-                        case 8:
-                            model.setReligion(cell.getStringCellValue());
-                            if (!cell.getStringCellValue().equals("")) {
-                                finalRowNum = rowNum;
-                                finalColNum = colNum;
-                                Religion religion = religionRepo.findByName(cell.getStringCellValue()).orElseThrow(
-                                        () -> new InvalidException("Lỗi trên cột 'Tôn giáo' tại hàng: " + (finalRowNum+1) + " và cột: " + (finalColNum + 1))
-                                );
-                                citizen.setReligion(religion);
-                            }
-                            break;
-                        case 9:
-                            model.setOtherNationality(cell.getStringCellValue());
-                            if (!cell.getStringCellValue().equals("")) {
-                                citizen.setOtherNationality(cell.getStringCellValue());
-                            }
-                            break;
-                        case 10:
-                            model.setEducationalLevel(cell.getStringCellValue());
-                            citizen.setEducationalLevel(cell.getStringCellValue());
-                            break;
-                        case 11:
-                            model.setJob(cell.getStringCellValue());
-                            citizen.setJob(cell.getStringCellValue());
-                            break;
-                        case 12: case 13: case 14:
-                            String adr = cell.getStringCellValue();
-                            if (colNum != 13 && adr.equals("")) {
-                                throw new InvalidException("Lỗi tại hàng: " + (rowNum +1) + " và cột: " + (colNum + 1));
-                            }
-                            if (!adr.equals("")) {
-                                String[] listNameOfAdr = adr.split(" - ");
-                                if (listNameOfAdr.length != 4) {
-                                    throw new InvalidException("Lỗi tại hàng: " + (rowNum +1) + " và cột: " + (colNum + 1));
-                                }
-                                List<Hamlet> hamlet = hamletRepo.findHamletFromExcel(listNameOfAdr[3], listNameOfAdr[2],
-                                        listNameOfAdr[1], listNameOfAdr[0]);
-
-                                if (hamlet != null) {
-                                    if (colNum == 11) {
-                                        provinceCodeOfHometown = hamlet.get(0).getCode().substring(0, 2);
-                                    }
-                                    Address add = new Address();
-                                    add.setHamlet(hamlet.get(0));
-                                    add.setAddressType(addressTypes.get(colNum-11));
-                                    add.setCitizen(citizen);
-                                    addresses.add(add);
-                                }
-                            }
-                            if (colNum == 13 && adr.equals("")) {
-                                Address add = new Address();
-//                                AddressType addressType = addressTypeRepo.findById(3).orElse(null);
-                                add.setAddressType(addressTypes.get(2));
-                                add.setCitizen(citizen);
-                                addresses.add(add);
-                            }
-                            // Lấy ra associatedCitizenNationalId
-                        case 15: case 17: case 19: case 21:
-                            if (!cell.getStringCellValue().equals("")) {
-                                association.setAssociatedCitizenNationalId(cell.getStringCellValue());
-                            }break;
-                            //lấy ra associatedCitizenName
-                        case 16: case 18: case 20: case 22:
-                            if (!cell.getStringCellValue().equals("")) {
-                                association.setAssociatedCitizenName(cell.getStringCellValue());
-                                association.setAssociationType(associationTypes.get(associationTypeIndex++));
-                                association.setCitizen(citizen);
-                            }
-                            if (association.getAssociatedCitizenName()!= null && association.getAssociatedCitizenNationalId()!= null) {
-                                associations.add(association);
-                                System.out.println("Dm quan col: " + (colNum + 1)  +" row: " + (rowNum + 1));
-                                System.out.println(association.getAssociatedCitizenName() + association.getAssociatedCitizenNationalId() + association.getCitizen());
-                            }
-                            association = new Association();
-//                            association.setAssociatedCitizenName(null);
-//                            association.setAssociatedCitizenNationalId(null);
-//                            association.setAssociationType(null);
-//                            association.setCitizen(null);
-                            break;
-                    }
-                    System.out.print(cell.getStringCellValue()+" ");
-                }
-                excelModels.add(model);
-                System.out.println();
-                citizen.setAddresses(addresses);
-                citizen.setAssociations(associations);
-                if (!Utils.validateNationalId(citizen.getNationalId(),citizen.getSex(),provinceCodeOfHometown, citizen.getDateOfBirth())) {
-                    throw new InvalidException("Invalid identifier at row " + (rowNum+1));
-                }
-                for (Association as :
-                        associations) {
-                    System.out.println(as.getCitizen() + as.getAssociatedCitizenName() + as.getAssociatedCitizenNationalId() + as.getAssociationType());
-                }
-                Citizen foundCitizen = repo.findByNationalId(citizen.getNationalId()).orElse(null);
-                if (foundCitizen == null) {
-                    citizens.add(citizen);
-                }
-            }
-            List<Citizen> list = repo.saveAll(citizens);
-
-            return "Thêm thông tin người dân từ file excel thành công!";
-        }  catch (IOException e) {
-            throw new RuntimeException(e);
+        List<CustomAddress> addressConditions = request.getAddresses();
+        List<AssociationDto> associationConditions = request.getAssociations();
+        StringBuilder condition = new StringBuilder();
+        List<String> joins = new ArrayList<>();
+        List<String> conditionClauses = new ArrayList<>();
+        if (addressConditions != null) {
+            int index = 1;
+           for (CustomAddress address:addressConditions) {
+               joinAddresses.append("c.addresses ad").append(index).append(" \n");
+               conditionAddress.append(" ad").append(index).append(".hamlet.code = '").append(address.getHamletCode()).append("' ")
+                       .append(" and ").append("ad").append(index).append(".addressType.id = ").append(address.getAddressType())
+                       .append(" \n");
+               conditionClauses.add(String.valueOf(conditionAddress));
+               conditionAddress.setLength(0);
+               joins.add(String.valueOf(joinAddresses));
+               joinAddresses.setLength(0);
+               index++;
+           }
         }
+
+        if (associationConditions != null) {
+            int index = 1;
+            for (AssociationDto association: associationConditions) {
+                joinAssociation.append("c.associations ass").append(index).append(" ");
+//                conditionAssociation.append(" (");
+                if (association.getAssociatedCitizenNationalId() != null) {
+                    conditionAssociation.append(" ass").append(index).append(".associatedCitizenNationalId = '")
+                            .append(association.getAssociatedCitizenNationalId())
+                            .append("' ");
+                    conditionClauses.add(String.valueOf(conditionAssociation));
+                    conditionAssociation.setLength(0);
+                }
+                if (association.getAssociatedCitizenName() != null) {
+                    conditionAssociation.append(" ass").append(index).append(".associatedCitizenName = '")
+                            .append(association.getAssociatedCitizenName())
+                            .append("' \n");
+                    conditionClauses.add(String.valueOf(conditionAssociation));
+                    conditionAssociation.setLength(0);
+                }
+                if (association.getAssociationType()!= null) {
+                    conditionAssociation.append(" ass").append(index).append(".associationType.id = ")
+                            .append(association.getAssociationType().getId())
+                            .append(" \n");
+                    conditionClauses.add(String.valueOf(conditionAssociation));
+                    conditionAssociation.setLength(0);
+                }
+                joins.add(String.valueOf(joinAssociation));
+                joinAssociation.setLength(0);
+            }
+        }
+        String joinsTable = String.join(" join ",joins);
+        if (joinsTable.length() > 0) {
+            joinsTable = " join " + joinsTable;
+            query.append(joinsTable);
+        }
+        if (request.getName() != null) {
+            conditionCitizen.append(" c.name = '").append(request.getName()).append("' ");
+            conditionClauses.add(String.valueOf(conditionCitizen));
+            conditionCitizen.setLength(0);
+            System.out.println("name");
+        }
+        if (request.getDateOfBirth() != null) {
+            conditionCitizen.append(" c.dateOfBirth = '").append(request.getDateOfBirth()).append("' \n");
+            conditionClauses.add(String.valueOf(conditionCitizen));
+            conditionCitizen.setLength(0);
+            System.out.println("dob");
+        }
+        if (request.getBloodType() != null) {
+            conditionCitizen.append(" c.bloodType = '").append(request.getBloodType()).append("' \n");
+            conditionClauses.add(String.valueOf(conditionCitizen));
+            conditionCitizen.setLength(0);
+            System.out.println("blood");
+        }
+        else {
+            conditionCitizen.append("c.bloodType is null \n");
+            conditionClauses.add(String.valueOf(conditionCitizen));
+            conditionCitizen.setLength(0);
+            System.out.println("blood null");
+        }
+        if (request.getSex() != null) {
+            conditionCitizen.append(" c.sex = '").append(request.getSex()).append("' \n");
+            conditionClauses.add(String.valueOf(conditionCitizen));
+            conditionCitizen.setLength(0);
+            System.out.println("sex");
+        }
+        if (request.getMaritalStatus() != null) {
+            conditionCitizen.append(" c.maritalStatus = '").append(request.getMaritalStatus()).append("' \n");
+            conditionClauses.add(String.valueOf(conditionCitizen));
+            conditionCitizen.setLength(0);
+            System.out.println("maria");
+        }
+        if (request.getEthnicityId() != null) {
+            conditionCitizen.append(" c.ethnicity.id = ").append(request.getEthnicityId()).append(" \n");
+            conditionClauses.add(String.valueOf(conditionCitizen));
+            conditionCitizen.setLength(0);
+            System.out.println("ethnicity");
+        }
+        if (request.getOtherNationality() != null) {
+            conditionCitizen.append(" c.otherNationality = '").append(request.getOtherNationality()).append("' \n");
+            conditionClauses.add(String.valueOf(conditionCitizen));
+            conditionCitizen.setLength(0);
+            System.out.println("otherNational");
+        }
+        else {
+            conditionCitizen.append(" c.otherNationality is null \n");
+            conditionClauses.add(String.valueOf(conditionClauses));
+            conditionCitizen.setLength(0);
+        }
+        if (request.getReligionId() != null) {
+            conditionCitizen.append(" c.religion.id = ").append(request.getReligionId()).append(" \n");
+            conditionClauses.add(String.valueOf(conditionCitizen));
+            conditionCitizen.setLength(0);
+            System.out.println("religion");
+        }
+        else {
+            conditionCitizen.append(" c.religion is null \n");
+            conditionClauses.add(String.valueOf(conditionClauses));
+            conditionCitizen.setLength(0);
+        }
+        if (request.getJob() != null) {
+            conditionCitizen.append(" c.job = '").append(request.getJob()).append("' \n");
+            conditionClauses.add(String.valueOf(conditionCitizen));
+            conditionCitizen.setLength(0);
+            System.out.println("job");
+        }
+        else {
+            conditionCitizen.append(" c.job is null \n");
+            conditionClauses.add(String.valueOf(conditionClauses));
+            conditionCitizen.setLength(0);
+        }
+        if (request.getEducationalLevel() != null) {
+            conditionCitizen.append(" c.educationalLevel = '").append(request.getEducationalLevel()).append("' \n");
+            conditionClauses.add(String.valueOf(conditionCitizen));
+            conditionCitizen.setLength(0);
+            System.out.println("education Level");
+        }
+        else {
+            conditionCitizen.append(" c.educationalLevel is null \n");
+            conditionClauses.add(String.valueOf(conditionClauses));
+            conditionCitizen.setLength(0);
+        }
+//        if (request.get)
+//        String joinsQuery = String.join(" and ", joinConditions);
+//        if (joinsQuery.length() > 0) {
+//            joinsQuery = " join " + joinsQuery;
+//            query.append(joinsQuery);
+//        }
+        String  conditionsQuery = String.join(" and ", conditionClauses);
+
+        if (conditionsQuery.length() > 0) {
+            conditionsQuery = " where " + conditionsQuery;
+            query.append(conditionsQuery);
+        }
+        System.out.println(query);
+        Query nativeQuery = entityManager.createQuery(String.valueOf(query));
+        List<CustomCitizenResponse> list = nativeQuery.getResultList();
+        System.out.println(list.size());
+//        List<CustomCitizenResponse> dtoList = list.stream().map(citizen -> mapper.map(citizen, CitizenDto.class)).collect(Collectors.toList());
+        return list;
     }
+
+    public String fullAddressInfo(Address ad) {
+        StringBuilder a = new StringBuilder();
+        a.append(ad.getAddressType().getName()).append(": ").append(ad.getHamlet().getAdministrativeUnit().getShortName())
+                .append(" ").append(ad.getHamlet().getName())
+                .append(", ").append(ad.getHamlet().getWard().getName())
+                .append(", ").append(ad.getHamlet().getWard().getDistrict().getName())
+                .append(", ").append(ad.getHamlet().getWard().getDistrict().getProvince().getName());
+        return String.valueOf(a);
+    }
+
+
 
 }
