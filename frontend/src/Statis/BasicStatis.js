@@ -67,7 +67,9 @@ function BasicStatis() {
     const [firstSelectOption, setFirstSelectOption] = useState(false)
     const [secondSelectOption, setSecondSelectOption] = useState(false)
     const [checkedAgeGroup, setCheckedAgeGroup] = useState(false)
+    const [titlePage, setTitlePage] = useState('')
     const [showWarningEndYear, setShowWarningEndYear] = useState(false)
+    const [heightScreen, setHeightScreen] = useState(window.screen.height)
     const [dataChart, setDataChart] = useState({
         labels: [],
         datasets: [
@@ -84,10 +86,10 @@ function BasicStatis() {
         { value: 'bloodType', label: "Nhóm máu", checked: false },
         { value: 'ethnicity', label: "Dân tộc", checked: false },
         { value: 'religion', label: "Tôn giáo", checked: false },
-        { value: 'otherNationality', label: "Quốc tịch khác", checked: false }
+        { value: 'otherNationality', label: "Quốc tịch khác", checked: false },
+        { value: 'job', label: "Nghề nghiệp", checked: false },
+        { value: 'educationLevel', label: "Trình độ văn hóa", checked: false }
     ])
-
-    let heightScreen = window.screen.height
 
     const fetchProvince = async () => {
         if (role === 'A1') {
@@ -124,6 +126,7 @@ function BasicStatis() {
     };
 
     const GetDataStatic = async (code) => {
+        setHeightScreen(window.screen.height)
         setShowMultiStatic(false)
         setShowTableMultiStatic(false)
         setDataStatic([])
@@ -254,6 +257,7 @@ function BasicStatis() {
     }
 
     const GetDataAgeStatic = async (start, end) => {
+        setHeightScreen(window.screen.height)
         if (end > 2023) {
             setShowWarningEndYear(true)
         } else {
@@ -345,6 +349,7 @@ function BasicStatis() {
         <div className="buttonChildOption" style={(option.checked) ? { backgroundColor: 'yellow' } : null} onClick={() => {
             GetDataStatic(option.value)
             option.checked = true
+            setTitlePage(" THEO " + (option.label).toUpperCase())
             listOption.map((otherOption) => {
                 if (otherOption.value !== option.value) otherOption.checked = false
             }
@@ -363,6 +368,7 @@ function BasicStatis() {
                     setShowMultiStatic(false)
                     setShowTableMultiStatic(false)
                     setCheckedAgeGroup(true)
+                    setTitlePage(" THEO NHÓM TUỔI")
                     listOption.map((option) => {
                         option.checked = false
                     })
@@ -431,7 +437,7 @@ function BasicStatis() {
         return (
             <div>
                 <div className='titleStatic'>BẢNG THỐNG KÊ TỔNG DÂN SỐ</div>
-                <Table striped bordered hover size="sm" className="tableResidentialInHamlet">
+                <Table striped bordered hover size="lg" className="tableResidentialInHamlet">
                     <thead>
                         <tr>
                             <th>Năm</th>
@@ -454,7 +460,7 @@ function BasicStatis() {
         return (
             <div>
                 <div className='titleStatic'>BẢNG THỐNG KÊ TỔNG DÂN SỐ</div>
-                <Table striped bordered hover size="sm" className="tableResidentialInHamlet">
+                <Table striped bordered hover size="lg" className="tableResidentialInHamlet">
                     <thead>
                         <tr>
                             <th>Đơn vị hành chính</th>
@@ -504,6 +510,7 @@ function BasicStatis() {
     }
 
     const GetDataToStatic = async () => {
+        setHeightScreen(window.screen.height)
         setShowTableMultiStatic(true)
         const provinceList = provinceCodes.map((province) => (province.value))
         console.log(provinceList)
@@ -595,7 +602,7 @@ function BasicStatis() {
                     {(showMultiStatic) ? SelectOption() : null}
                     {(showAge) ? SelectYear() : null}
                     <div className="chartStatic">
-                        {(showChart || showChartAge) ? <div className='titleStatic'>BIỂU ĐỒ THỂ HIỆN CƠ CẤU</div> : null}
+                        {(showChart || showChartAge) ? <div className='titleStatic'>BIỂU ĐỒ THỂ HIỆN CƠ CẤU {titlePage}</div> : null}
                         {(showChart) ? <Pie data={dataChart} className='chart' /> : null}
                         {(option === 'region') ? <Bar data={dataChart} className='chart' /> : null}
                     </div>
