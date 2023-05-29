@@ -1,6 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './NavbarPage.css'
-import logo from './file/logo.png'
+import logo from './file/logo_color.png'
 import { AiOutlineMenu, AiOutlineLogout } from "react-icons/ai";
 import { useNavigate } from 'react-router-dom';
 import { BsPersonCircle } from 'react-icons/bs'
