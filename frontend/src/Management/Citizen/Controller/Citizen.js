@@ -59,6 +59,8 @@ function Citizen() {
     const [address1, setAddress1] = useState()
     const [address2, setAddress2] = useState()
     const [address3, setAddress3] = useState()
+    const [job, setJob] = useState()
+    const [educationalLevel, setEducationalLevel] = useState()
 
     let totalPopulation;
 
@@ -147,7 +149,7 @@ function Citizen() {
         setDefaultIndex(5)
         const response_population = await axios('http://localhost:8080/api/v1/citizen/by-hamlet/' + code + '?page=' + page, config)
         setHamlet(response_population.data.citizens)
-        setCitizens(response_population.data.citizens)
+        setCitizens(response_population.data.citizens.content)
         setNumberPage(response_population.data.totalPages)
         setCountCitizen(response_population.data.totalElements)
     }
@@ -249,11 +251,16 @@ function Citizen() {
     const fetchDetailCitizen = async (code) => {
         try {
             const response = await axios('http://localhost:8080/api/v1/citizen/' + code, config);
+            console.log(response.data)
             setIdCitizen(response.data.nationalId)
             setBloodType(response.data.bloodType)
             setDateOfBirth(response.data.dateOfBirth)
-            if (response.data.religion !== null) setReligion(response.data.religion.name)
-            else setReligion(null)
+            if (response.data.religion !== null) {
+                setReligion(response.data.religion.name)
+            }
+            else {
+                setReligion(null)
+            }
             setName(response.data.name)
             setOtherNationality(response.data.otherNationality)
             setEthnicity(response.data.ethnicity.name)
@@ -261,8 +268,13 @@ function Citizen() {
             setSex(response.data.sex)
             setAddress1(response.data.addresses[0].hamlet.administrativeUnit.fullName + " " + response.data.addresses[0].hamlet.name + ", " + response.data.addresses[0].hamlet.ward.name + ", " + response.data.addresses[0].hamlet.ward.district.name + ", " + response.data.addresses[0].hamlet.ward.district.province.name)
             setAddress2(response.data.addresses[1].hamlet.administrativeUnit.fullName + " " + response.data.addresses[1].hamlet.name + ", " + response.data.addresses[1].hamlet.ward.name + ", " + response.data.addresses[1].hamlet.ward.district.name + ", " + response.data.addresses[1].hamlet.ward.district.province.name)
-            if (response.data.addresses.length === 3) setAddress3(response.data.addresses[2].hamlet.administrativeUnit.fullName + " " + response.data.addresses[2].hamlet.name + ", " + response.data.addresses[2].hamlet.ward.name + ", " + response.data.addresses[2].hamlet.ward.district.name + ", " + response.data.addresses[2].hamlet.ward.district.province.name)
-            else setAddress3(null)
+            if (response.data.addresses.length === 3) {
+                setAddress3(response.data.addresses[2].hamlet.administrativeUnit.fullName + " " + response.data.addresses[2].hamlet.name + ", " + response.data.addresses[2].hamlet.ward.name + ", " + response.data.addresses[2].hamlet.ward.district.name + ", " + response.data.addresses[2].hamlet.ward.district.province.name)
+            } else {
+                setAddress3(null)
+            }
+            setJob(response.data.job)
+            setEducationalLevel(response.data.educationalLevel)
             setShowDetail(true);
             console.log(response.data.addresses)
             setShowButton(false)
@@ -342,8 +354,12 @@ function Citizen() {
                             <th className="row-data">{(religion === null) ? "Không có" : religion}</th>
                         </tr>
                         <tr>
-                            <th className="row-head">Quốc tịch khác</th>
-                            <th className="row-data">{(otherNationality === "") ? "Không có" : otherNationality}</th>
+                            <th className="row-head">Nghề nghiệp</th>
+                            <th className="row-data">{job}</th>
+                        </tr>
+                        <tr>
+                            <th className="row-head">Trình độ văn hóa</th>
+                            <th className="row-data">{(educationalLevel === "") ? "Không có" : educationalLevel}</th>
                         </tr>
                     </tbody>
                 </Table>

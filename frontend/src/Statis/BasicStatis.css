@@ -17,20 +17,40 @@
     align-items: center;
 }
 
-.flexStatic {
+.flexStatis {
     display: flex;
+}
+
+.flexStatis .flex_first {
+    align-items: center;
+    width: 30%;
+    border: 2px solid black;
+}
+
+.flexStatis .flex_second {
+    align-items: center;
+    text-align: center;
+    margin-top: 30px;
+    width: 100%;
+}
+
+.flexStatis .flex_second .chartStatic {
+    width: 80%;
+    max-width: 350px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.flexStatis .flex_second .chartLine {
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .tableResidentialInHamlet {
     width: 600px;
     margin-left: auto;
     margin-right: auto;
-}
-
-.flex_second {
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 50px;
 }
 
 .titleStatic {
@@ -40,32 +60,6 @@
     margin-bottom: 30px;
 }
 
-.chartStatic {
-    width: 80%;
-    max-width: 350px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.flex_first {
-    align-items: center;
-    width: 30%;
-    border: 2px solid black;
-}
-
-.flex_second {
-    align-items: center;
-    text-align: center;
-    margin-top: 30px;
-    width: 100%;
-}
-
-.chartLine {
-    width: 70%;
-    margin-left: auto;
-    margin-right: auto;
-}
-
 .flex-year {
     display: flex;
     margin-bottom: 20px;
@@ -73,15 +67,20 @@
     margin-right: auto;
 }
 
-.flexFormInput {
+.flex-year .flexFormInput {
     display: flex;
     margin-left: auto;
     margin-right: auto;
 }
 
-.formInput {
+.flex-year .flexFormInput .formInput {
     margin-right: 20px;
     display: flex;
+}
+
+.titleSelectYear {
+    margin-bottom: 20px;
+    font-weight: bold;
 }
 
 .formInputMultiOption {
@@ -90,12 +89,7 @@
     margin-left: 5%;
 }
 
-.titleSelectYear {
-    margin-bottom: 20px;
-    font-weight: bold;
-}
-
-.selectMultiOption {
+.formInputMultiOption .selectMultiOption {
     width: 60%;
 }
 

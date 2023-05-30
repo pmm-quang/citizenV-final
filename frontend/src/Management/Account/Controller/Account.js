@@ -151,11 +151,11 @@ function Account() {
   }, [])
 
   const listAccDeclaration = accountList.map((account, index) =>
-    (account.declaration.startTime === null || account.declaration.status === "Đã hoàn thành" || account.declaration.status === "Đã khóa" || account.declaration.status === "Đã quá hạn khai báo") ? <option key={index} value={account.username}>{account.username + ". " + account.division.name}</option> : null
+    (account.declaration.startTime === null || account.declaration.status === "Đã hoàn thành" || account.declaration.status === "Đã khóa" || account.declaration.status === "Đã quá hạn khai báo") ? <option key={index} value={account.username}>{account.username + ". " + account.division.administrativeUnit.shortName + " " + account.division.name}</option> : null
   )
 
   const listAccAcceptDeclaration = accountList.map((account, index) =>
-    (account.declaration.status === "Đang khai báo" || account.declaration.status === "Chưa mở khai báo") ? <option key={index} value={account.username}>{account.username + ". " + account.division.name}</option> : null
+    (account.declaration.status === "Đang khai báo" || account.declaration.status === "Chưa mở khai báo") ? <option key={index} value={account.username}>{account.username + ". " + account.division.administrativeUnit.shortName + " " + account.division.name}</option> : null
   )
 
   const listDivision = division.map((post) =>

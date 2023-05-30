@@ -1,0 +1,199 @@
+.pagelistButton {
+    margin-top: 20px;
+    display: block;
+}
+
+.listButton {
+    margin-top: 20px;
+    display: block;
+}
+
+.optionButton {
+    display: inline-block;
+    margin-left: 20px;
+}
+
+.listOptions {
+    width: 20%,
+}
+
+.inputOptions {
+    width: 100%;
+}
+
+.optionButtonSelect, .optionButtonSelect:hover {
+    display: inline-block;
+    background-color: red;
+    border: 2px solid black;
+    color: white;
+    font-weight: bold;
+    margin-left: 20px;
+}
+
+.listForm {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.titlePage {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.formFlex {
+    flex: 250px;
+    margin-left: 20px;
+}
+
+.titleFlex {
+    text-align: center;
+    margin-right: 5%;
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.noteJob {
+    font-size: 13px;
+    margin-left: 10px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+.noteInputbyfile {
+    font-weight: bold;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.warning {
+    color: red;
+    font-weight: bold;
+    font-size: 40px;
+    margin-top: 30px;
+    text-align: center;
+}
+
+
+.childWarning {
+    color: red;
+    font-weight: bold;
+    font-size: 35px;
+    text-align: center;
+}
+
+.successNotify {
+    color: green;
+    font-weight: bold;
+    font-size: 40px;
+    margin-top: 30px;
+    text-align: center;
+}
+
+
+.childSuccessNotify {
+    color: green;
+    font-weight: bold;
+    font-size: 35px;
+    text-align: center;
+}
+
+.firstPageFlex {
+    display: flex
+}
+
+.secondPageFlex {
+    display: flex
+}
+
+.FindCitizenOption {
+    width: 20%;
+    border-right: 3px solid black;
+    top: 0%
+}
+
+.FindCitizenOption .title {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.FindCitizenOption .buttonOption {
+    width: 100%;
+    text-align: center;
+    border-bottom: 2px solid black;
+    height: 50px;
+    background-color: rgb(130, 91, 237);
+}
+
+.FindCitizenOption .buttonOption:hover {
+    cursor: pointer;
+    background-color: rgb(173, 150, 237)
+}
+
+.FindCitizenOption .buttonOption .titleOption {
+    padding-top: 12px;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.noteFindCitizen {
+    font-size: 12px;
+    margin-left: 10px;
+    margin-right: 5px;
+    margin-top: 10px;
+    font-style: italic;
+}
+
+.flexFindCitizen {
+    display: flex
+}
+
+.pageFindCitizen {
+    width: 90%;
+}
+
+.listOptions {
+    width: 15%,
+}
+
+.inputOption {
+    width: 90%;
+}
+
+.flexOptionNationalId .titleOptionNationalId {
+    display: inline-block;
+    margin-left: 22%;
+    margin-top: 30px;
+}
+
+.flexOptionNationalId input {
+    display: inline-block;
+    height: 38px;
+    border-radius: 5px;
+    width: 40%;
+    margin-left: 10px;
+    padding: 10px;
+}
+
+.flexOptionNationalId .buttonInput {
+    display: inline-block;
+    margin-left: 10px;
+    border: 2px solid black;
+    height: 39px;
+    border-radius: 5px;
+    width: 100px;
+}
+
+.detailed-resident-info {
+    margin-left: 20%;
+    margin-top: 20px;
+}
+
+.detailed-resident-info .row-head {
+    width: 15vw;
+    background-color: aqua;
+}

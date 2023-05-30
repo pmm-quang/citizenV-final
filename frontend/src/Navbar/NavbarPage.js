@@ -13,7 +13,6 @@ import axios from 'axios';
 function NavbarPage() {
   const user_account = JSON.parse(localStorage.getItem("user"));
   const author = user_account.role;
-  console.log(user_account)
 
   const [show, setShow] = useState(false)
   const [showChangePassword, setShowChangePassword] = useState(false)
@@ -155,7 +154,7 @@ function NavbarPage() {
         {(author === 'B2') ? <div className='option' style={{ marginLeft: '115px' }} onClick={() => { navigate("/citizen") }}>Thông tin dân cư</div> : null}
         {(author !== 'B2') ? <div className='option' onClick={() => { navigate("/citizen") }}>Thông tin dân cư</div> : null}
         <div className='option' onClick={() => { navigate("/statis") }}>Thống kê</div>
-        <div className='option' onClick={() => { navigate("/findresidential") }}>Tìm kiếm người dân</div>
+        <div className='option' onClick={() => { navigate("/findcitizen") }}>Tìm kiếm người dân</div>
         {(author === 'B2') ? <div className='option' onClick={() => { navigate("/citizeninput") }}>Nhập liệu</div> : null}
 
         <div className='sub-nav'>
@@ -168,7 +167,7 @@ function NavbarPage() {
             {(author !== 'B2') ? <div className='sub-option' onClick={() => { navigate("/account") }}>Quản lý tài khoản</div> : null}
             <div className='sub-option' onClick={() => { navigate("/citizen") }}>Thông tin dân cư</div>
             <div className='sub-option' onClick={() => { navigate("/statis") }}>Thống kê</div>
-            <div className='sub-option' onClick={() => { navigate("/findresidential") }}>Tìm kiếm người dân</div>
+            <div className='sub-option' onClick={() => { navigate("/findcitizen") }}>Tìm kiếm người dân</div>
             {(author === 'B2') ? <div className='sub-option' onClick={() => { navigate("/citizeninput") }}>Nhập liệu</div> : null}
           </div>
         </div>

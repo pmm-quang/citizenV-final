@@ -57,6 +57,8 @@ function BasicStatis() {
     const [dataStatic, setDataStatic] = useState([]);
     const [start, setStart] = useState('')
     const [end, setEnd] = useState('')
+    const [startAgeAv, setStartAgeAv] = useState('')
+    const [endAgeAv, setEndAgeAv] = useState('')
     const [dataAgeStatic, setDataAgeStatic] = useState([]);
     const [value, setValue] = useState([])
     const [showBasicStatis, setShowBasicStatis] = useState(false)
@@ -66,10 +68,15 @@ function BasicStatis() {
     const [optionList, setOptionList] = useState([])
     const [firstSelectOption, setFirstSelectOption] = useState(false)
     const [secondSelectOption, setSecondSelectOption] = useState(false)
+    const [thirdSelectOption, setThirdSelectOption] = useState(false)
     const [checkedAgeGroup, setCheckedAgeGroup] = useState(false)
     const [titlePage, setTitlePage] = useState('')
     const [showWarningEndYear, setShowWarningEndYear] = useState(false)
     const [heightScreen, setHeightScreen] = useState(window.screen.height)
+    const [message, setMessage] = useState('')
+    const [ageGroupChecked, setAgeGroupChecked] = useState(false)
+    const [ageAverageChecked, setAgeAverageChecked] = useState(false)
+    const [showAverageAge, setShowAverageAge] = useState(false)
     const [dataChart, setDataChart] = useState({
         labels: [],
         datasets: [
@@ -90,6 +97,8 @@ function BasicStatis() {
         { value: 'job', label: "Nghề nghiệp", checked: false },
         { value: 'educationLevel', label: "Trình độ văn hóa", checked: false }
     ])
+
+    let listAdvanceOption = [false, false]
 
     const fetchProvince = async () => {
         if (role === 'A1') {
@@ -257,8 +266,14 @@ function BasicStatis() {
     }
 
     const GetDataAgeStatic = async (start, end) => {
-        setHeightScreen(window.screen.height)
-        if (end > 2023) {
+        if (start > 2023) {
+            setMessage("Năm bắt đầu phải luôn nhỏ hơn hoặc bằng năm hiện tại")
+            setShowWarningEndYear(true)
+        } else if (end > 2023) {
+            setMessage("Năm kết thúc phải luôn nhỏ hơn hoặc bằng năm hiện tại")
+            setShowWarningEndYear(true)
+        } else if (end <= start) {
+            setMessage("Năm bắt đầu phải luôn nhỏ hơn năm kết thúc")
             setShowWarningEndYear(true)
         } else {
             setShowChartAge(true)
@@ -267,25 +282,49 @@ function BasicStatis() {
             setOption("ageGroup")
             setShowChart(false)
             const year = end - start;
-            const response = await axios.get("http://localhost:8080/api/v1/statistics/population/citizen/age-group?year=" + year + "&startYear=" + start + "&endYear=" + end, config)
-            setDataAgeStatic(response.data)
-            setDataChart({
-                labels: response.data.map(item => item.year),
-                datasets: [
-                    {
-                        label: "Dưới độ tuổi lao động",
-                        data: response.data.map(item => item.ageGroupPopulation[0].population)
-                    },
-                    {
-                        label: "Trong độ tuổi lao động",
-                        data: response.data.map(item => item.ageGroupPopulation[1].population)
-                    },
-                    {
-                        label: "Trên độ tuổi lao động",
-                        data: response.data.map(item => item.ageGroupPopulation[2].population)
-                    }
-                ]
-            })
+            let response
+            if (role === 'A1') {
+                response = await axios.get("http://localhost:8080/api/v1/statistics/population/citizen/age-group?year=" + year + "&startYear=" + start + "&endYear=" + end, config)
+                setDataAgeStatic(response.data)
+                setDataChart({
+                    labels: response.data.map(item => item.year),
+                    datasets: [
+                        {
+                            label: "Dưới độ tuổi lao động",
+                            data: response.data.map(item => item.ageGroupPopulation[0].population)
+                        },
+                        {
+                            label: "Trong độ tuổi lao động",
+                            data: response.data.map(item => item.ageGroupPopulation[1].population)
+                        },
+                        {
+                            label: "Trên độ tuổi lao động",
+                            data: response.data.map(item => item.ageGroupPopulation[2].population)
+                        }
+                    ]
+                })
+            } else {
+                response = await axios.get("http://localhost:8080/api/v1/statistics/population/citizen/age-group/" + user + "?startYear=" + start + "&endYear=" + end, config)
+                setDataAgeStatic(response.data.details)
+                console.log(response.data.details)
+                setDataChart({
+                    labels: response.data.details.map(item => item.year),
+                    datasets: [
+                        {
+                            label: "Dưới độ tuổi lao động",
+                            data: response.data.details.map(item => item.ageGroupPopulation[0].population)
+                        },
+                        {
+                            label: "Trong độ tuổi lao động",
+                            data: response.data.details.map(item => item.ageGroupPopulation[1].population)
+                        },
+                        {
+                            label: "Trên độ tuổi lao động",
+                            data: response.data.details.map(item => item.ageGroupPopulation[2].population)
+                        }
+                    ]
+                })
+            }
             console.log(dataChart)
         }
     }
@@ -358,22 +397,39 @@ function BasicStatis() {
         }}>{option.label}</div>
     )
 
-    const BasicStatis = () => {
+    const ListOptionAdvanceStatic = () => {
         return (
             <div>
-                {listOptionBasicStatic}
-                <div className="buttonChildOption" style={(checkedAgeGroup) ? { backgroundColor: 'yellow' } : null} onClick={() => {
+                <div className="buttonChildOption" style={(ageGroupChecked) ? { backgroundColor: 'yellow' } : null} onClick={() => {
+                    setAgeAverageChecked(false);
+                    setAgeGroupChecked(true)
                     setShowAge(true)
                     setShowChart(false)
+                    setShowAverageAge(false)
                     setShowMultiStatic(false)
                     setShowTableMultiStatic(false)
                     setCheckedAgeGroup(true)
                     setTitlePage(" THEO NHÓM TUỔI")
-                    listOption.map((option) => {
-                        option.checked = false
-                    })
-                }
-                }>Nhóm tuổi</div>
+                }}>Nhóm tuổi</div>
+                <div className="buttonChildOption" style={(ageAverageChecked) ? { backgroundColor: 'yellow' } : null} onClick={() => {
+                    setAgeAverageChecked(true);
+                    setAgeGroupChecked(false)
+                    setShowAge(false)
+                    setShowAverageAge(true)
+                    setShowChart(false)
+                    setShowMultiStatic(false)
+                    setShowTableMultiStatic(false)
+                    setCheckedAgeGroup(true)
+                    setTitlePage(" THEO TUỔI TRUNG BÌNH")
+                }}>Tuổi trung bình</div>
+            </div>
+        )
+    }
+
+    const BasicStatis = () => {
+        return (
+            <div>
+                {listOptionBasicStatic}
             </div>
         )
     }
@@ -385,6 +441,7 @@ function BasicStatis() {
                     setSecondSelectOption(false)
                     setShowMultiStatic(false)
                     setShowTableMultiStatic(false)
+                    setThirdSelectOption(false)
                     setCheckedAgeGroup(false)
                     listOption.map((option) => {
                         option.checked = false
@@ -393,17 +450,40 @@ function BasicStatis() {
                     setShowChartAge(false)
                     setShowAge(false)
                     setShowBasicStatis(false)
+                    setAgeAverageChecked(false)
+                    setAgeGroupChecked(false)
                 }}><div className="titleOption">Thống kê cơ bản</div></div>
                 {(firstSelectOption) ? <BasicStatis /> : null}
                 <div className="buttonOption" style={(secondSelectOption) ? { backgroundColor: 'yellow' } : null} onClick={() => {
-                    setShowMultiStatic(true)
+                    setShowMultiStatic(false)
                     setShowChart(false)
                     setShowChartAge(false)
                     setShowAge(false)
                     setShowBasicStatis(false)
                     setSecondSelectOption(!secondSelectOption)
+                    setThirdSelectOption(false)
+                    setFirstSelectOption(false)
+                    setAgeAverageChecked(false)
+                    setAgeGroupChecked(false)
+                    setCheckedAgeGroup(false)
+                    listOption.map((option) => {
+                        option.checked = false
+                    })
+                }}><div className="titleOption">Thống kê theo khoảng thời gian</div></div>
+                {(secondSelectOption) ? <ListOptionAdvanceStatic /> : null}
+                <div className="buttonOption" style={(thirdSelectOption) ? { backgroundColor: 'yellow' } : null} onClick={() => {
+                    setShowMultiStatic(true)
+                    setShowChart(false)
+                    setShowChartAge(false)
+                    setShowAge(false)
+                    setShowBasicStatis(false)
+                    setSecondSelectOption(false)
+                    setThirdSelectOption(!thirdSelectOption)
                     setFirstSelectOption(false)
                     setCheckedAgeGroup(false)
+                    setAgeAverageChecked(false)
+                    setShowAverageAge(false)
+                    setAgeGroupChecked(false)
                     listOption.map((option) => {
                         option.checked = false
                     })
@@ -509,6 +589,37 @@ function BasicStatis() {
         )
     }
 
+    const SelectYearInAverageAge = () => {
+        return (
+            <div>
+                <div className="titleSelectYear">THỐNG KÊ TUỔI TRUNG BÌNH TRONG KHOẢNG THỜI GIAN</div>
+                <div className="flex-year">
+                    <div className="flexFormInput">
+                        <Form.Group className="formInput">
+                            <Form.Label style={{ width: '150px', marginTop: '6px' }}>1*. Năm bắt đầu</Form.Label>
+                            <Form.Control type="text" style={{ width: '200px' }} value={startAgeAv} onChange={(e) => {
+                                setStartAgeAv(e.target.value)
+                                setShowChartAge(false)
+                            }} />
+                        </Form.Group>
+                        <Form.Group className="formInput">
+                            <Form.Label style={{ width: '150px', marginTop: '6px' }}>2*. Năm kết thúc</Form.Label>
+                            <Form.Control type="text" style={{ width: '200px' }} value={endAgeAv} onChange={(e) => {
+                                setEndAgeAv(e.target.value)
+                                setShowChartAge(false)
+                            }} />
+                        </Form.Group>
+                        <Form.Group style={{ marginLeft: '30px' }}>
+                            <Button onClick={() => {
+                                GetDataAgeStatic(start, end)
+                            }}> Xác nhận </Button>
+                        </Form.Group>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
     const GetDataToStatic = async () => {
         setHeightScreen(window.screen.height)
         setShowTableMultiStatic(true)
@@ -565,6 +676,70 @@ function BasicStatis() {
         }
     }
 
+    const GetDataAgeAverageToStatic = async () => {
+        if (start > 2023) {
+            setMessage("Năm bắt đầu phải luôn nhỏ hơn hoặc bằng năm hiện tại")
+            setShowWarningEndYear(true)
+        } else if (end > 2023) {
+            setMessage("Năm kết thúc phải luôn nhỏ hơn hoặc bằng năm hiện tại")
+            setShowWarningEndYear(true)
+        } else if (end <= start) {
+            setMessage("Năm bắt đầu phải luôn nhỏ hơn năm kết thúc")
+            setShowWarningEndYear(true)
+        } else {
+            setShowChartAge(true)
+            setDataStatic([])
+            setDataAgeStatic([])
+            setOption("ageGroup")
+            setShowChart(false)
+            const year = end - start;
+            let response
+            if (role === 'A1') {
+                response = await axios.get("http://localhost:8080/api/v1/statistics/population/citizen/age-group?year=" + year + "&startYear=" + start + "&endYear=" + end, config)
+                setDataAgeStatic(response.data)
+                setDataChart({
+                    labels: response.data.map(item => item.year),
+                    datasets: [
+                        {
+                            label: "Dưới độ tuổi lao động",
+                            data: response.data.map(item => item.ageGroupPopulation[0].population)
+                        },
+                        {
+                            label: "Trong độ tuổi lao động",
+                            data: response.data.map(item => item.ageGroupPopulation[1].population)
+                        },
+                        {
+                            label: "Trên độ tuổi lao động",
+                            data: response.data.map(item => item.ageGroupPopulation[2].population)
+                        }
+                    ]
+                })
+            } else {
+                response = await axios.get("http://localhost:8080/api/v1/statistics/avg-age?divisionCode=" + user + "&startYear=" + startAgeAv + "&endYear=" + endAgeAv, config)
+                setDataAgeStatic(response.data)
+                console.log(response.data)
+                setDataChart({
+                    labels: response.data.details.map(item => item.year),
+                    datasets: [
+                        {
+                            label: "Dưới độ tuổi lao động",
+                            data: response.data.details.map(item => item.ageGroupPopulation[0].population)
+                        },
+                        {
+                            label: "Trong độ tuổi lao động",
+                            data: response.data.details.map(item => item.ageGroupPopulation[1].population)
+                        },
+                        {
+                            label: "Trên độ tuổi lao động",
+                            data: response.data.details.map(item => item.ageGroupPopulation[2].population)
+                        }
+                    ]
+                })
+            }
+            console.log(dataChart)
+        }
+    }
+
     const SelectOption = () => {
         return (
             <div className='showSelectMultiOption'>
@@ -596,11 +771,12 @@ function BasicStatis() {
 
     const PageStatic = () => {
         return (
-            <div className="flexStatic">
+            <div className="flexStatis">
                 <TreeUnits className="flex_first" />
                 <div className="flex_second">
                     {(showMultiStatic) ? SelectOption() : null}
                     {(showAge) ? SelectYear() : null}
+                    {(showAverageAge) ? SelectYearInAverageAge() : null}
                     <div className="chartStatic">
                         {(showChart || showChartAge) ? <div className='titleStatic'>BIỂU ĐỒ THỂ HIỆN CƠ CẤU {titlePage}</div> : null}
                         {(showChart) ? <Pie data={dataChart} className='chart' /> : null}
@@ -621,23 +797,23 @@ function BasicStatis() {
 
     const ModalWarningEndYear = () => {
         return (
-          <Modal show={showWarningEndYear}>
-            <Modal.Header className='headerModal'>
-              <Modal.Title className='titleModal'>LỖI</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              Năm kết thúc không thể lớn hơn năm hiện tại
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={() => {
-                setShowWarningEndYear(false)
-              }}>
-                Đóng
-              </Button>
-            </Modal.Footer>
-          </Modal>
+            <Modal show={showWarningEndYear}>
+                <Modal.Header className='headerModal'>
+                    <Modal.Title className='titleModal'>LỖI</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {message}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => {
+                        setShowWarningEndYear(false)
+                    }}>
+                        Đóng
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         )
-      }
+    }
 
     return (
         <div>
