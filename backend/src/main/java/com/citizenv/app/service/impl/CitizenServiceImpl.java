@@ -485,13 +485,13 @@ public class CitizenServiceImpl implements CitizenService {
             conditionCitizen.setLength(0);
             System.out.println("dob");
         }
-        if (request.getBloodType() != null && !request.getBloodType().equals("Không xác định")) {
+        if (request.getBloodType() != null) {
             conditionCitizen.append(" c.bloodType = '").append(request.getBloodType()).append("' \n");
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
             System.out.println("blood");
         }
-        else if (request.getBloodType() != null){
+        else {
             conditionCitizen.append("c.bloodType is null \n");
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
@@ -515,46 +515,46 @@ public class CitizenServiceImpl implements CitizenService {
             conditionCitizen.setLength(0);
             System.out.println("ethnicity");
         }
-        if (request.getOtherNationality() != null && !request.getOtherNationality().equals("Không")) {
+        if (request.getOtherNationality() != null) {
             conditionCitizen.append(" c.otherNationality = '").append(request.getOtherNationality()).append("' \n");
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
             System.out.println("otherNational");
         }
-        else if (request.getOtherNationality() != null){
+        else {
             conditionCitizen.append(" c.otherNationality is null \n");
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
         }
-        if (request.getReligionId() != null && request.getReligionId() != 0) {
+        if (request.getReligionId() != null) {
             conditionCitizen.append(" c.religion.id = ").append(request.getReligionId()).append(" \n");
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
             System.out.println("religion");
         }
-        else if (request.getReligionId() != null){
+        else {
             conditionCitizen.append(" c.religion is null \n");
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
         }
-        if (request.getJob() != null && !request.getJob().equals("Không xác định")) {
+        if (request.getJob() != null) {
             conditionCitizen.append(" c.job = '").append(request.getJob()).append("' \n");
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
             System.out.println("job");
         }
-        else if (request.getJob() != null && request.getJob().equals("Không xác định")){
+        else {
             conditionCitizen.append(" c.job is null \n");
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
         }
-        if (request.getEducationalLevel() != null && !request.getEducationalLevel().equals("Không xác định")) {
+        if (request.getEducationalLevel() != null) {
             conditionCitizen.append(" c.educationalLevel = '").append(request.getEducationalLevel()).append("' \n");
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
             System.out.println("education Level");
         }
-        else if (request.getEducationalLevel() != null && request.getEducationalLevel().equals("Không xác định")){
+        else {
             conditionCitizen.append(" c.educationalLevel is null \n");
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);

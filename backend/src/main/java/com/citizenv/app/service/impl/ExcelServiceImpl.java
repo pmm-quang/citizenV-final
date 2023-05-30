@@ -236,45 +236,26 @@ public class ExcelServiceImpl implements ExcelService {
 
         //Thiết lập số dòng cần nhóm lại
         int rowToGroup = 2;
-        Row headerRow = sheet.createRow(0);
-        CellStyle headerCellStyle = workbook.createCellStyle();
-        headerCellStyle.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
-        headerCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-
-        String[] columnNames = {"Số CMND/CCCD", "Họ và tên", "Ngày sinh","Giới tính", "Nhóm máu","Tình trạng hôn nhân",
-                "Dân tộc", "Tôn giáo", "Quốc tịch khác", "Trình độ học vấn", "Nghề nghiệp", "Quê quán", "Địa chỉ thường trú"
-                , "Địa chỉ tạm trú"};
-        for (int i = 0; i < 14; i++) {
-            Cell headerCell = headerRow.createCell(i);
-            headerCell.setCellValue(columnNames[i]);
-            headerCell.setCellStyle(headerCellStyle);
-
-            // Gộp các ô dữ liệu của dòng 1 và dòng 2 lại thành một ô và căn giữa
-            sheet.addMergedRegion(new CellRangeAddress(0, 1, i, i));
-            CellStyle mergedCellStyle = workbook.createCellStyle();
-            mergedCellStyle.setAlignment(HorizontalAlignment.CENTER);
-            headerCell.setCellStyle(mergedCellStyle);
-        }
-        String[] columnNames2 = {"Cha", "Mẹ", "Người giám hộ", "Vợ (hoặc chồng)"};
-        for (int i = 0; i < columnNames2.length; i++) {
-            Cell headerCell = headerRow.createCell(i + 14);
-            headerCell.setCellValue(columnNames[i]);
-            headerCell.setCellStyle(headerCellStyle);
-
-            sheet.addMergedRegion(new CellRangeAddress(0, 0, i + 14, i + 15));
-            CellStyle mergedCellStyle = workbook.createCellStyle();
-            mergedCellStyle.setAlignment(HorizontalAlignment.CENTER);
-            headerCell.setCellStyle(mergedCellStyle);
-        }
-        Row headerRow1 = sheet.createRow(1);
-        String[] columnNames3 = {"Số CMND/CCCD", "Họ và tên","Số CMND/CCCD", "Họ và tên","Số CMND/CCCD", "Họ và tên"};
-        for (int i = 0; i < columnNames3.length; i++) {
-            Cell headerCell = headerRow1.createCell(i + 14);
-            headerCell.setCellValue(columnNames3[i]);
-            headerCell.setCellStyle(headerCellStyle);
-
-        }
-        int rowIndex = 2;
+//        Row headerRow = sheet.createRow(0);
+//        CellStyle headerCellStyle = workbook.createCellStyle();
+//        headerCellStyle.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
+//        headerCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+//
+//        String[] columnNames = {"Số CMND/CCCD", "Họ và tên", "Ngày sinh","Giới tính", "Nhóm máu","Tình trạng hôn nhân",
+//                "Dân tộc", "Tôn giáo", "Quốc tịch khác", "Trình độ học vấn", "Nghề nghiệp", "Quê quán", "Địa chỉ thường trú"
+//                , "Địa chỉ tạm trú", "Cha", "Mẹ", "Người giám hộ", "Vợ (hoặc chồng)"};
+//        for (int i = 0; i < 14; i++) {
+//            Cell headerCell = headerRow.createCell(i);
+//            headerCell.setCellValue(columnNames[i]);
+//            headerCell.setCellStyle(headerCellStyle);
+//
+//            // Gộp các ô dữ liệu của dòng 1 và dòng 2 lại thành một ô và căn giữa
+//            sheet.addMergedRegion(new CellRangeAddress(0, 1, i, i));
+//            CellStyle mergedCellStyle = workbook.createCellStyle();
+//            mergedCellStyle.setAlignment(HorizontalAlignment.CENTER);
+//            headerCell.setCellStyle(mergedCellStyle);
+//        }
+        int rowIndex = 0;
         for (Citizen c: list) {
             Row row = sheet.createRow(rowIndex++);
             row.createCell(0).setCellValue(c.getNationalId());
