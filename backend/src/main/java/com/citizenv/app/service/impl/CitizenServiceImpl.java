@@ -559,12 +559,7 @@ public class CitizenServiceImpl implements CitizenService {
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
         }
-//        if (request.get)
-//        String joinsQuery = String.join(" and ", joinConditions);
-//        if (joinsQuery.length() > 0) {
-//            joinsQuery = " join " + joinsQuery;
-//            query.append(joinsQuery);
-//        }
+
         String  conditionsQuery = String.join(" and ", conditionClauses);
 
         if (conditionsQuery.length() > 0) {
@@ -575,20 +570,8 @@ public class CitizenServiceImpl implements CitizenService {
         Query nativeQuery = entityManager.createQuery(String.valueOf(query));
         List<CustomCitizenResponse> list = nativeQuery.getResultList();
         System.out.println(list.size());
-//        List<CustomCitizenResponse> dtoList = list.stream().map(citizen -> mapper.map(citizen, CitizenDto.class)).collect(Collectors.toList());
         return list;
     }
-
-    public String fullAddressInfo(Address ad) {
-        StringBuilder a = new StringBuilder();
-        a.append(ad.getAddressType().getName()).append(": ").append(ad.getHamlet().getAdministrativeUnit().getShortName())
-                .append(" ").append(ad.getHamlet().getName())
-                .append(", ").append(ad.getHamlet().getWard().getName())
-                .append(", ").append(ad.getHamlet().getWard().getDistrict().getName())
-                .append(", ").append(ad.getHamlet().getWard().getDistrict().getProvince().getName());
-        return String.valueOf(a);
-    }
-
 
 
 }

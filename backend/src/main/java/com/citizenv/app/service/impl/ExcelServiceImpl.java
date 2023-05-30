@@ -6,14 +6,14 @@ import com.citizenv.app.exception.InvalidException;
 import com.citizenv.app.payload.excel.ExcelCitizen;
 import com.citizenv.app.repository.*;
 import com.citizenv.app.service.ExcelService;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -225,5 +225,172 @@ public class ExcelServiceImpl implements ExcelService {
         }  catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public ByteArrayResource exportDataToExcel() throws IOException {
+        List<Citizen> list = repo.findAllByHamletCode("01010101", 2);
+        Workbook workbook = new XSSFWorkbook();
+        //Tạo 1 trang tính mới
+        Sheet sheet = workbook.createSheet("Danh sách người dân");
+
+        //Thiết lập số dòng cần nhóm lại
+        int rowToGroup = 2;
+//        Row headerRow = sheet.createRow(0);
+//        CellStyle headerCellStyle = workbook.createCellStyle();
+//        headerCellStyle.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
+//        headerCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+//
+//        String[] columnNames = {"Số CMND/CCCD", "Họ và tên", "Ngày sinh","Giới tính", "Nhóm máu","Tình trạng hôn nhân",
+//                "Dân tộc", "Tôn giáo", "Quốc tịch khác", "Trình độ học vấn", "Nghề nghiệp", "Quê quán", "Địa chỉ thường trú"
+//                , "Địa chỉ tạm trú", "Cha", "Mẹ", "Người giám hộ", "Vợ (hoặc chồng)"};
+//        for (int i = 0; i < 14; i++) {
+//            Cell headerCell = headerRow.createCell(i);
+//            headerCell.setCellValue(columnNames[i]);
+//            headerCell.setCellStyle(headerCellStyle);
+//
+//            // Gộp các ô dữ liệu của dòng 1 và dòng 2 lại thành một ô và căn giữa
+//            sheet.addMergedRegion(new CellRangeAddress(0, 1, i, i));
+//            CellStyle mergedCellStyle = workbook.createCellStyle();
+//            mergedCellStyle.setAlignment(HorizontalAlignment.CENTER);
+//            headerCell.setCellStyle(mergedCellStyle);
+//        }
+        int rowIndex = 0;
+        for (Citizen c: list) {
+            Row row = sheet.createRow(rowIndex++);
+            row.createCell(0).setCellValue(c.getNationalId());
+            row.createCell(1).setCellValue(c.getName());
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy"); // Định dạng mới
+            String formattedDate = c.getDateOfBirth().format(formatter);
+            row.createCell(2).setCellValue(formattedDate);
+            row.createCell(3).setCellValue(c.getSex());
+            if (c.getBloodType() != null) {
+                row.createCell(4).setCellValue(c.getBloodType());
+            } else {
+                row.createCell(4).setCellValue("");
+            }
+            row.createCell(5).setCellValue(c.getMaritalStatus());
+            row.createCell(6).setCellValue(c.getEthnicity().getName());
+            if (c.getReligion() != null) {
+                row.createCell(7).setCellValue(c.getReligion().getName());
+            } else {
+                row.createCell(7).setCellValue("");
+            }
+
+            if (c.getOtherNationality() != null) {
+                row.createCell(8).setCellValue(c.getOtherNationality());
+            } else {
+                row.createCell(8).setCellValue("");
+            }
+
+            if (c.getEducationalLevel() != null) {
+                row.createCell(9).setCellValue(c.getEducationalLevel());
+            } else {
+                row.createCell(9).setCellValue("");
+            }
+
+            if (c.getJob() != null) {
+                row.createCell(10).setCellValue(c.getJob());
+            } else {
+                row.createCell(10).setCellValue("");
+            }
+            for (Address address: c.getAddresses()) {
+                if (address.getAddressType().getId() == 1) {
+                    String fullAddress = address.getHamlet().getName() + ", " + address.getHamlet().getWard().getName()
+                            + ", " + address.getHamlet().getWard().getDistrict().getName()
+                            + ", " + address.getHamlet().getWard().getDistrict().getProvince().getName();
+                    row.createCell(11).setCellValue(fullAddress);
+                    break;
+                }
+            }
+            for (Address address: c.getAddresses()) {
+                if (address.getAddressType().getId() == 2) {
+                    String fullAddress = address.getHamlet().getName() + ", " + address.getHamlet().getWard().getName()
+                            + ", " + address.getHamlet().getWard().getDistrict().getName()
+                            + ", " + address.getHamlet().getWard().getDistrict().getProvince().getName();
+                    row.createCell(12).setCellValue(fullAddress);
+                    break;
+                }
+            }
+
+            for (Address address: c.getAddresses()) {
+                if (address.getAddressType().getId() == 3) {
+                    if (address.getHamlet() != null) {
+                        String fullAddress = address.getHamlet().getName() + ", " + address.getHamlet().getWard().getName()
+                                + ", " + address.getHamlet().getWard().getDistrict().getName()
+                                + ", " + address.getHamlet().getWard().getDistrict().getProvince().getName();
+                        row.createCell(13).setCellValue(fullAddress);
+                    } else {
+                        row.createCell(13).setCellValue("");
+                    }
+                    break;
+                }
+            }
+            boolean checkAssociation = false;
+            for (Association association: c.getAssociations()) {
+                if (association.getAssociationType().getId() == 1) {
+                    checkAssociation = true;
+                    row.createCell(14).setCellValue(association.getAssociatedCitizenNationalId());
+                    row.createCell(15).setCellValue(association.getAssociatedCitizenName());
+                    break;
+                }
+            }
+            if (!checkAssociation) {
+                row.createCell(14).setCellValue("");
+                row.createCell(15).setCellValue("");
+            }
+
+            checkAssociation = false;
+            for (Association association: c.getAssociations()) {
+                if (association.getAssociationType().getId() == 2) {
+                    checkAssociation = true;
+                    row.createCell(16).setCellValue(association.getAssociatedCitizenNationalId());
+                    row.createCell(17).setCellValue(association.getAssociatedCitizenName());
+                    break;
+                }
+            }
+            if (!checkAssociation) {
+                row.createCell(16).setCellValue("");
+                row.createCell(17).setCellValue("");
+            }
+
+            checkAssociation = false;
+            for (Association association: c.getAssociations()) {
+                if (association.getAssociationType().getId() == 3) {
+                    checkAssociation = true;
+                    row.createCell(18).setCellValue(association.getAssociatedCitizenNationalId());
+                    row.createCell(19).setCellValue(association.getAssociatedCitizenName());
+                    break;
+                }
+            }
+            if (!checkAssociation) {
+                row.createCell(18);
+                row.createCell(19);
+            }
+
+            checkAssociation = false;
+            for (Association association: c.getAssociations()) {
+                if (association.getAssociationType().getId() == 3) {
+                    checkAssociation = true;
+                    row.createCell(20).setCellValue(association.getAssociatedCitizenNationalId());
+                    row.createCell(21).setCellValue(association.getAssociatedCitizenName());
+                    break;
+                }
+            }
+            if (!checkAssociation) {
+                row.createCell(20);
+                row.createCell(21);
+            }
+
+        }
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        workbook.write(outputStream);
+
+        workbook.close();
+
+        byte[] bytes = outputStream.toByteArray();
+        ByteArrayResource resource = new ByteArrayResource(bytes);
+
+        return resource;
     }
 }

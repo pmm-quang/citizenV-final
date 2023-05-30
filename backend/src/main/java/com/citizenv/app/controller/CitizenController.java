@@ -6,7 +6,10 @@ import com.citizenv.app.payload.custom.CustomCitizenResponse;
 import com.citizenv.app.secirity.SecurityUtils;
 import com.citizenv.app.service.CitizenService;
 import com.citizenv.app.service.ExcelService;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -90,6 +93,17 @@ public class CitizenController {
 //        String filePath = "src/main/java/com/citizenv/app/controller/file.xlsx";
         String message = excelService.createUserFromExcelFile(excelFile);
         return ResponseEntity.ok().body(message);
+    }
+
+    @GetMapping("/excel/export")
+    public ResponseEntity<?> exportDataFromExcel() throws IOException {
+        ByteArrayResource resource = excelService.exportDataToExcel();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", "data.xlsx");
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(resource);
     }
 
     @PostMapping ("/search")

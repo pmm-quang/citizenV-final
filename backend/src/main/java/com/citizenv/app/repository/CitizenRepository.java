@@ -19,6 +19,7 @@ import java.util.Optional;
 @Repository
 public interface CitizenRepository extends JpaRepository<Citizen, Long> {
 
+
     Optional<Citizen> findByNationalId(String nationalId);
 
     @Modifying
@@ -37,7 +38,7 @@ public interface CitizenRepository extends JpaRepository<Citizen, Long> {
             "where h.code = :hamletCode and a.addressType.id = :addressTypeId")
     List<Citizen> findAllByHamletCode(@Param("hamletCode") String hamletCode,
                                       @Param("addressTypeId") Integer addressTypeId);
-    @Query(value = "select new com.citizenv.app.payload.custom.CustomCitizenResponse(c.nationalId, c.name, c.sex) from Citizen c " +
+    @Query(value = "select new com.citizenv.app.payload.custom.CustomCitizenResponse(c.nationalId, c.name,c.dateOfBirth, c.sex) from Citizen c " +
             "join Address a on c.id = a.citizen.id " +
             "join Hamlet h on h.id = a.hamlet.id " +
             "where h.code = :hamletCode and a.addressType.id = :addressTypeId")
@@ -51,7 +52,7 @@ public interface CitizenRepository extends JpaRepository<Citizen, Long> {
     List<Citizen> findAllByWardCode(@Param("wardCode") String wardCode,
                                     @Param("addressTypeId") Integer addressTypeId);
 
-    @Query(value = "select new com.citizenv.app.payload.custom.CustomCitizenResponse(c.nationalId, c.name, c.sex) from Citizen c " +
+    @Query(value = "select new com.citizenv.app.payload.custom.CustomCitizenResponse(c.nationalId, c.name,c.dateOfBirth, c.sex) from Citizen c " +
             "join Address a on c.id = a.citizen.id " +
             "join Hamlet h on h.id = a.hamlet.id " +
             "join Ward w on w.id = h.ward.id " +
@@ -67,7 +68,7 @@ public interface CitizenRepository extends JpaRepository<Citizen, Long> {
     List<Citizen> findAllByDistrictCode(@Param("districtCode") String districtCode,
                                         @Param("addressTypeId") Integer addressTypeId);
 
-    @Query(value = "select new com.citizenv.app.payload.custom.CustomCitizenResponse(c.nationalId, c.name, c.sex) from Citizen c " +
+    @Query(value = "select new com.citizenv.app.payload.custom.CustomCitizenResponse(c.nationalId, c.name,c.dateOfBirth, c.sex) from Citizen c " +
             "join Address a on c.id = a.citizen.id " +
             "join Hamlet h on h.id = a.hamlet.id " +
             "join Ward w on w.id = h.ward.id " +
