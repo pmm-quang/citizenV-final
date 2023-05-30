@@ -416,7 +416,7 @@ public class CitizenServiceImpl implements CitizenService {
         StringBuilder conditionAssociation = new StringBuilder();
         StringBuilder conditionCitizen = new StringBuilder();
         List<String> joinConditions = new ArrayList<>();
-        query.append("select distinct new com.citizenv.app.payload.custom.CustomCitizenResponse(c.nationalId, c.name, c.sex) from Citizen c ");
+        query.append("select distinct new com.citizenv.app.payload.custom.CustomCitizenResponse(c.nationalId, c.name, c.dateOfBirth, c.sex) from Citizen c ");
 
         List<CustomAddress> addressConditions = request.getAddresses();
         List<AssociationDto> associationConditions = request.getAssociations();
