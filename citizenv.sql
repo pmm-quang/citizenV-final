@@ -19153,7 +19153,7 @@ CREATE TABLE `ethnicities` (
 --
 
 INSERT INTO `ethnicities` (`id`, `name`) VALUES
-(1, 'Kinh (Việt)'),
+(1, 'Kinh'),
 (2, 'Tày'),
 (3, 'Thái'),
 (4, 'Mường'),
@@ -19173,7 +19173,7 @@ INSERT INTO `ethnicities` (`id`, `name`) VALUES
 (18, 'Hrê'),
 (19, 'RaGlay'),
 (20, 'Mnông'),
-(21, 'Thổ (4)'),
+(21, 'Thổ'),
 (22, 'Xtiêng'),
 (23, 'Khơ mú'),
 (24, 'Bru Vân Kiều'),
