@@ -33,6 +33,6 @@ Images:\
 ![image](https://github.com/pmm-quang/citizenV-final/assets/64970914/b8141c82-6792-40f5-8a8d-30af0ce0b9ff "B2 - Citizen input, page 2")
 ![image](https://github.com/pmm-quang/citizenV-final/assets/64970914/eddfa0e1-14ed-4f4f-9d1c-359eb097413c "B2 - Citizen input, page 3")
 ![image](https://github.com/pmm-quang/citizenV-final/assets/64970914/75656ed5-434f-4e9b-b65c-e86a9adb651b "B2 - Citizen input, import from .xlsx excel file")
-![image](https://github.com/pmm-quang/citizenV-final/assets/64970914/0d042866-9eb0-4f6b-8b2b-2d7c0d0d32fe "B2 - Citizen input, page 1, database relationship structure")
+![image](https://github.com/pmm-quang/citizenV-final/assets/64970914/0d042866-9eb0-4f6b-8b2b-2d7c0d0d32fe "Database relationship structure")
 
 
