@@ -11,16 +11,10 @@ import com.citizenv.app.payload.*;
 import com.citizenv.app.payload.custom.CustomAddress;
 import com.citizenv.app.payload.custom.CustomCitizenRequest;
 import com.citizenv.app.payload.custom.CustomCitizenResponse;
-import com.citizenv.app.payload.excel.ExcelCitizen;
 import com.citizenv.app.repository.*;
 import com.citizenv.app.service.CitizenService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -28,16 +22,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -147,8 +136,6 @@ public class CitizenServiceImpl implements CitizenService {
         Citizen c = validate(citizen);
         Citizen newCitizen = mapper.map(c, Citizen.class);
         List<Address> addresses = new ArrayList<>();
-        Address hometown = new Address();
-        Address permanentAddress = new Address();
         Address temporaryAddress = new Address();
         for (CustomAddress ad : citizen.getAddresses()) {
             Address address = new Address();
@@ -161,7 +148,6 @@ public class CitizenServiceImpl implements CitizenService {
                     () -> new ResourceNotFoundException("Thôn/xóm/bản/tổ dân phố", "mã định danh", hamletCode)
             );
             address.setParam(c, foundHamlet, foundAddressType);
-//            address.fullAddressInfo(fullAddressInfo(address));
             addresses.add(address);
         }
         if (citizen.getAddresses().size() == 2) {
@@ -172,9 +158,6 @@ public class CitizenServiceImpl implements CitizenService {
             temporaryAddress.setAddressType(foundAddressType);
             addresses.add(temporaryAddress);
         }
-//        addresses.add(hometown);
-//        addresses.add(permanentAddress);
-//        addresses.add(temporaryAddress);
         newCitizen.setAddresses(addresses);
 
         List<Association> associations = new ArrayList<>();
@@ -233,13 +216,6 @@ public class CitizenServiceImpl implements CitizenService {
         //update Association
         List<Association> associations = new ArrayList<>();
         for (AssociationDto as: citizen.getAssociations()) {
-//            Association association = new Association();
-//            AssociationType associationType = mapper.map(as.getAssociationType(), AssociationType.class);
-//            association.setId(as.getId());
-//            association.setAssociatedCitizenNationalId(as.getAssociatedCitizenNationalId());
-//            association.setAssociatedCitizenName(as.getAssociatedCitizenName());
-//            association.setAssociationType(associationType);
-//            associations.add(association);
             Association association = mapper.map(as, Association.class);
             associations.add(association);
 
@@ -420,7 +396,6 @@ public class CitizenServiceImpl implements CitizenService {
 
         List<CustomAddress> addressConditions = request.getAddresses();
         List<AssociationDto> associationConditions = request.getAssociations();
-        StringBuilder condition = new StringBuilder();
         List<String> joins = new ArrayList<>();
         List<String> conditionClauses = new ArrayList<>();
         if (addressConditions != null) {
@@ -485,21 +460,14 @@ public class CitizenServiceImpl implements CitizenService {
             conditionCitizen.setLength(0);
             System.out.println("dob");
         }
-<<<<<<< Updated upstream
-        if (request.getBloodType() != null) {
-=======
+
         if (request.getBloodType() != null && !request.getBloodType().equals("Không")) {
->>>>>>> Stashed changes
             conditionCitizen.append(" c.bloodType = '").append(request.getBloodType()).append("' \n");
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
             System.out.println("blood");
         }
-<<<<<<< Updated upstream
-        else {
-=======
         else if ("Không".equals(request.getBloodType())){
->>>>>>> Stashed changes
             conditionCitizen.append("c.bloodType is null \n");
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
@@ -523,17 +491,13 @@ public class CitizenServiceImpl implements CitizenService {
             conditionCitizen.setLength(0);
             System.out.println("ethnicity");
         }
-        if (request.getOtherNationality() != null) {
+        if (request.getOtherNationality() != null && !request.getOtherNationality().equals("Không")) {
             conditionCitizen.append(" c.otherNationality = '").append(request.getOtherNationality()).append("' \n");
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
             System.out.println("otherNational");
         }
-<<<<<<< Updated upstream
-        else {
-=======
         else if ("Không".equals(request.getOtherNationality())){
->>>>>>> Stashed changes
             conditionCitizen.append(" c.otherNationality is null \n");
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
@@ -544,49 +508,29 @@ public class CitizenServiceImpl implements CitizenService {
             conditionCitizen.setLength(0);
             System.out.println("religion");
         }
-<<<<<<< Updated upstream
-        else {
-=======
         else if (request.getReligionId() != null && request.getReligionId() == 0){
->>>>>>> Stashed changes
             conditionCitizen.append(" c.religion is null \n");
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
         }
-<<<<<<< Updated upstream
-        if (request.getJob() != null) {
-=======
         if (request.getJob() != null && !request.getJob().equals("Không")) {
->>>>>>> Stashed changes
             conditionCitizen.append(" c.job = '").append(request.getJob()).append("' \n");
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
             System.out.println("job");
         }
-<<<<<<< Updated upstream
-        else {
-=======
         else if ("Không".equals(request.getJob())){
->>>>>>> Stashed changes
             conditionCitizen.append(" c.job is null \n");
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
         }
-<<<<<<< Updated upstream
-        if (request.getEducationalLevel() != null) {
-=======
         if (request.getEducationalLevel() != null && !request.getEducationalLevel().equals("Không")) {
->>>>>>> Stashed changes
             conditionCitizen.append(" c.educationalLevel = '").append(request.getEducationalLevel()).append("' \n");
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
             System.out.println("education Level");
         }
-<<<<<<< Updated upstream
-        else {
-=======
         else if ("Không".equals(request.getEducationalLevel())){
->>>>>>> Stashed changes
             conditionCitizen.append(" c.educationalLevel is null \n");
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
@@ -600,10 +544,6 @@ public class CitizenServiceImpl implements CitizenService {
         }
         System.out.println(query);
         Query nativeQuery = entityManager.createQuery(String.valueOf(query));
-        List<CustomCitizenResponse> list = nativeQuery.getResultList();
-        System.out.println(list.size());
-        return list;
+        return nativeQuery.getResultList();
     }
-
-
 }
