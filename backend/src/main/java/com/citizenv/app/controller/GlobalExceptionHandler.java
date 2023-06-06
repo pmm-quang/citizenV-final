@@ -53,6 +53,6 @@ public class  GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleUnwantedException(Exception e) {
         e.printStackTrace();
-        return ResponseEntity.status(500).body("Bố mày không biết lỗi gì");
+        return ResponseEntity.status(500).body("Lỗi không xác định");
     }
 }

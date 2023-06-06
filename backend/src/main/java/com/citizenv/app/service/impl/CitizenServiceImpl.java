@@ -18,6 +18,7 @@ import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -81,6 +82,8 @@ public class CitizenServiceImpl implements CitizenService {
         this.associationTypeRepo = associationTypeRepo;
     }
 
+    @Override
+    @Cacheable(value = "citizens")
     public List<CitizenDto> getAll() {
         List<Citizen> entities = repo.findAll();
         return entities.stream().map(l-> mapper.map(l, CitizenDto.class)).collect(Collectors.toList());
