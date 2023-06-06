@@ -425,17 +425,17 @@ public class CitizenServiceImpl implements CitizenService {
         List<String> conditionClauses = new ArrayList<>();
         if (addressConditions != null) {
             int index = 1;
-           for (CustomAddress address:addressConditions) {
-               joinAddresses.append("c.addresses ad").append(index).append(" \n");
-               conditionAddress.append(" ad").append(index).append(".hamlet.code = '").append(address.getHamletCode()).append("' ")
-                       .append(" and ").append("ad").append(index).append(".addressType.id = ").append(address.getAddressType())
-                       .append(" \n");
-               conditionClauses.add(String.valueOf(conditionAddress));
-               conditionAddress.setLength(0);
-               joins.add(String.valueOf(joinAddresses));
-               joinAddresses.setLength(0);
-               index++;
-           }
+            for (CustomAddress address:addressConditions) {
+                joinAddresses.append("c.addresses ad").append(index).append(" \n");
+                conditionAddress.append(" ad").append(index).append(".hamlet.code = '").append(address.getHamletCode()).append("' ")
+                        .append(" and ").append("ad").append(index).append(".addressType.id = ").append(address.getAddressType())
+                        .append(" \n");
+                conditionClauses.add(String.valueOf(conditionAddress));
+                conditionAddress.setLength(0);
+                joins.add(String.valueOf(joinAddresses));
+                joinAddresses.setLength(0);
+                index++;
+            }
         }
 
         if (associationConditions != null) {
@@ -485,13 +485,21 @@ public class CitizenServiceImpl implements CitizenService {
             conditionCitizen.setLength(0);
             System.out.println("dob");
         }
+<<<<<<< Updated upstream
         if (request.getBloodType() != null) {
+=======
+        if (request.getBloodType() != null && !request.getBloodType().equals("Không")) {
+>>>>>>> Stashed changes
             conditionCitizen.append(" c.bloodType = '").append(request.getBloodType()).append("' \n");
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
             System.out.println("blood");
         }
+<<<<<<< Updated upstream
         else {
+=======
+        else if ("Không".equals(request.getBloodType())){
+>>>>>>> Stashed changes
             conditionCitizen.append("c.bloodType is null \n");
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
@@ -521,7 +529,11 @@ public class CitizenServiceImpl implements CitizenService {
             conditionCitizen.setLength(0);
             System.out.println("otherNational");
         }
+<<<<<<< Updated upstream
         else {
+=======
+        else if ("Không".equals(request.getOtherNationality())){
+>>>>>>> Stashed changes
             conditionCitizen.append(" c.otherNationality is null \n");
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
@@ -532,29 +544,49 @@ public class CitizenServiceImpl implements CitizenService {
             conditionCitizen.setLength(0);
             System.out.println("religion");
         }
+<<<<<<< Updated upstream
         else {
+=======
+        else if (request.getReligionId() != null && request.getReligionId() == 0){
+>>>>>>> Stashed changes
             conditionCitizen.append(" c.religion is null \n");
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
         }
+<<<<<<< Updated upstream
         if (request.getJob() != null) {
+=======
+        if (request.getJob() != null && !request.getJob().equals("Không")) {
+>>>>>>> Stashed changes
             conditionCitizen.append(" c.job = '").append(request.getJob()).append("' \n");
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
             System.out.println("job");
         }
+<<<<<<< Updated upstream
         else {
+=======
+        else if ("Không".equals(request.getJob())){
+>>>>>>> Stashed changes
             conditionCitizen.append(" c.job is null \n");
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
         }
+<<<<<<< Updated upstream
         if (request.getEducationalLevel() != null) {
+=======
+        if (request.getEducationalLevel() != null && !request.getEducationalLevel().equals("Không")) {
+>>>>>>> Stashed changes
             conditionCitizen.append(" c.educationalLevel = '").append(request.getEducationalLevel()).append("' \n");
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);
             System.out.println("education Level");
         }
+<<<<<<< Updated upstream
         else {
+=======
+        else if ("Không".equals(request.getEducationalLevel())){
+>>>>>>> Stashed changes
             conditionCitizen.append(" c.educationalLevel is null \n");
             conditionClauses.add(String.valueOf(conditionCitizen));
             conditionCitizen.setLength(0);

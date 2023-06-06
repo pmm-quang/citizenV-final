@@ -95,15 +95,18 @@ public class CitizenController {
         return ResponseEntity.ok().body(message);
     }
 
-    @GetMapping("/excel/export")
-    public ResponseEntity<?> exportDataFromExcel() throws IOException {
-        ByteArrayResource resource = excelService.exportDataToExcel();
+    @GetMapping("/excel/export/{hamletCode}")
+    public ResponseEntity<?> exportDataFromExcel(@PathVariable String hamletCode) throws IOException {
+//        String divisionCode = SecurityUtils.getDivisionCodeCurrentUserLogin();
+//        if (hamletCode.indexOf(divisionCode) == 0) {
+        ByteArrayResource resource = excelService.exportDataToExcel(hamletCode);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         headers.setContentDispositionFormData("attachment", "data.xlsx");
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(resource);
+        return ResponseEntity.ok().headers(headers).body(resource);
+//        } else {
+//            throw new AccessDeniedException(Constant.ACCESS_DENIED_MESSAGE_DO_NOT_HAVE_ACCESS);
+//        }
     }
 
     @PostMapping ("/search")

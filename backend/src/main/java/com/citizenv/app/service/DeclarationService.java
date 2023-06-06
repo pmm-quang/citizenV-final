@@ -11,4 +11,5 @@ public interface DeclarationService {
     String setCompleted(String username);
     String openDeclaration(String username, DeclarationDto declaration);
     String lockDeclaration(String username);
+    String changeTimeDeclaration(String username, DeclarationDto declaration);
 }

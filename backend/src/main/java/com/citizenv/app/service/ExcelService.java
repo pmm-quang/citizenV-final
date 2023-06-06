@@ -7,5 +7,5 @@ import java.io.IOException;
 
 public interface ExcelService {
     String createUserFromExcelFile(MultipartFile excelFile);
-    ByteArrayResource exportDataToExcel() throws IOException;
+    ByteArrayResource exportDataToExcel(String divisionCode) throws IOException;
 }

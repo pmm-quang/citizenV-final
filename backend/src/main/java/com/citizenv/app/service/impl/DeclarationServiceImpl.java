@@ -149,4 +149,34 @@ public class DeclarationServiceImpl implements DeclarationService {
         return "Đã khóa quyền khai báo thành công!";
     }
 
+    @Transactional
+    @Override
+    public String changeTimeDeclaration(String username, DeclarationDto declaration) {
+        User foundUser = userRepo.findByUsername(username).orElseThrow(
+                () -> new ResourceNotFoundException("Tài khoản", "username", username)
+        );
+        String status = foundUser.getDeclaration().getStatus();
+        if (!(status.equals(Constant.DECLARATION_STATUS_DECLARING) || status.equals(Constant.DECLARATION_STATUS_NOT_OPEN))) {
+            throw new InvalidException("Tài khoản chưa được cấp thời gian mở khai báo, không thể sửa thời gian khai báo");
+        }
+        LocalDate startDateDto = declaration.getStartTime();
+        LocalDate endDateDto = declaration.getEndTime();
+        LocalDateTime startTime = LocalDateTime.of(startDateDto, LocalTime.of(0, 0, 0));
+        LocalDateTime endTime  = LocalDateTime.of(endDateDto, LocalTime.of(23, 59, 59));
+        LocalDateTime now = LocalDateTime.now();
+        if (endTime.isBefore(now) || (endTime.isBefore(startTime))) {
+            throw new InvalidException("Ngày bắt đầu hoặc ngày kết thúc không hợp lệ");
+        }
+        foundUser.getDeclaration().setStartTime(Timestamp.valueOf(startTime));
+        foundUser.getDeclaration().setEndTime(Timestamp.valueOf(endTime));
+        if (startTime.isBefore(now) && endTime.isAfter(now)) {
+            userRepo.insertUserRole(foundUser.getId(), Constant.EDITOR_ROLE_ID);
+            foundUser.getDeclaration().setStatus(Constant.DECLARATION_STATUS_DECLARING);
+            declaration.setStatus(Constant.DECLARATION_STATUS_DECLARING);
+        } else {
+            foundUser.getDeclaration().setStatus(Constant.DECLARATION_STATUS_NOT_OPEN);
+        }
+        return "Đã chỉnh sửa thời gian khai báo thành công!";
+    }
+
 }

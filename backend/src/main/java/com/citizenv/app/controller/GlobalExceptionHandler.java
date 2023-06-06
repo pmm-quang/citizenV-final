@@ -1,5 +1,6 @@
 package com.citizenv.app.controller;
 
+import com.citizenv.app.component.Constant;
 import com.citizenv.app.exception.InvalidException;
 import com.citizenv.app.exception.ResourceFoundException;
 import com.citizenv.app.exception.ResourceNotFoundException;
@@ -42,7 +43,11 @@ public class  GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<String> accessDenied(Exception e) {
-        return ResponseEntity.status(403).body(e.getMessage());
+        String message = e.getMessage();
+        if(e.getMessage().equals("ACCESS DENIED")) {
+            message = Constant.ACCESS_DENIED_MESSAGE_DO_NOT_HAVE_ACCESS;
+        }
+        return ResponseEntity.status(403).body(message);
     }
 
     @ExceptionHandler(Exception.class)
